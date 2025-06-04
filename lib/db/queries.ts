@@ -36,7 +36,11 @@ import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
 
-const client = postgres(process.env.POSTGRES_URL!);
+const connectionString = process.env.POSTGRES_URL;
+if (!connectionString) {
+  throw new Error('POSTGRES_URL environment variable is not set');
+}
+const client = postgres(connectionString);
 const db = drizzle(client);
 
 
@@ -95,6 +99,15 @@ export async function getUser(email: string): Promise<Array<User>> {
       'bad_request:database',
       'Failed to get user by email',
     );
+  }
+}
+
+export async function getUserById(id: string): Promise<User | null> {
+  try {
+    const [foundUser] = await db.select().from(user).where(eq(user.id, id)).limit(1);
+    return foundUser || null;
+  } catch (error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to get user by id');
   }
 }
 
