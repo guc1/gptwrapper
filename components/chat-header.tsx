@@ -66,21 +66,18 @@ function PureChatHeader({
       )}
 
       {!isReadonly && (
-        <VisibilitySelector
-          chatId={chatId}
-          selectedVisibilityType={selectedVisibilityType}
-          className="order-1 md:order-3"
-        />
+        <div className="order-1 md:order-3 flex items-center gap-2">
+          <VisibilitySelector
+            chatId={chatId}
+            selectedVisibilityType={selectedVisibilityType}
+          />
+          {session?.user && (
+            <MessageLimitIndicator userId={session.user.id} />
+          )}
+        </div>
       )}
 
       <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
-
-
-      {session?.user && ( // Conditionally render MessageLimitIndicator
-        <div className="order-4 md:order-4 ml-2 md:ml-auto">
-          <MessageLimitIndicator />
-        </div>
-      )}
 
 
       <Button

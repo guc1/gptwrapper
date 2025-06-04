@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { fetcher } from '@/lib/utils';
+import { cn, fetcher } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Ensure this path is correct
 import { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict, format, isPast } from 'date-fns';
@@ -15,9 +15,15 @@ interface MessageStatus {
   userType: UserType;
 }
 
-export function MessageLimitIndicator() {
+export function MessageLimitIndicator({
+  userId,
+  className,
+}: {
+  userId: string;
+  className?: string;
+}) {
   const { data, error, isLoading } = useSWR<MessageStatus>(
-    '/api/message-status',
+    userId ? `/api/message-status?userId=${userId}` : null,
     fetcher,
     {
       refreshInterval: 30000,
@@ -63,14 +69,21 @@ export function MessageLimitIndicator() {
 
   if (isLoading) {
     return (
-      <div className="text-xs text-muted-foreground px-2 py-1 animate-pulse flex items-center gap-1">
+      <div className={cn(
+        'text-xs text-muted-foreground px-2 py-1 animate-pulse flex items-center gap-1',
+        className,
+      )}>
         <LoaderIcon size={12} /> Loading...
       </div>
     );
   }
 
   if (error || !data) {
-    return <div className="text-xs text-muted-foreground px-2 py-1">Limit N/A</div>;
+    return (
+      <div className={cn('text-xs text-muted-foreground px-2 py-1', className)}>
+        Limit N/A
+      </div>
+    );
   }
 
    if (data.userType !== 'guest') {
@@ -81,7 +94,12 @@ export function MessageLimitIndicator() {
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="text-xs text-muted-foreground cursor-default px-2 py-1 border rounded-md bg-background hover:bg-accent">
+          <div
+            className={cn(
+              'text-xs text-muted-foreground cursor-default px-2 py-1 border rounded-md bg-background hover:bg-accent',
+              className,
+            )}
+          >
             {displayMessagesLeft}
           </div>
         </TooltipTrigger>
