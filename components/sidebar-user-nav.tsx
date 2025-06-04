@@ -117,7 +117,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                     })();
 
                     await signOut({ redirect: false });
-                    signIn('guest', {
+                    await signIn('guest', {
                       redirect: true,
                       redirectTo: '/',
                       guestId: storedGuestId || undefined,
