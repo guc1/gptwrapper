@@ -1,137 +1,117 @@
-'use client';
+import NextAuth, { type DefaultSession } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import type { DefaultJWT } from 'next-auth/jwt';
+import { compare } from 'bcryptjs';
 
-import { ChevronUp } from 'lucide-react';
-import Image from 'next/image';
-import type { User } from 'next-auth';
-import { signOut, signIn, useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import { useTheme } from 'next-themes';
+import { createGuestUser, getUser, getUserById } from '@/lib/db/queries';
+import { authConfig } from './auth.config';
+import { DUMMY_PASSWORD, guestRegex } from '@/lib/constants';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { useRouter } from 'next/navigation';
-import { toast } from './toast';
-import { LoaderIcon } from './icons';
-import { guestRegex } from '@/lib/constants';
+export type UserType = 'guest' | 'regular';
 
-export function SidebarUserNav({ user }: { user: User }) {
-  const router = useRouter();
-  const { data, status } = useSession();
-  const { setTheme, theme } = useTheme();
+/* ─── Type‑script module augmentations ─────────────────────────────── */
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      type: UserType;
+    } & DefaultSession['user'];
+  }
 
-  const isGuest = guestRegex.test(data?.user?.email ?? '');
-
-  useEffect(() => {
-    if (isGuest && data?.user?.id) {
-      try {
-        localStorage.setItem('guestUserId', data.user.id);
-      } catch {
-        // ignore write errors
-      }
-    }
-  }, [isGuest, data?.user?.id]);
-
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {status === 'loading' ? (
-              <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10 justify-between">
-                <div className="flex flex-row gap-2">
-                  <div className="size-6 bg-zinc-500/30 rounded-full animate-pulse" />
-                  <span className="bg-zinc-500/30 text-transparent rounded-md animate-pulse">
-                    Loading auth status
-                  </span>
-                </div>
-                <div className="animate-spin text-zinc-500">
-                  <LoaderIcon />
-                </div>
-              </SidebarMenuButton>
-            ) : (
-              <SidebarMenuButton
-                data-testid="user-nav-button"
-                className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10"
-              >
-                <Image
-                  src={`https://avatar.vercel.sh/${user.email}`}
-                  alt={user.email ?? 'User Avatar'}
-                  width={24}
-                  height={24}
-                  className="rounded-full"
-                />
-                <span data-testid="user-email" className="truncate">
-                  {isGuest ? 'Guest' : user?.email}
-                </span>
-                <ChevronUp className="ml-auto" />
-              </SidebarMenuButton>
-            )}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            data-testid="user-nav-menu"
-            side="top"
-            className="w-[--radix-popper-anchor-width]"
-          >
-            <DropdownMenuItem
-              data-testid="user-nav-item-theme"
-              className="cursor-pointer"
-              onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild data-testid="user-nav-item-auth">
-              <button
-                type="button"
-                className="w-full cursor-pointer"
-                onClick={() => {
-                  if (status === 'loading') {
-                    toast({
-                      type: 'error',
-                      description:
-                        'Checking authentication status, please try again!',
-                    });
-
-                    return;
-                  }
-
-                  if (isGuest) {
-                    router.push('/login');
-                  } else {
-                    const storedGuestId = (() => {
-                      try {
-                        return localStorage.getItem('guestUserId');
-                      } catch {
-                        return null;
-                      }
-                    })();
-
-                    signOut({ redirect: false }).then(() => {
-                      signIn('guest', {
-                        redirect: true,
-                        redirectTo: '/',
-                        guestId: storedGuestId || undefined,
-                      });
-                    });
-                  }
-                }}
-              >
-                {isGuest ? 'Login to your account' : 'Sign out'}
-              </button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
+  interface User {
+    id?: string;
+    email?: string | null;
+    type: UserType;
+  }
 }
+
+declare module 'next-auth/jwt' {
+  interface JWT extends DefaultJWT {
+    id: string;
+    type: UserType;
+  }
+}
+
+/* ─── NextAuth configuration ──────────────────────────────────────── */
+export const {
+  handlers: { GET, POST },
+  auth,
+} = NextAuth({
+  ...authConfig,
+
+  providers: [
+    /* 1. Regular email/password users */
+    Credentials({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email', placeholder: 'you@example.com' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize({ email, password }) {
+        if (!email || !password) return null;
+
+        /* Look up the user */
+        const users = await getUser(email);
+        if (users.length === 0) {
+          /* Dummy hash to equalise timing */
+          await compare(password, DUMMY_PASSWORD);
+          return null;
+        }
+
+        const [user] = users;
+        if (!user.password) {
+          await compare(password, DUMMY_PASSWORD);
+          return null;
+        }
+
+        const passwordsMatch = await compare(password, user.password);
+        if (!passwordsMatch) return null;
+
+        /* Successful login */
+        return { ...user, type: 'regular' } as any;
+      },
+    }),
+
+    /* 2. One‑click guest users */
+    Credentials({
+      id: 'guest',          // matches signIn('guest')
+      name: 'Guest account',
+      credentials: {
+        guestId: { label: 'Guest ID', type: 'text', optional: true },
+      },
+      async authorize(credentials) {
+        /* If a guestId was passed, try to reuse that user */
+        if (credentials?.guestId) {
+          const existingUser = await getUserById(credentials.guestId);
+          if (existingUser && guestRegex.test(existingUser.email)) {
+            return { ...existingUser, type: 'guest' } as any;
+          }
+        }
+
+        /* Otherwise create a fresh guest */
+        const [guestUser] = await createGuestUser();
+        return { ...guestUser, type: 'guest' } as any;
+      },
+    }),
+  ],
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.type = (user as any).type;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.type = token.type as UserType;
+      }
+      return session;
+    },
+  },
+});
+
