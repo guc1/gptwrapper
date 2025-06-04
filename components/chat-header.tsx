@@ -13,19 +13,20 @@ import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
+import { MessageLimitIndicator } from './message-limit-indicator'; // Added
 
 function PureChatHeader({
   chatId,
   selectedModelId,
   selectedVisibilityType,
   isReadonly,
-  session,
+  session, // Added session prop
 }: {
   chatId: string;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
-  session: Session;
+  session: Session; // Added session prop type
 }) {
   const router = useRouter();
   const { open } = useSidebar();
@@ -33,7 +34,7 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
+    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 border-b"> {/* Added border-b for separation */}
       <SidebarToggle />
 
       {(!open || windowWidth < 768) && (
@@ -41,14 +42,15 @@ function PureChatHeader({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              className="order-2 md:order-1 md:px-2 px-2 md:h-fit ml-auto md:ml-0"
+              type="button"
+              className="order-2 md:order-1 md:px-2 px-2 md:h-[34px] ml-auto md:ml-0" // md:h-fit changed to md:h-[34px] for consistency
               onClick={() => {
                 router.push('/');
                 router.refresh();
               }}
             >
               <PlusIcon />
-              <span className="md:sr-only">New Chat</span>
+              <span className="hidden md:inline ml-1">New Chat</span> {/* Changed sr-only to hidden md:inline */}
             </Button>
           </TooltipTrigger>
           <TooltipContent>New Chat</TooltipContent>
@@ -71,16 +73,26 @@ function PureChatHeader({
         />
       )}
 
+      <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
+
+
+      {session?.user && ( // Conditionally render MessageLimitIndicator
+        <div className="order-4 md:order-4 ml-2 md:ml-auto">
+          <MessageLimitIndicator />
+        </div>
+      )}
+
+
       <Button
-        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"
+        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-5 ml-2" // order-4 to order-last/5 and ml-auto to ml-2
         asChild
       >
         <Link
-          href={`https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-chatbot&env=AUTH_SECRET&envDescription=Learn more about how to get the API Keys for the application&envLink=https://github.com/vercel/ai-chatbot/blob/main/.env.example&demo-title=AI Chatbot&demo-description=An Open-Source AI Chatbot Template Built With Next.js and the AI SDK by Vercel.&demo-url=https://chat.vercel.ai&products=[{"type":"integration","protocol":"ai","productSlug":"grok","integrationSlug":"xai"},{"type":"integration","protocol":"storage","productSlug":"neon","integrationSlug":"neon"},{"type":"integration","protocol":"storage","productSlug":"upstash-kv","integrationSlug":"upstash"},{"type":"blob"}]`}
-          target="_noblank"
+          href={`https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-chatbot&env=AUTH_SECRET&envDescription=Learn%20more%20about%20how%20to%20get%20the%20API%20Keys%20for%20the%20application&envLink=https://github.com/vercel/ai-chatbot/blob/main/.env.example&demo-title=AI%20Chatbot&demo-description=An%20Open-Source%20AI%20Chatbot%20Template%20Built%20With%20Next.js%20and%20the%20AI%20SDK%20by%20Vercel.&demo-url=https://chat.vercel.ai&products=[{"type":"integration","protocol":"ai","productSlug":"grok","integrationSlug":"xai"},{"type":"integration","protocol":"storage","productSlug":"neon","integrationSlug":"neon"},{"type":"integration","protocol":"storage","productSlug":"upstash-kv","integrationSlug":"upstash"},{"type":"blob"}]`}
+          target="_blank" // Corrected target
         >
           <VercelIcon size={16} />
-          Deploy with Vercel
+          Deploy
         </Link>
       </Button>
     </header>
@@ -88,5 +100,9 @@ function PureChatHeader({
 }
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
-  return prevProps.selectedModelId === nextProps.selectedModelId;
+  if (prevProps.selectedModelId !== nextProps.selectedModelId) return false;
+  if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType) return false;
+  if (prevProps.isReadonly !== nextProps.isReadonly) return false;
+  // Add more checks if needed, e.g., for session changes that affect UI
+  return true;
 });

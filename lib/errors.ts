@@ -4,6 +4,7 @@ export type ErrorType =
   | 'forbidden'
   | 'not_found'
   | 'rate_limit'
+  | 'limit_exceeded' // Added
   | 'offline';
 
 export type Surface =
@@ -46,7 +47,7 @@ export class ChatSDKError extends Error {
     this.type = type as ErrorType;
     this.cause = cause;
     this.surface = surface as Surface;
-    this.message = getMessageByErrorCode(errorCode);
+    this.message = getMessageByErrorCode(errorCode); // Use the helper
     this.statusCode = getStatusCodeByType(this.type);
   }
 
@@ -73,6 +74,7 @@ export class ChatSDKError extends Error {
   }
 }
 
+// Helper function to get user-friendly messages
 export function getMessageByErrorCode(errorCode: ErrorCode): string {
   if (errorCode.includes('database')) {
     return 'An error occurred while executing a database query.';
@@ -89,6 +91,8 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
 
     case 'rate_limit:chat':
       return 'You have exceeded your maximum number of messages for the day. Please try again later.';
+    case 'limit_exceeded:chat': // Added case
+      return "You've used your free message for today. Please log in or create an account to continue chatting.";
     case 'not_found:chat':
       return 'The requested chat was not found. Please check the chat ID and try again.';
     case 'forbidden:chat':
@@ -107,10 +111,19 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case 'bad_request:document':
       return 'The request to create or update the document was invalid. Please check your input and try again.';
 
+    // Add other specific error messages as needed for 'vote', 'history', etc.
+    case 'unauthorized:vote':
+      return 'You need to be logged in to vote.';
+    case 'forbidden:vote':
+      return 'You cannot vote on this message.';
+    case 'not_found:vote':
+        return 'Chat or message not found for voting.';
+
     default:
       return 'Something went wrong. Please try again later.';
   }
 }
+
 
 function getStatusCodeByType(type: ErrorType) {
   switch (type) {
@@ -124,6 +137,8 @@ function getStatusCodeByType(type: ErrorType) {
       return 404;
     case 'rate_limit':
       return 429;
+    case 'limit_exceeded': // Added
+      return 402; // Payment Required, or 403 Forbidden could also work
     case 'offline':
       return 503;
     default:

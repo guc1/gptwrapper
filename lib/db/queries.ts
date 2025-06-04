@@ -1,3 +1,4 @@
+// lib/db/queries.ts
 import 'server-only';
 
 import {
@@ -34,14 +35,57 @@ import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
 
-// Optionally, if not using email/pass login, you can
-// use the Drizzle adapter for Auth.js / NextAuth
-// https://authjs.dev/reference/adapter/drizzle
-
-// biome-ignore lint: Forbidden non-null assertion.
 const client = postgres(process.env.POSTGRES_URL!);
 const db = drizzle(client);
 
+
+export async function transferChatOwnership(
+  chatId: string,
+  oldUserId: string, // This is the guestUserId
+  newUserId: string,
+) {
+  try {
+    if (!chatId || !oldUserId || !newUserId || oldUserId === newUserId) {
+      console.warn(`Invalid parameters for chat transfer: chatId=${chatId}, oldUserId=${oldUserId}, newUserId=${newUserId}`);
+      return null;
+    }
+
+    // First, verify the chat exists and belongs to the oldUserId (guest)
+    const [chatToTransfer] = await db
+      .select({ id: chat.id, currentUserId: chat.userId })
+      .from(chat)
+      .where(eq(chat.id, chatId))
+      .limit(1);
+
+    if (!chatToTransfer) {
+      console.warn(`Chat transfer: Chat ${chatId} not found.`);
+      return null;
+    }
+
+    if (chatToTransfer.currentUserId !== oldUserId) {
+      console.warn(`Chat transfer: Chat ${chatId} belongs to user ${chatToTransfer.currentUserId}, not guest ${oldUserId}. Cannot transfer.`);
+      return null;
+    }
+
+    const [updatedChat] = await db
+      .update(chat)
+      .set({ userId: newUserId })
+      .where(and(eq(chat.id, chatId), eq(chat.userId, oldUserId))) // Double-check ownership during update
+      .returning();
+    
+    if (updatedChat) {
+        console.log(`Successfully transferred ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}`);
+    } else {
+        console.warn(`Failed to transfer ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}. Update returned no rows.`);
+    }
+    return updatedChat || null;
+  } catch (error) {
+    console.error(`Error during transferChatOwnership for chat ${chatId}:`, error);
+    throw new ChatSDKError('bad_request:database', 'Failed to transfer chat ownership due to a database error.');
+  }
+}
+
+// ... (getUser, createUser, createGuestUser remain the same as your last provided version) ...
 export async function getUser(email: string): Promise<Array<User>> {
   try {
     return await db.select().from(user).where(eq(user.email, email));
@@ -53,17 +97,25 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
-export async function createUser(email: string, password: string) {
+export async function createUser(email: string, password: string): Promise<User> {
   const hashedPassword = generateHashedPassword(password);
 
   try {
-    return await db.insert(user).values({ email, password: hashedPassword });
+    const [createdUser] = await db
+      .insert(user)
+      .values({ email, password: hashedPassword })
+      .returning();
+    if (!createdUser) {
+        throw new Error('User creation failed to return the created user.');
+    }
+    return createdUser;
   } catch (error) {
+    console.error('Error creating user:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to create user');
   }
 }
 
-export async function createGuestUser() {
+export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'>>> {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
 
@@ -100,10 +152,12 @@ export async function saveChat({
       visibility,
     });
   } catch (error) {
+    console.error("Error saving chat:", error);
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }
 
+// ... (rest of queries: deleteChatById, getChatsByUserId, etc. remain the same)
 export async function deleteChatById({ id }: { id: string }) {
   try {
     await db.delete(vote).where(eq(vote.chatId, id));
@@ -474,7 +528,7 @@ export async function getMessageCountByUserId({
   differenceInHours,
 }: { id: string; differenceInHours: number }) {
   try {
-    const twentyFourHoursAgo = new Date(
+    const targetDate = new Date(
       Date.now() - differenceInHours * 60 * 60 * 1000,
     );
 
@@ -485,7 +539,7 @@ export async function getMessageCountByUserId({
       .where(
         and(
           eq(chat.userId, id),
-          gte(message.createdAt, twentyFourHoursAgo),
+          gte(message.createdAt, targetDate),
           eq(message.role, 'user'),
         ),
       )

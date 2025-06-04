@@ -4,6 +4,7 @@ import {
   createDataStream,
   smoothStream,
   streamText,
+  StreamData, // Use StreamData directly
 } from 'ai';
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
@@ -13,7 +14,6 @@ import {
   getChatById,
   getMessageCountByUserId,
   getMessagesByChatId,
-  getStreamIdsByChatId,
   saveChat,
   saveMessages,
 } from '@/lib/db/queries';
@@ -32,42 +32,33 @@ import {
   createResumableStreamContext,
   type ResumableStreamContext,
 } from 'resumable-stream';
-import { after } from 'next/server';
-import type { Chat } from '@/lib/db/schema';
-import { differenceInSeconds } from 'date-fns';
+import { after, type NextRequest } from 'next/server';
 import { ChatSDKError } from '@/lib/errors';
+import { NextResponse } from 'next/server';
 
 export const maxDuration = 60;
 
 let globalStreamContext: ResumableStreamContext | null = null;
-
 function getStreamContext() {
   if (!globalStreamContext) {
     try {
-      globalStreamContext = createResumableStreamContext({
-        waitUntil: after,
-      });
+      globalStreamContext = createResumableStreamContext({ waitUntil: after });
     } catch (error: any) {
       if (error.message.includes('REDIS_URL')) {
-        console.log(
-          ' > Resumable streams are disabled due to missing REDIS_URL',
-        );
+        console.log(' > Resumable streams disabled: missing REDIS_URL');
       } else {
         console.error(error);
       }
     }
   }
-
   return globalStreamContext;
 }
 
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
-
   try {
-    const json = await request.json();
-    requestBody = postRequestBodySchema.parse(json);
-  } catch (_) {
+    requestBody = postRequestBodySchema.parse(await request.json());
+  } catch {
     return new ChatSDKError('bad_request:api').toResponse();
   }
 
@@ -76,11 +67,9 @@ export async function POST(request: Request) {
       requestBody;
 
     const session = await auth();
-
     if (!session?.user) {
       return new ChatSDKError('unauthorized:chat').toResponse();
     }
-
     const userType: UserType = session.user.type;
 
     const messageCount = await getMessageCountByUserId({
@@ -88,45 +77,32 @@ export async function POST(request: Request) {
       differenceInHours: 24,
     });
 
-    if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
-      return new ChatSDKError('rate_limit:chat').toResponse();
+    if (messageCount >= entitlementsByUserType[userType].maxMessagesPerDay) {
+      return new ChatSDKError('limit_exceeded:chat', 'Message limit reached for the day.').toResponse();
     }
 
     const chat = await getChatById({ id });
-
     if (!chat) {
-      const title = await generateTitleFromUserMessage({
-        message,
-      });
-
+      const title = await generateTitleFromUserMessage({ message });
       await saveChat({
         id,
         userId: session.user.id,
         title,
         visibility: selectedVisibilityType,
       });
-    } else {
-      if (chat.userId !== session.user.id) {
-        return new ChatSDKError('forbidden:chat').toResponse();
-      }
+    } else if (chat.userId !== session.user.id) {
+      return new ChatSDKError('forbidden:chat').toResponse();
     }
 
     const previousMessages = await getMessagesByChatId({ id });
-
     const messages = appendClientMessage({
-      // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
+      // @ts-expect-error: conversion from DB → UI shape
       messages: previousMessages,
       message,
     });
 
     const { longitude, latitude, city, country } = geolocation(request);
-
-    const requestHints: RequestHints = {
-      longitude,
-      latitude,
-      city,
-      country,
-    };
+    const requestHints: RequestHints = { longitude, latitude, city, country };
 
     await saveMessages({
       messages: [
@@ -166,29 +142,21 @@ export async function POST(request: Request) {
             getWeather,
             createDocument: createDocument({ session, dataStream }),
             updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
+            requestSuggestions: requestSuggestions({ session, dataStream }),
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
               try {
                 const assistantId = getTrailingMessageId({
                   messages: response.messages.filter(
-                    (message) => message.role === 'assistant',
+                    (msg) => msg.role === 'assistant',
                   ),
                 });
-
-                if (!assistantId) {
-                  throw new Error('No assistant message found!');
-                }
-
+                if (!assistantId) throw new Error('No assistant message found');
                 const [, assistantMessage] = appendResponseMessages({
                   messages: [message],
                   responseMessages: response.messages,
                 });
-
                 await saveMessages({
                   messages: [
                     {
@@ -202,8 +170,8 @@ export async function POST(request: Request) {
                     },
                   ],
                 });
-              } catch (_) {
-                console.error('Failed to save chat');
+              } catch {
+                console.error('Failed to save assistant reply');
               }
             }
           },
@@ -214,148 +182,104 @@ export async function POST(request: Request) {
         });
 
         result.consumeStream();
-
-        result.mergeIntoDataStream(dataStream, {
-          sendReasoning: true,
-        });
+        result.mergeIntoDataStream(dataStream, { sendReasoning: true });
       },
-      onError: () => {
-        return 'Oops, an error occurred!';
-      },
+      onError: () => 'Oops, an error occurred!',
     });
 
     const streamContext = getStreamContext();
-
     if (streamContext) {
       return new Response(
         await streamContext.resumableStream(streamId, () => stream),
       );
-    } else {
-      return new Response(stream);
     }
-  } catch (error) {
-    if (error instanceof ChatSDKError) {
-      return error.toResponse();
+    return new Response(stream);
+  } catch (err) {
+    console.error('POST /api/chat failed:', err);
+    if (err instanceof ChatSDKError) {
+      return err.toResponse();
     }
+    return new Response('Internal Server Error', { status: 500 });
   }
 }
 
-export async function GET(request: Request) {
-  const streamContext = getStreamContext();
-  const resumeRequestedAt = new Date();
-
-  if (!streamContext) {
-    return new Response(null, { status: 204 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const chatId = searchParams.get('chatId');
-
-  if (!chatId) {
-    return new ChatSDKError('bad_request:api').toResponse();
-  }
-
-  const session = await auth();
-
-  if (!session?.user) {
-    return new ChatSDKError('unauthorized:chat').toResponse();
-  }
-
-  let chat: Chat;
-
+export async function DELETE(request: NextRequest) {
   try {
-    chat = await getChatById({ id: chatId });
-  } catch {
-    return new ChatSDKError('not_found:chat').toResponse();
-  }
-
-  if (!chat) {
-    return new ChatSDKError('not_found:chat').toResponse();
-  }
-
-  if (chat.visibility === 'private' && chat.userId !== session.user.id) {
-    return new ChatSDKError('forbidden:chat').toResponse();
-  }
-
-  const streamIds = await getStreamIdsByChatId({ chatId });
-
-  if (!streamIds.length) {
-    return new ChatSDKError('not_found:stream').toResponse();
-  }
-
-  const recentStreamId = streamIds.at(-1);
-
-  if (!recentStreamId) {
-    return new ChatSDKError('not_found:stream').toResponse();
-  }
-
-  const emptyDataStream = createDataStream({
-    execute: () => {},
-  });
-
-  const stream = await streamContext.resumableStream(
-    recentStreamId,
-    () => emptyDataStream,
-  );
-
-  /*
-   * For when the generation is streaming during SSR
-   * but the resumable stream has concluded at this point.
-   */
-  if (!stream) {
-    const messages = await getMessagesByChatId({ id: chatId });
-    const mostRecentMessage = messages.at(-1);
-
-    if (!mostRecentMessage) {
-      return new Response(emptyDataStream, { status: 200 });
+    const session = await auth();
+    if (!session?.user) {
+      return new ChatSDKError('unauthorized:chat').toResponse();
     }
 
-    if (mostRecentMessage.role !== 'assistant') {
-      return new Response(emptyDataStream, { status: 200 });
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return new ChatSDKError('bad_request:api', 'Chat ID is required.').toResponse();
     }
 
-    const messageCreatedAt = new Date(mostRecentMessage.createdAt);
+    const chat = await getChatById({ id });
 
-    if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
-      return new Response(emptyDataStream, { status: 200 });
+    if (!chat) {
+      return new ChatSDKError('not_found:chat').toResponse();
     }
 
-    const restoredStream = createDataStream({
-      execute: (buffer) => {
-        buffer.writeData({
-          type: 'append-message',
-          message: JSON.stringify(mostRecentMessage),
-        });
-      },
+    if (chat.userId !== session.user.id) {
+      return new ChatSDKError('forbidden:chat', 'You do not own this chat.').toResponse();
+    }
+
+    const deletedChat = await deleteChatById({ id });
+    return NextResponse.json(deletedChat, { status: 200 });
+
+  } catch (err) {
+    console.error('DELETE /api/chat failed:', err);
+    if (err instanceof ChatSDKError) {
+      return err.toResponse();
+    }
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const chatId = searchParams.get('chatId');
+    const streamId = searchParams.get('streamId');
+
+    if (!chatId) {
+      return new ChatSDKError('bad_request:api', 'chatId is required.').toResponse();
+    }
+
+    const session = await auth();
+    if (!session?.user) {
+      return new ChatSDKError('unauthorized:chat').toResponse();
+    }
+
+    const chat = await getChatById({ id: chatId });
+    if (!chat) {
+      return new ChatSDKError('not_found:chat').toResponse();
+    }
+    if (chat.visibility === 'private' && chat.userId !== session.user.id) {
+      return new ChatSDKError('forbidden:chat').toResponse();
+    }
+
+    const streamContext = getStreamContext();
+    if (!streamContext) {
+      return new ChatSDKError('bad_request:api', 'Resumable streams not configured.').toResponse();
+    }
+
+    // The fallback function MUST return a Promise<ReadableStream | Response> or ReadableStream | Response
+    const resumedStream = await streamContext.resumableStream(streamId || chatId, async () => {
+      const data = new StreamData();
+      data.close(); // Close the StreamData instance, making its stream end.
+      return data.stream; // This is a ReadableStream
     });
 
-    return new Response(restoredStream, { status: 200 });
+    return new Response(resumedStream);
+  } catch (err) {
+    console.error('GET /api/chat (resume) failed:', err);
+    if (err instanceof ChatSDKError) {
+      return err.toResponse();
+    }
+    return new Response('Internal Server Error', { status: 500 });
   }
-
-  return new Response(stream, { status: 200 });
-}
-
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-
-  if (!id) {
-    return new ChatSDKError('bad_request:api').toResponse();
-  }
-
-  const session = await auth();
-
-  if (!session?.user) {
-    return new ChatSDKError('unauthorized:chat').toResponse();
-  }
-
-  const chat = await getChatById({ id });
-
-  if (chat.userId !== session.user.id) {
-    return new ChatSDKError('forbidden:chat').toResponse();
-  }
-
-  const deletedChat = await deleteChatById({ id });
-
-  return Response.json(deletedChat, { status: 200 });
 }

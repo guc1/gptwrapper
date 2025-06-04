@@ -1,21 +1,41 @@
+// app/(auth)/register/page.tsx
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useActionState, useEffect, useState, useRef } from 'react';
 
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
 
-import { register, type RegisterActionState } from '../actions';
+import { register } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession } from 'next-auth/react';
+import { useSWRConfig } from 'swr';
+
+export interface RegisterActionState {
+  status:
+    | 'idle'
+    | 'in_progress'
+    | 'success'
+    | 'failed'
+    | 'user_exists'
+    | 'invalid_data';
+  redirectTo?: string;
+}
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { mutate: globalSWRMutate } = useSWRConfig();
+
+  const chatIdToResume = searchParams.get('chatIdToResume');
+  const guestUserId = searchParams.get('guestUserId');
+  const unsentPrompt = searchParams.get('unsentPrompt');
 
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
+  const hasShownSuccessToastRef = useRef(false);
 
   const [state, formAction] = useActionState<RegisterActionState, FormData>(
     register,
@@ -29,24 +49,58 @@ export default function Page() {
   useEffect(() => {
     if (state.status === 'user_exists') {
       toast({ type: 'error', description: 'Account already exists!' });
+      if (state.redirectTo) {
+        const loginLink = new URL(state.redirectTo, window.location.origin);
+        if (chatIdToResume) loginLink.searchParams.set('chatIdToResume', chatIdToResume);
+        if (guestUserId) loginLink.searchParams.set('guestUserId', guestUserId);
+        if (unsentPrompt) loginLink.searchParams.set('unsentPrompt', unsentPrompt);
+        router.replace(loginLink.toString());
+      }
     } else if (state.status === 'failed') {
       toast({ type: 'error', description: 'Failed to create account!' });
+      hasShownSuccessToastRef.current = false;
+      setIsSuccessful(false); // Reset button state
     } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Failed validating your submission!',
-      });
+      toast({ type: 'error', description: 'Failed validating your submission!' });
+      hasShownSuccessToastRef.current = false;
+      setIsSuccessful(false); // Reset button state
     } else if (state.status === 'success') {
-      toast({ type: 'success', description: 'Account created successfully!' });
-
+      if (!hasShownSuccessToastRef.current) {
+        toast({ type: 'success', description: 'Account created successfully!' });
+        hasShownSuccessToastRef.current = true;
+      }
       setIsSuccessful(true);
-      updateSession();
-      router.refresh();
+      
+      const performRedirectAndRefresh = async () => {
+        await updateSession(); 
+        
+        // Revalidate SWR caches that might depend on the new session
+        await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/message-status'), undefined, { revalidate: true });
+        await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/auth/session'), undefined, { revalidate: true });
+
+
+        if (state.redirectTo) {
+          router.replace(state.redirectTo);
+        } else {
+          router.replace('/');
+        }
+      };
+      
+      const timer = setTimeout(() => {
+        performRedirectAndRefresh();
+      }, 300); // Adjusted delay
+      return () => clearTimeout(timer);
     }
-  }, [state]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]); // Simplified dependencies if router, updateSession, etc. are stable
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
+    if (chatIdToResume) formData.append('chatIdToResume', chatIdToResume);
+    if (guestUserId) formData.append('guestUserId', guestUserId);
+    if (unsentPrompt) formData.append('unsentPrompt', unsentPrompt);
+    hasShownSuccessToastRef.current = false;
+    setIsSuccessful(false); // Reset for new submission
     formAction(formData);
   };
 
@@ -64,7 +118,7 @@ export default function Page() {
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {'Already have an account? '}
             <Link
-              href="/login"
+              href={`/login${chatIdToResume ? `?chatIdToResume=${chatIdToResume}&guestUserId=${guestUserId || ''}&unsentPrompt=${encodeURIComponent(unsentPrompt || '')}` : ''}`}
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
               Sign in

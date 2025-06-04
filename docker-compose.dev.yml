@@ -1,0 +1,19 @@
+# docker-compose.dev.yml
+# (delete the first line `version:` if you want to silence the deprecation warning)
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: chatbot
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: chatbot
+    ports:
+      - "5433:5432"   # host‑side 5433  →  container‑side 5432  ⬅️ changed
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"   # leave Redis unchanged

@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
+import { LoginSignupDialog } from '@/components/ui/login-signup-dialog'; // Added
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
@@ -56,10 +57,6 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      // `next-themes` injects an extra classname to the body element to avoid
-      // visual flicker before hydration. Hence the `suppressHydrationWarning`
-      // prop is necessary to avoid the React hydration mismatch warning.
-      // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
       suppressHydrationWarning
       className={`${geist.variable} ${geistMono.variable}`}
     >
@@ -78,7 +75,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-center" />
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            {children}
+            <LoginSignupDialog /> {/* Added Dialog Here */}
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,3 +1,4 @@
+// app/(chat)/chat/[id]/page.tsx
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
@@ -9,10 +10,18 @@ import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import type { DBMessage } from '@/lib/db/schema';
 import type { Attachment, UIMessage } from 'ai';
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const { id } = params;
-  const chat = await getChatById({ id });
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  // Access params and searchParams within the async function body
+  const chatId = params.id; // Use a different variable name to avoid confusion with props.params
+  const initialPromptFromQuery = typeof searchParams?.prompt === 'string' ? searchParams.prompt : undefined;
+  
+  const chat = await getChatById({ id: chatId });
 
   if (!chat) {
     notFound();
@@ -21,21 +30,34 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const session = await auth();
 
   if (!session) {
-    redirect('/api/auth/guest');
+    const redirectBase = process.env.AUTH_URL || 'http://localhost:3000';
+    const currentPath = `/chat/${chatId}`;
+    let redirectUrlQuery = '';
+    if (initialPromptFromQuery) {
+      redirectUrlQuery = `?prompt=${encodeURIComponent(initialPromptFromQuery)}`;
+    }
+    
+    const fullRedirectUrl = `${redirectBase}${currentPath}${redirectUrlQuery}`;
+    
+    const guestAuthUrl = new URL('/api/auth/guest', redirectBase);
+    guestAuthUrl.searchParams.set('redirectUrl', fullRedirectUrl);
+    
+    redirect(guestAuthUrl.toString());
   }
 
   if (chat.visibility === 'private') {
     if (!session.user) {
-      return notFound();
+      // This should have been caught by the !session check above, but for safety
+      notFound();
     }
 
     if (session.user.id !== chat.userId) {
-      return notFound();
+      notFound();
     }
   }
 
   const messagesFromDb = await getMessagesByChatId({
-    id,
+    id: chatId,
   });
 
   function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
@@ -43,8 +65,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       id: message.id,
       parts: message.parts as UIMessage['parts'],
       role: message.role as UIMessage['role'],
-      // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
+      content: (message.parts as Array<{type: string, text?: string}>)?.find(p => p.type === 'text')?.text || '',
       createdAt: message.createdAt,
       experimental_attachments:
         (message.attachments as Array<Attachment>) ?? [],
@@ -54,35 +75,21 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get('chat-model');
 
-  if (!chatModelFromCookie) {
-    return (
-      <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          initialChatModel={DEFAULT_CHAT_MODEL}
-          initialVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-          session={session}
-          autoResume={true}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
-  }
+  const chatComponentProps = {
+    id: chat.id,
+    initialMessages: convertToUIMessages(messagesFromDb),
+    initialChatModel: chatModelFromCookie?.value || DEFAULT_CHAT_MODEL,
+    initialVisibilityType: chat.visibility,
+    isReadonly: session?.user?.id !== chat.userId,
+    session: session, // session is guaranteed here
+    autoResume: true,
+    initialInput: initialPromptFromQuery,
+  };
 
   return (
     <>
-      <Chat
-        id={chat.id}
-        initialMessages={convertToUIMessages(messagesFromDb)}
-        initialChatModel={chatModelFromCookie.value}
-        initialVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
-        session={session}
-        autoResume={true}
-      />
-      <DataStreamHandler id={id} />
+      <Chat {...chatComponentProps} />
+      <DataStreamHandler id={chatId} /> {/* Ensure consistent use of chatId */}
     </>
   );
 }
