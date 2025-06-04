@@ -4,9 +4,10 @@ import Credentials from 'next-auth/providers/credentials';
 import {
   createGuestUser,
   getUser,
+  getUserById,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
-import { DUMMY_PASSWORD } from '@/lib/constants';
+import { DUMMY_PASSWORD, guestRegex } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
 
 export type UserType = 'guest' | 'regular';
@@ -76,10 +77,17 @@ export const {
 
     /* 2. One‑click guest users  */
     Credentials({
-      id: 'guest',            // 👈 matches signIn('guest')
+      id: 'guest', // 👈 matches signIn('guest')
       name: 'Guest account',
-      credentials: {},
-      async authorize() {
+      credentials: { guestId: { label: 'Guest ID', type: 'text', optional: true } },
+      async authorize(credentials) {
+        if (credentials?.guestId) {
+          const existingUser = await getUserById(credentials.guestId);
+          if (existingUser && guestRegex.test(existingUser.email)) {
+            return { ...existingUser, type: 'guest' };
+          }
+        }
+
         const [guestUser] = await createGuestUser();
         return { ...guestUser, type: 'guest' };
       },

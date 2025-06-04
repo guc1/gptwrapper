@@ -3,7 +3,8 @@
 import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import type { User } from 'next-auth';
-import { signOut, useSession } from 'next-auth/react';
+import { signOut, signIn, useSession } from 'next-auth/react';
+import { useEffect } from 'react';
 import { useTheme } from 'next-themes';
 
 import {
@@ -29,6 +30,16 @@ export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
 
   const isGuest = guestRegex.test(data?.user?.email ?? '');
+
+  useEffect(() => {
+    if (isGuest && data?.user?.id) {
+      try {
+        localStorage.setItem('guestUserId', data.user.id);
+      } catch {
+        // ignore write errors
+      }
+    }
+  }, [isGuest, data?.user?.id]);
 
   return (
     <SidebarMenu>
@@ -97,8 +108,20 @@ export function SidebarUserNav({ user }: { user: User }) {
                   if (isGuest) {
                     router.push('/login');
                   } else {
-                    signOut({
-                      redirectTo: '/',
+                    const storedGuestId = (() => {
+                      try {
+                        return localStorage.getItem('guestUserId');
+                      } catch {
+                        return null;
+                      }
+                    })();
+
+                    signOut({ redirect: false }).then(() => {
+                      signIn('guest', {
+                        redirect: true,
+                        redirectTo: '/',
+                        guestId: storedGuestId || undefined,
+                      });
                     });
                   }
                 }}
