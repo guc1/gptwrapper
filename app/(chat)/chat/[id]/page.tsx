@@ -14,12 +14,15 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // Access params and searchParams within the async function body
-  const chatId = params.id; // Use a different variable name to avoid confusion with props.params
-  const initialPromptFromQuery = typeof searchParams?.prompt === 'string' ? searchParams.prompt : undefined;
+  const { id: chatId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const initialPromptFromQuery =
+    typeof resolvedSearchParams?.prompt === 'string'
+      ? resolvedSearchParams.prompt
+      : undefined;
   
   const chat = await getChatById({ id: chatId });
 

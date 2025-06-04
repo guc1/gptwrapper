@@ -92,6 +92,11 @@ function PureMultimodalInput({
       const finalValue = domValue || localStorageInput || '';
       setInput(finalValue);
       adjustHeight();
+      if (finalValue) {
+        textareaRef.current.focus();
+        const len = finalValue.length;
+        textareaRef.current.setSelectionRange(len, len);
+      }
     }
     // Only run once after hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
