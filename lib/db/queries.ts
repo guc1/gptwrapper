@@ -11,6 +11,7 @@ import {
   gte,
   inArray,
   lt,
+  sql,
   type SQL,
 } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -589,4 +590,55 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
       'Failed to get stream ids by chat id',
     );
   }
+}export async function saveUserMessageWithLimit({
+  userId,
+  chatId,
+  messageId,
+  parts,
+  attachments,
+  maxMessages,
+}: {
+  userId: string;
+  chatId: string;
+  messageId: string;
+  parts: any;
+  attachments: any;
+  maxMessages: number;
+}) {
+  const targetDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT 1 FROM "User" WHERE id = ${userId} FOR UPDATE`);
+
+    const [stats] = await tx
+      .select({ count: count(message.id) })
+      .from(message)
+      .innerJoin(chat, eq(message.chatId, chat.id))
+      .where(
+        and(
+          eq(chat.userId, userId),
+          gte(message.createdAt, targetDate),
+          eq(message.role, 'user'),
+        ),
+      )
+      .execute();
+
+    if ((stats?.count ?? 0) >= maxMessages) {
+      return null;
+    }
+
+    const [inserted] = await tx
+      .insert(message)
+      .values({
+        id: messageId,
+        chatId,
+        role: 'user',
+        parts,
+        attachments,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    return inserted;
+  });
 }

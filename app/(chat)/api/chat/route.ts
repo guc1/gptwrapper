@@ -12,9 +12,9 @@ import {
   createStreamId,
   deleteChatById,
   getChatById,
-  getMessageCountByUserId,
   getMessagesByChatId,
   saveChat,
+  saveUserMessageWithLimit,
   saveMessages,
 } from '@/lib/db/queries';
 import { generateUUID, getTrailingMessageId } from '@/lib/utils';
@@ -72,15 +72,6 @@ export async function POST(request: Request) {
     }
     const userType: UserType = session.user.type;
 
-    const messageCount = await getMessageCountByUserId({
-      id: session.user.id,
-      differenceInHours: 24,
-    });
-
-    if (messageCount >= entitlementsByUserType[userType].maxMessagesPerDay) {
-      return new ChatSDKError('limit_exceeded:chat', 'Message limit reached for the day.').toResponse();
-    }
-
     const chat = await getChatById({ id });
     if (!chat) {
       const title = await generateTitleFromUserMessage({ message });
@@ -101,21 +92,21 @@ export async function POST(request: Request) {
       message,
     });
 
+    const userMessage = await saveUserMessageWithLimit({
+      userId: session.user.id,
+      chatId: id,
+      messageId: message.id,
+      parts: message.parts,
+      attachments: message.experimental_attachments ?? [],
+      maxMessages: entitlementsByUserType[userType].maxMessagesPerDay,
+    });
+
+    if (!userMessage) {
+      return new ChatSDKError('limit_exceeded:chat', 'Message limit reached for the day.').toResponse();
+    }
+
     const { longitude, latitude, city, country } = geolocation(request);
     const requestHints: RequestHints = { longitude, latitude, city, country };
-
-    await saveMessages({
-      messages: [
-        {
-          chatId: id,
-          id: message.id,
-          role: 'user',
-          parts: message.parts,
-          attachments: message.experimental_attachments ?? [],
-          createdAt: new Date(),
-        },
-      ],
-    });
 
     const streamId = generateUUID();
     await createStreamId({ streamId, chatId: id });
