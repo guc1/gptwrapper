@@ -7,11 +7,37 @@ import { DataStreamHandler } from '@/components/data-stream-handler';
 import { auth } from '../(auth)/auth';
 import { redirect } from 'next/navigation';
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
   const session = await auth();
 
   if (!session) {
     redirect('/api/auth/guest');
+  }
+
+  const chatIdToResume =
+    typeof searchParams?.chatIdToResume === 'string'
+      ? searchParams.chatIdToResume
+      : null;
+  const guestUserId =
+    typeof searchParams?.guestUserId === 'string'
+      ? searchParams.guestUserId
+      : null;
+  const unsentPrompt =
+    typeof searchParams?.unsentPrompt === 'string'
+      ? searchParams.unsentPrompt
+      : null;
+
+  if (chatIdToResume && guestUserId && session.user?.id) {
+    const { transferChatOwnership } = await import('@/lib/db/queries');
+    await transferChatOwnership(chatIdToResume, guestUserId, session.user.id);
+    const promptSuffix = unsentPrompt
+      ? `?prompt=${encodeURIComponent(unsentPrompt)}`
+      : '';
+    redirect(`/chat/${chatIdToResume}${promptSuffix}`);
   }
 
   const id = generateUUID();

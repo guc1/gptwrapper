@@ -1,9 +1,12 @@
 import { compare } from 'bcrypt-ts';
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import { randomUUID } from 'crypto';
 import {
   createGuestUser,
   getUser,
+  createUser,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
@@ -84,9 +87,29 @@ export const {
         return { ...guestUser, type: 'guest' };
       },
     }),
+
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
 
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        if (!user.email) return false;
+        const [existingUser] = await getUser(user.email);
+        if (existingUser) {
+          user.id = existingUser.id;
+        } else {
+          const newUser = await createUser(user.email, randomUUID());
+          user.id = newUser.id;
+        }
+        (user as any).type = 'regular';
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = (user as any).id;
