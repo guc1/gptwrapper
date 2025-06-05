@@ -1,7 +1,7 @@
 // components/chat.tsx
 'use client';
 
-import type { Attachment, CreateMessage, Message as SDKMessage, UIMessage, ChatRequestOptions as CoreChatRequestOptions } from 'ai';
+import type { Attachment, UIMessage, ChatRequestOptions as CoreChatRequestOptions } from 'ai';
 import { useChat, type UseChatHelpers } from '@ai-sdk/react';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
@@ -17,7 +17,7 @@ import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
 import { toast } from './toast';
 import type { Session } from 'next-auth';
-import { useSearchParams, useRouter } from 'next/navigation'; // useRouter if needed for URL clearing
+import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
@@ -54,7 +54,6 @@ export function Chat({
 }) {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { openPopup: openLoginSignupPopup } = useLoginSignupPopup();
-  const router = useRouter();
   const hasSetInitialInputRef = useRef(false);
 
   const { visibilityType } = useChatVisibility({
@@ -156,13 +155,9 @@ export function Chat({
   }, [propInitialInput, promptFromAuthRedirect, queryFromUrl, setInput, status, messages.length]);
 
 
-  const handleSubmit = useCallback((
-    eOrForm?: React.FormEvent<HTMLFormElement> | undefined, // Make event optional
-    chatRequestOptions?: ChatRequestOptions
-  ) => {
-    if (eOrForm && typeof eOrForm === 'object' && 'preventDefault' in eOrForm) {
-      eOrForm.preventDefault();
-    }
+  const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
+    (eOrForm, chatRequestOptions) => {
+    eOrForm?.preventDefault?.();
     
     if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0 && input.trim() !== '')) {
       if (session.user?.id) {
@@ -186,14 +181,12 @@ export function Chat({
     };
     // The first argument to useChat's handleSubmit can be an event or options.
     // If eOrForm is an event, it's passed. If it's undefined (programmatic call), pass undefined.
-    internalUseChatHandleSubmit(eOrForm as React.FormEvent<HTMLFormElement> | undefined, optionsWithAttachments);
+    internalUseChatHandleSubmit(eOrForm, optionsWithAttachments);
   }, [messageStatus, openLoginSignupPopup, internalUseChatHandleSubmit, id, attachments, input, session.user?.id]);
 
 
-  const append = useCallback(async (
-    message: SDKMessage | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ): Promise<string | null> => {
+  const append: UseChatHelpers['append'] = useCallback(
+    async (message, chatRequestOptions) => {
     if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0)) {
        if (session.user?.id) {
          openLoginSignupPopup({
