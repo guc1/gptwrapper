@@ -155,7 +155,7 @@ export function Chat({
   }, [propInitialInput, promptFromAuthRedirect, queryFromUrl, setInput, status, messages.length]);
 
 
-  const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
+   const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
     (eOrForm, chatRequestOptions) => {
     // Allow calling without an event when submitting programmatically
     eOrForm?.preventDefault?.();
