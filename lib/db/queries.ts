@@ -36,7 +36,10 @@ import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
 
-const client = postgres(process.env.POSTGRES_URL!);
+if (!process.env.POSTGRES_URL) {
+  throw new Error('POSTGRES_URL is not defined');
+}
+const client = postgres(process.env.POSTGRES_URL);
 const db = drizzle(client);
 
 
