@@ -7,10 +7,13 @@ import { useActionState, useEffect, useState, useRef } from 'react';
 
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { LogoGoogle } from '@/components/icons';
 
 import { register } from '../actions';
 import { toast } from '@/components/toast';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useSWRConfig } from 'swr';
 
 export interface RegisterActionState {
@@ -104,6 +107,15 @@ export default function Page() {
     formAction(formData);
   };
 
+  const handleGoogleSignIn = () => {
+    const params = new URLSearchParams();
+    if (chatIdToResume) params.set('chatIdToResume', chatIdToResume);
+    if (guestUserId) params.set('guestUserId', guestUserId);
+    if (unsentPrompt) params.set('unsentPrompt', unsentPrompt);
+    const callbackUrl = params.size ? `/?${params.toString()}` : '/';
+    signIn('google', { callbackUrl });
+  };
+
   return (
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
@@ -113,6 +125,12 @@ export default function Page() {
             Create an account with your email and password
           </p>
         </div>
+        <div className="px-4 sm:px-16">
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+            <LogoGoogle /> Continue with Google
+          </Button>
+        </div>
+        <Separator className="my-6" />
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">

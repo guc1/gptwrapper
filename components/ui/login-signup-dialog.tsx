@@ -12,8 +12,10 @@ import {
   DialogOverlay,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { LogoGoogle } from '@/components/icons';
 import Link from 'next/link';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
+import { signIn } from 'next-auth/react';
 // import { X } from 'lucide-react'; // No longer needed here if DialogContent provides it
 // import { useEffect } from 'react'; // No longer needed for body blur
 
@@ -39,6 +41,19 @@ export function LoginSignupDialog() {
     return basePath;
   };
 
+  const getCallbackUrl = () => {
+    if (chatContext) {
+      const params = new URLSearchParams();
+      params.append('chatIdToResume', chatContext.chatId);
+      params.append('guestUserId', chatContext.guestUserId);
+      if (chatContext.unsentPrompt) {
+        params.append('unsentPrompt', chatContext.unsentPrompt);
+      }
+      return `/?${params.toString()}`;
+    }
+    return '/';
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(newOpenState) => { if (!newOpenState) closePopup(); }}>
       <DialogOverlay className="backdrop-blur-sm" /> {/* backdrop-blur-sm added by default in globals.css modification or here */}
@@ -58,6 +73,16 @@ export function LoginSignupDialog() {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col sm:gap-2 pt-4">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              signIn('google', { callbackUrl: getCallbackUrl() });
+              closePopup();
+            }}
+          >
+            <LogoGoogle /> Continue with Google
+          </Button>
           <Button asChild onClick={closePopup} className="w-full">
             <Link href={getAuthLink('/login')}>Login</Link>
           </Button>
