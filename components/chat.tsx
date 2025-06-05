@@ -157,6 +157,7 @@ export function Chat({
 
   const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
     (eOrForm, chatRequestOptions) => {
+    // Allow calling without an event when submitting programmatically
     eOrForm?.preventDefault?.();
     
     if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0 && input.trim() !== '')) {
