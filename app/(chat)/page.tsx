@@ -10,25 +10,26 @@ import { redirect } from 'next/navigation';
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const session = await auth();
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
+  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
 
   if (!session) {
     redirect('/api/auth/guest');
   }
-
   const chatIdToResume =
-    typeof searchParams?.chatIdToResume === 'string'
-      ? searchParams.chatIdToResume
+    typeof resolvedSearchParams?.chatIdToResume === 'string'
+      ? resolvedSearchParams.chatIdToResume
       : null;
   const guestUserId =
-    typeof searchParams?.guestUserId === 'string'
-      ? searchParams.guestUserId
+    typeof resolvedSearchParams?.guestUserId === 'string'
+      ? resolvedSearchParams.guestUserId
       : null;
   const unsentPrompt =
-    typeof searchParams?.unsentPrompt === 'string'
-      ? searchParams.unsentPrompt
+    typeof resolvedSearchParams?.unsentPrompt === 'string'
+      ? resolvedSearchParams.unsentPrompt
       : null;
 
   if (chatIdToResume && guestUserId && session.user?.id) {
@@ -41,8 +42,6 @@ export default async function Page({
   }
 
   const id = generateUUID();
-
-  const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get('chat-model');
 
   if (!modelIdFromCookie) {
