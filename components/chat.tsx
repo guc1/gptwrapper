@@ -155,11 +155,10 @@ export function Chat({
   }, [propInitialInput, promptFromAuthRedirect, queryFromUrl, setInput, status, messages.length]);
 
 
-  const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
+   const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
     (eOrForm, chatRequestOptions) => {
-    if (eOrForm && typeof eOrForm === 'object' && 'preventDefault' in eOrForm) {
-      eOrForm.preventDefault();
-    }
+    // Allow calling without an event when submitting programmatically
+    eOrForm?.preventDefault?.();
     
     if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0 && input.trim() !== '')) {
       if (session.user?.id) {
@@ -183,7 +182,7 @@ export function Chat({
     };
     // The first argument to useChat's handleSubmit can be an event or options.
     // If eOrForm is an event, it's passed. If it's undefined (programmatic call), pass undefined.
-    internalUseChatHandleSubmit(eOrForm as React.FormEvent<HTMLFormElement> | undefined, optionsWithAttachments);
+    internalUseChatHandleSubmit(eOrForm, optionsWithAttachments);
   }, [messageStatus, openLoginSignupPopup, internalUseChatHandleSubmit, id, attachments, input, session.user?.id]);
 
 
