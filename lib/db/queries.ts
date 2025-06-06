@@ -29,6 +29,7 @@ import {
   type DBMessage,
   type Chat,
   stream,
+  messageUsage,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 import { generateUUID } from '../utils';
@@ -42,7 +43,6 @@ if (!process.env.POSTGRES_URL) {
 const client = postgres(process.env.POSTGRES_URL);
 const db = drizzle(client);
 
-
 export async function transferChatOwnership(
   chatId: string,
   oldUserId: string, // This is the guestUserId
@@ -50,7 +50,9 @@ export async function transferChatOwnership(
 ) {
   try {
     if (!chatId || !oldUserId || !newUserId || oldUserId === newUserId) {
-      console.warn(`Invalid parameters for chat transfer: chatId=${chatId}, oldUserId=${oldUserId}, newUserId=${newUserId}`);
+      console.warn(
+        `Invalid parameters for chat transfer: chatId=${chatId}, oldUserId=${oldUserId}, newUserId=${newUserId}`,
+      );
       return null;
     }
 
@@ -67,7 +69,9 @@ export async function transferChatOwnership(
     }
 
     if (chatToTransfer.currentUserId !== oldUserId) {
-      console.warn(`Chat transfer: Chat ${chatId} belongs to user ${chatToTransfer.currentUserId}, not guest ${oldUserId}. Cannot transfer.`);
+      console.warn(
+        `Chat transfer: Chat ${chatId} belongs to user ${chatToTransfer.currentUserId}, not guest ${oldUserId}. Cannot transfer.`,
+      );
       return null;
     }
 
@@ -76,16 +80,26 @@ export async function transferChatOwnership(
       .set({ userId: newUserId })
       .where(and(eq(chat.id, chatId), eq(chat.userId, oldUserId))) // Double-check ownership during update
       .returning();
-    
+
     if (updatedChat) {
-        console.log(`Successfully transferred ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}`);
+      console.log(
+        `Successfully transferred ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}`,
+      );
     } else {
-        console.warn(`Failed to transfer ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}. Update returned no rows.`);
+      console.warn(
+        `Failed to transfer ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}. Update returned no rows.`,
+      );
     }
     return updatedChat || null;
   } catch (error) {
-    console.error(`Error during transferChatOwnership for chat ${chatId}:`, error);
-    throw new ChatSDKError('bad_request:database', 'Failed to transfer chat ownership due to a database error.');
+    console.error(
+      `Error during transferChatOwnership for chat ${chatId}:`,
+      error,
+    );
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to transfer chat ownership due to a database error.',
+    );
   }
 }
 
@@ -101,7 +115,10 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
-export async function createUser(email: string, password: string): Promise<User> {
+export async function createUser(
+  email: string,
+  password: string,
+): Promise<User> {
   const hashedPassword = generateHashedPassword(password);
 
   try {
@@ -110,7 +127,7 @@ export async function createUser(email: string, password: string): Promise<User>
       .values({ email, password: hashedPassword })
       .returning();
     if (!createdUser) {
-        throw new Error('User creation failed to return the created user.');
+      throw new Error('User creation failed to return the created user.');
     }
     return createdUser;
   } catch (error) {
@@ -119,7 +136,9 @@ export async function createUser(email: string, password: string): Promise<User>
   }
 }
 
-export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'>>> {
+export async function createGuestUser(): Promise<
+  Array<Pick<User, 'id' | 'email'>>
+> {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
 
@@ -156,7 +175,7 @@ export async function saveChat({
       visibility,
     });
   } catch (error) {
-    console.error("Error saving chat:", error);
+    console.error('Error saving chat:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }
@@ -537,14 +556,12 @@ export async function getMessageCountByUserId({
     );
 
     const [stats] = await db
-      .select({ count: count(message.id) })
-      .from(message)
-      .innerJoin(chat, eq(message.chatId, chat.id))
+      .select({ count: count(messageUsage.id) })
+      .from(messageUsage)
       .where(
         and(
-          eq(chat.userId, id),
-          gte(message.createdAt, targetDate),
-          eq(message.role, 'user'),
+          eq(messageUsage.userId, id),
+          gte(messageUsage.createdAt, targetDate),
         ),
       )
       .execute();
@@ -593,7 +610,8 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
       'Failed to get stream ids by chat id',
     );
   }
-}export async function saveUserMessageWithLimit({
+}
+export async function saveUserMessageWithLimit({
   userId,
   chatId,
   messageId,
@@ -614,14 +632,12 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
     await tx.execute(sql`SELECT 1 FROM "User" WHERE id = ${userId} FOR UPDATE`);
 
     const [stats] = await tx
-      .select({ count: count(message.id) })
-      .from(message)
-      .innerJoin(chat, eq(message.chatId, chat.id))
+      .select({ count: count(messageUsage.id) })
+      .from(messageUsage)
       .where(
         and(
-          eq(chat.userId, userId),
-          gte(message.createdAt, targetDate),
-          eq(message.role, 'user'),
+          eq(messageUsage.userId, userId),
+          gte(messageUsage.createdAt, targetDate),
         ),
       )
       .execute();
@@ -629,6 +645,8 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
     if ((stats?.count ?? 0) >= maxMessages) {
       return null;
     }
+
+    const now = new Date();
 
     const [inserted] = await tx
       .insert(message)
@@ -638,9 +656,14 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
         role: 'user',
         parts,
         attachments,
-        createdAt: new Date(),
+        createdAt: now,
       })
       .returning();
+
+    await tx.insert(messageUsage).values({
+      userId,
+      createdAt: now,
+    });
 
     return inserted;
   });
