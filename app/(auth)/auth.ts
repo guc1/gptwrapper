@@ -75,12 +75,17 @@ const providers = [
     name: 'Guest account',
     credentials: {},
     async authorize(credentials, request) {
-      const cookieStore = await cookies();
-      const cookieId =
-        (credentials as any)?.guestUserId || cookieStore.get('guest_user_id')?.value;
+      const cookieStore = cookies();
+      const credentialId = (credentials as any)?.guestUserId;
+      const cookieId = cookieStore.get('guest_user_id')?.value;
 
-      if (cookieId) {
-        const existingUser = await getUserById(cookieId);
+      const candidateId =
+        credentialId && credentialId !== 'undefined' ? credentialId : cookieId;
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (candidateId && uuidRegex.test(candidateId)) {
+        const existingUser = await getUserById(candidateId);
         if (existingUser) {
           const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
           cookieStore.set('guest_user_id', existingUser.id, {

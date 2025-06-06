@@ -18,12 +18,17 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const guestUserId = cookieStore.get('guest_user_id')?.value;
 
-  return signIn('guest', {
+  const signInOptions: Record<string, any> = {
     redirect: true,
     redirectTo: redirectUrl,
-    guestUserId,
-  });
+  };
+
+  if (guestUserId) {
+    signInOptions.guestUserId = guestUserId;
+  }
+
+  return signIn('guest', signInOptions);
 }
