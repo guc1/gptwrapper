@@ -1,6 +1,7 @@
 import Form from 'next/form';
 
 import { signOut } from '@/app/(auth)/auth';
+import { cookies } from 'next/headers';
 
 export const SignOutForm = () => {
   return (
@@ -8,6 +9,8 @@ export const SignOutForm = () => {
       className="w-full"
       action={async () => {
         'use server';
+        const cookieStore = cookies();
+        cookieStore.set('loggedOut', '1');
 
         await signOut({
           redirectTo: '/',

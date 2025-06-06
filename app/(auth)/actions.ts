@@ -4,6 +4,7 @@
 import { z } from 'zod';
 import { createUser, getUser, transferChatOwnership } from '@/lib/db/queries';
 import { signIn } from './auth';
+import { cookies } from 'next/headers';
 import type { User } from '@/lib/db/schema';
 import { ChatSDKError } from '@/lib/errors';
 
@@ -67,9 +68,11 @@ export const login = async (
       }
     }
     
-    const redirectTo = chatIdToResume 
+    const redirectTo = chatIdToResume
       ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
       : '/';
+
+    cookies().delete('loggedOut');
 
     return { status: 'success', redirectTo };
 
@@ -139,9 +142,11 @@ export const register = async (
       redirect: false,
     });
     
-    const redirectTo = chatIdToResume 
+    const redirectTo = chatIdToResume
       ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
       : '/';
+
+    cookies().delete('loggedOut');
 
     return { status: 'success', redirectTo };
   } catch (error) {
