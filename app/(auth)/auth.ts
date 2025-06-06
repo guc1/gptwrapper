@@ -7,10 +7,12 @@ import {
   createGuestUser,
   getUser,
   createUser,
+  getUserById,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
+import { cookies } from 'next/headers';
 
 export type UserType = 'guest' | 'regular';
 
@@ -72,8 +74,38 @@ const providers = [
     id: 'guest', // matches signIn('guest')
     name: 'Guest account',
     credentials: {},
-    async authorize() {
+    async authorize(credentials, request) {
+      const cookieStore = cookies();
+      const credentialId = (credentials as any)?.guestUserId;
+      const cookieId = cookieStore.get('guest_user_id')?.value;
+
+      const candidateId =
+        credentialId && credentialId !== 'undefined' ? credentialId : cookieId;
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (candidateId && uuidRegex.test(candidateId)) {
+        const existingUser = await getUserById(candidateId);
+        if (existingUser) {
+          const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
+          cookieStore.set('guest_user_id', existingUser.id, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            expires,
+          });
+          return { ...existingUser, type: 'guest' };
+        }
+      }
+
       const [guestUser] = await createGuestUser();
+      const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
+      cookieStore.set('guest_user_id', guestUser.id, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        expires,
+      });
       return { ...guestUser, type: 'guest' };
     },
   }),

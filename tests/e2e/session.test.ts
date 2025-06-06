@@ -205,4 +205,29 @@ test.describe('Entitlements', () => {
       getMessageByErrorCode('rate_limit:chat'),
     );
   });
+
+  test('Guest message count persists after login and logout', async ({ page }) => {
+    const authPage = new AuthPage(page);
+    const testUser = generateRandomTestUser();
+
+    await chatPage.createNewChat();
+    await chatPage.sendUserMessage('Why is the sky blue?');
+    await chatPage.isGenerationComplete();
+
+    await authPage.register(testUser.email, testUser.password);
+    await authPage.expectToastToContain('Account created successfully!');
+    await page.waitForURL('/');
+
+    await authPage.openSidebar();
+    const userNavButton = page.getByTestId('user-nav-button');
+    await userNavButton.click();
+    const authMenuItem = page.getByTestId('user-nav-item-auth');
+    await authMenuItem.click();
+    await page.waitForURL('/');
+
+    await chatPage.sendUserMessage('Another question?');
+    await chatPage.expectToastToContain(
+      getMessageByErrorCode('rate_limit:chat'),
+    );
+  });
 });
