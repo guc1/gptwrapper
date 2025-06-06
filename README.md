@@ -54,6 +54,7 @@ You will need to use the environment variables [defined in `.env.example`](.env.
 2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
 3. Download your environment variables: `vercel env pull`
 4. Add your Google OAuth credentials (`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`) to `.env.local`
+5. If these credentials are missing, Google sign-in will be disabled and only guest accounts are available.
 
 ```bash
 pnpm install

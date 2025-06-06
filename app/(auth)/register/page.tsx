@@ -16,6 +16,8 @@ import { toast } from '@/components/toast';
 import { useSession, signIn } from 'next-auth/react';
 import { useSWRConfig } from 'swr';
 
+const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
+
 export interface RegisterActionState {
   status:
     | 'idle'
@@ -125,11 +127,17 @@ export default function Page() {
             Create an account with your email and password
           </p>
         </div>
-        <div className="px-4 sm:px-16">
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-            <LogoGoogle /> Continue with Google
-          </Button>
-        </div>
+        {googleEnabled && (
+          <div className="px-4 sm:px-16">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+            >
+              <LogoGoogle /> Continue with Google
+            </Button>
+          </div>
+        )}
         <Separator className="my-6" />
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
