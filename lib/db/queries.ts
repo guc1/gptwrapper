@@ -136,6 +136,17 @@ export async function createUser(
   }
 }
 
+export async function getUserById(id: string): Promise<Array<User>> {
+  try {
+    return await db.select().from(user).where(eq(user.id, id));
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get user by id',
+    );
+  }
+}
+
 export async function createGuestUser(): Promise<
   Array<Pick<User, 'id' | 'email'>>
 > {
