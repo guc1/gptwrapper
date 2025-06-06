@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { getMessageCountByUserId } from '@/lib/db/queries';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
-import { addHours, isAfter, subHours } from 'date-fns';
+import { addHours, subHours } from 'date-fns';
 import { db } from '@/lib/db/drizzle-client'; // Assuming you'll create a central db client
 import { message, chat } from '@/lib/db/schema';
 import { and, eq, gte, asc } from 'drizzle-orm';

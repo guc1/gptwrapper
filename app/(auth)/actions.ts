@@ -3,9 +3,9 @@
 
 import { z } from 'zod';
 import { createUser, getUser, transferChatOwnership } from '@/lib/db/queries';
+import { cookies } from 'next/headers';
 import { signIn } from './auth';
 import type { User } from '@/lib/db/schema';
-import { ChatSDKError } from '@/lib/errors';
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -22,6 +22,8 @@ export const login = async (
   formData: FormData,
 ): Promise<LoginActionState> => {
   try {
+    const cookieStore = await cookies();
+    const existingGuestId = cookieStore.get('guest-id')?.value;
     const validatedData = authFormSchema.parse({
       email: formData.get('email'),
       password: formData.get('password'),
@@ -44,6 +46,13 @@ export const login = async (
       // but rather return an error object or null. This behavior can vary.
       // Let's assume it throws an error that can be caught.
     });
+
+    if (existingGuestId) {
+      cookieStore.set('guest-id', existingGuestId, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
 
 
     // If signIn doesn't throw and we reach here, it means authentication was successful
@@ -102,6 +111,8 @@ export const register = async (
   formData: FormData,
 ): Promise<RegisterActionState> => {
   try {
+    const cookieStore = await cookies();
+    const existingGuestId = cookieStore.get('guest-id')?.value;
     const validatedData = authFormSchema.parse({
       email: formData.get('email'),
       password: formData.get('password'),
@@ -138,6 +149,13 @@ export const register = async (
       password: validatedData.password, // Use the original password for sign-in
       redirect: false,
     });
+
+    if (existingGuestId) {
+      cookieStore.set('guest-id', existingGuestId, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
     
     const redirectTo = chatIdToResume 
       ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
