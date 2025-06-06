@@ -104,8 +104,6 @@ export function Chat({
     onFinish: () => {
       mutateGlobal(unstable_serialize(getChatHistoryPaginationKey));
       mutateMessageStatus();
-      setInput('');
-      setAttachments([]);
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {
