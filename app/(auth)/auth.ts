@@ -7,10 +7,12 @@ import {
   createGuestUser,
   getUser,
   createUser,
+  getUserById,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
+import { cookies } from 'next/headers';
 
 export type UserType = 'guest' | 'regular';
 
@@ -72,8 +74,33 @@ const providers = [
     id: 'guest', // matches signIn('guest')
     name: 'Guest account',
     credentials: {},
-    async authorize() {
+    async authorize(credentials, request) {
+      const cookieStore = await cookies();
+      const cookieId =
+        (credentials as any)?.guestUserId || cookieStore.get('guest_user_id')?.value;
+
+      if (cookieId) {
+        const existingUser = await getUserById(cookieId);
+        if (existingUser) {
+          const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
+          cookieStore.set('guest_user_id', existingUser.id, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            expires,
+          });
+          return { ...existingUser, type: 'guest' };
+        }
+      }
+
       const [guestUser] = await createGuestUser();
+      const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
+      cookieStore.set('guest_user_id', guestUser.id, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        expires,
+      });
       return { ...guestUser, type: 'guest' };
     },
   }),
