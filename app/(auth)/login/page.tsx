@@ -1,4 +1,4 @@
-// app/(auth)/register/page.tsx
+// app/(auth)/login/page.tsx
 'use client';
 
 import Link from 'next/link';
@@ -11,23 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { LogoGoogle } from '@/components/icons';
 
-import { register } from '../actions';
+import { login, type LoginActionState } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession, signIn } from 'next-auth/react';
 import { useSWRConfig } from 'swr';
 
 const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
-
-export interface RegisterActionState {
-  status:
-    | 'idle'
-    | 'in_progress'
-    | 'success'
-    | 'failed'
-    | 'user_exists'
-    | 'invalid_data';
-  redirectTo?: string;
-}
 
 export default function Page() {
   const router = useRouter();
@@ -42,8 +31,8 @@ export default function Page() {
   const [isSuccessful, setIsSuccessful] = useState(false);
   const hasShownSuccessToastRef = useRef(false);
 
-  const [state, formAction] = useActionState<RegisterActionState, FormData>(
-    register,
+  const [state, formAction] = useActionState<LoginActionState, FormData>(
+    login,
     {
       status: 'idle',
     },
@@ -52,17 +41,8 @@ export default function Page() {
   const { update: updateSession } = useSession();
 
   useEffect(() => {
-    if (state.status === 'user_exists') {
-      toast({ type: 'error', description: 'Account already exists!' });
-      if (state.redirectTo) {
-        const loginLink = new URL(state.redirectTo, window.location.origin);
-        if (chatIdToResume) loginLink.searchParams.set('chatIdToResume', chatIdToResume);
-        if (guestUserId) loginLink.searchParams.set('guestUserId', guestUserId);
-        if (unsentPrompt) loginLink.searchParams.set('unsentPrompt', unsentPrompt);
-        router.replace(loginLink.toString());
-      }
-    } else if (state.status === 'failed') {
-      toast({ type: 'error', description: 'Failed to create account!' });
+    if (state.status === 'failed') {
+      toast({ type: 'error', description: 'Invalid credentials!' });
       hasShownSuccessToastRef.current = false;
       setIsSuccessful(false);
     } else if (state.status === 'invalid_data') {
@@ -71,14 +51,14 @@ export default function Page() {
       setIsSuccessful(false);
     } else if (state.status === 'success') {
       if (!hasShownSuccessToastRef.current) {
-        toast({ type: 'success', description: 'Account created successfully!' });
+        toast({ type: 'success', description: 'Signed in successfully!' });
         hasShownSuccessToastRef.current = true;
       }
       setIsSuccessful(true);
-      
+
       const performRedirectAndRefresh = async () => {
-        await updateSession(); 
-        
+        await updateSession();
+
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/message-status'), undefined, { revalidate: true });
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/auth/session'), undefined, { revalidate: true });
 
@@ -88,14 +68,14 @@ export default function Page() {
           router.replace('/');
         }
       };
-      
+
       const timer = setTimeout(() => {
         performRedirectAndRefresh();
-      }, 300); 
+      }, 300);
       return () => clearTimeout(timer);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]); // router, updateSession, globalSWRMutate are stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
@@ -120,34 +100,30 @@ export default function Page() {
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
+          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Create an account with your email and password
+            Use your email and password to sign in
           </p>
         </div>
         {googleEnabled && (
           <div className="px-4 sm:px-16">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleGoogleSignIn}
-            >
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
               <LogoGoogle /> Continue with Google
             </Button>
           </div>
         )}
         <Separator className="my-6" />
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
+          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {'Already have an account? '}
+            {"Don't have an account? "}
             <Link
-              href={`/login${chatIdToResume ? `?chatIdToResume=${chatIdToResume}&guestUserId=${guestUserId || ''}&unsentPrompt=${encodeURIComponent(unsentPrompt || '')}` : ''}`}
+              href={`/register${chatIdToResume ? `?chatIdToResume=${chatIdToResume}&guestUserId=${guestUserId || ''}&unsentPrompt=${encodeURIComponent(unsentPrompt || '')}` : ''}`}
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
-              Sign in
+              Sign up
             </Link>
-            {' instead.'}
+            {' for free.'}
           </p>
         </AuthForm>
       </div>
