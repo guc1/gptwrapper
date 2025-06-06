@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { getMessageCountByUserId } from '@/lib/db/queries';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
+import { cookies } from 'next/headers';
 import { addHours, isAfter, subHours } from 'date-fns';
 import { db } from '@/lib/db/drizzle-client'; // Assuming you'll create a central db client
 import { message, chat } from '@/lib/db/schema';
@@ -18,12 +19,23 @@ export async function GET() {
   const userType: UserType = session.user.type;
   const maxMessages = entitlementsByUserType[userType].maxMessagesPerDay;
 
+  const logoutCookie = cookies().get('loggedOut');
+
+  if (logoutCookie && userType === 'guest') {
+    return NextResponse.json({
+      messagesLeft: 0,
+      maxMessages,
+      nextResetTimestamp: null,
+      userType,
+    });
+  }
+
   const messagesInLast24Hours = await getMessageCountByUserId({
     id: userId,
     differenceInHours: 24,
   });
 
-  const messagesLeft = Math.max(0, maxMessages - messagesInLast24Hours);
+  let messagesLeft = Math.max(0, maxMessages - messagesInLast24Hours);
   let nextResetTimestamp: number | null = null;
 
   if (userType === 'guest') {
