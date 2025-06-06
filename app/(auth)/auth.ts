@@ -2,7 +2,7 @@ import { compare } from 'bcrypt-ts';
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import {
   createGuestUser,
   getUser,
@@ -38,6 +38,57 @@ declare module 'next-auth/jwt' {
 }
 
 /* ─── Auth.js configuration  ──────────────────────────────────────── */
+/* Determine available authentication providers */
+const providers = [
+  /* 1. Regular e‑mail/password users  */
+  Credentials({
+    id: 'credentials', // explicit id
+    name: 'Credentials',
+    credentials: {},
+    async authorize({ email, password }: any) {
+      /* Look up the user */
+      const users = await getUser(email);
+      if (users.length === 0) {
+        /* Dummy hash to equalise timing */
+        await compare(password, DUMMY_PASSWORD);
+        return null;
+      }
+
+      const [user] = users;
+      if (!user.password) {
+        await compare(password, DUMMY_PASSWORD);
+        return null;
+      }
+
+      const passwordsMatch = await compare(password, user.password);
+      if (!passwordsMatch) return null;
+
+      return { ...user, type: 'regular' };
+    },
+  }),
+
+  /* 2. One‑click guest users  */
+  Credentials({
+    id: 'guest', // matches signIn('guest')
+    name: 'Guest account',
+    credentials: {},
+    async authorize() {
+      const [guestUser] = await createGuestUser();
+      return { ...guestUser, type: 'guest' };
+    },
+  }),
+];
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+  );
+}
+
 export const {
   handlers: { GET, POST },
   auth,
@@ -45,55 +96,12 @@ export const {
   signOut,
 } = NextAuth({
   /** ENV: set AUTH_SECRET & (optionally) AUTH_URL  */
-  trustHost: !!process.env.AUTH_TRUST_HOST || process.env.NODE_ENV !== 'production',
+  trustHost:
+    !!process.env.AUTH_TRUST_HOST || process.env.NODE_ENV !== 'production',
 
   ...authConfig,
 
-  providers: [
-    /* 1. Regular e‑mail/password users  */
-    Credentials({
-      id: 'credentials',      // 👈 explicit id
-      name: 'Credentials',
-      credentials: {},
-      async authorize({ email, password }: any) {
-        /* Look up the user */
-        const users = await getUser(email);
-        if (users.length === 0) {
-          /* Dummy hash to equalise timing */
-          await compare(password, DUMMY_PASSWORD);
-          return null;
-        }
-
-        const [user] = users;
-        if (!user.password) {
-          await compare(password, DUMMY_PASSWORD);
-          return null;
-        }
-
-        const passwordsMatch = await compare(password, user.password);
-        if (!passwordsMatch) return null;
-
-        return { ...user, type: 'regular' };
-      },
-    }),
-
-    /* 2. One‑click guest users  */
-    Credentials({
-      id: 'guest',            // 👈 matches signIn('guest')
-      name: 'Guest account',
-      credentials: {},
-      async authorize() {
-        const [guestUser] = await createGuestUser();
-        return { ...guestUser, type: 'guest' };
-      },
-    }),
-
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-      allowDangerousEmailAccountLinking: true,
-    }),
-  ],
+  providers,
 
   callbacks: {
     async signIn({ user, account }) {
