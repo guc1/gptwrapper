@@ -51,3 +51,29 @@ export async function updateChatVisibility({
 }) {
   await updateChatVisiblityById({ chatId, visibility });
 }
+
+export async function updateUserTypeAfterCheckout({
+  userId,
+  planId,
+}: {
+  userId: string;
+  planId: string;
+}) {
+  const { db } = await import('@/lib/db/drizzle-client');
+  const schemaModule = await import('@/lib/db/schema');
+  const userTable = schemaModule.user;
+  const { eq } = await import('drizzle-orm');
+  const { unstable_update } = await import('@/app/(auth)/auth');
+
+  const PLAN_MAP: Record<string, 'basic' | 'gemiddeld' | 'top' | undefined> = {
+    'basic-model': 'basic',
+    'gemiddeld-model': 'gemiddeld',
+    'top-model': 'top',
+  };
+
+  const type = PLAN_MAP[planId];
+  if (!type) return;
+
+  await db.update(userTable).set({ type }).where(eq(userTable.id, userId));
+  await unstable_update({ user: { type } });
+}

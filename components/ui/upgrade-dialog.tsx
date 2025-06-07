@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface Plan {
   id: string;
@@ -47,6 +48,14 @@ const plans: Array<Plan> = [
 export function UpgradeDialog() {
   const { isOpen, closePopup } = useUpgradePopup();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const { data: session } = useSession();
+
+  const currentType = session?.user?.type;
+  const PLAN_TYPE_MAP: Record<string, string> = {
+    'basic-model': 'basic',
+    'gemiddeld-model': 'gemiddeld',
+    'top-model': 'top',
+  };
 
   async function checkout(planId: string) {
     setLoadingId(planId);
@@ -75,16 +84,18 @@ export function UpgradeDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-wrap gap-4 mt-4">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className="border rounded-md p-4 flex flex-col items-start w-full sm:w-1/3"
-            >
-              <img
-                src={plan.image}
-                alt={plan.name}
-                className="h-24 w-full object-cover rounded"
-              />
+          {plans.map((plan) => {
+            if (PLAN_TYPE_MAP[plan.id] === currentType) return null;
+            return (
+              <div
+                key={plan.id}
+                className="border rounded-md p-4 flex flex-col items-start w-full sm:w-1/3"
+              >
+                <img
+                  src={plan.image}
+                  alt={plan.name}
+                  className="h-24 w-full object-cover rounded"
+                />
               <h3 className="mt-2 font-semibold">{plan.name}</h3>
               <p className="text-sm text-muted-foreground">
                 {plan.description}
@@ -97,8 +108,9 @@ export function UpgradeDialog() {
               >
                 {loadingId === plan.id ? 'Loading...' : 'Purchase'}
               </Button>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </DialogContent>
     </Dialog>

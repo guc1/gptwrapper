@@ -16,6 +16,17 @@ export default async function Page({
 
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
 
+  const success = resolvedSearchParams?.success === 'true';
+  const planId =
+    typeof resolvedSearchParams?.planId === 'string'
+      ? resolvedSearchParams.planId
+      : null;
+
+  if (success && planId && session?.user?.id) {
+    const { PostCheckoutUpdater } = await import('@/components/post-checkout-updater');
+    return <PostCheckoutUpdater userId={session.user.id} planId={planId} />;
+  }
+
   if (!session) {
     redirect('/api/auth/guest');
   }

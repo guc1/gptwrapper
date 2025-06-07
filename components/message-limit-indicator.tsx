@@ -5,7 +5,7 @@ import { cn, fetcher } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Ensure this path is correct
 import { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict, format, isPast } from 'date-fns';
-import type { UserType } from '@/app/(auth)/auth';
+import type { UserType } from '@/lib/user-types';
 import { LoaderIcon } from './icons';
 
 interface MessageStatus {

@@ -6,7 +6,8 @@ import {
   streamText,
   StreamData, // Use StreamData directly
 } from 'ai';
-import { auth, type UserType } from '@/app/(auth)/auth';
+import { auth } from '@/app/(auth)/auth';
+import type { UserType } from '@/lib/user-types';
 import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
 import {
   createStreamId,

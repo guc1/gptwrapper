@@ -1,0 +1,1 @@
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "type" varchar(32) NOT NULL DEFAULT 'regular';

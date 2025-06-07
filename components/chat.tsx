@@ -23,7 +23,7 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
-import type { UserType } from '@/app/(auth)/auth';
+import type { UserType } from '@/lib/user-types';
 
 type ChatRequestOptions = CoreChatRequestOptions;
 
