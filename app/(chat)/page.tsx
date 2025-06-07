@@ -16,6 +16,34 @@ export default async function Page({
 
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
 
+  const success = resolvedSearchParams?.success === 'true';
+  const planId =
+    typeof resolvedSearchParams?.planId === 'string'
+      ? resolvedSearchParams.planId
+      : null;
+
+  if (success && planId && session?.user?.id) {
+    const { db } = await import('@/lib/db/drizzle-client');
+    const schemaModule = await import('@/lib/db/schema');
+    const userTable = schemaModule.user;
+    const { eq } = await import('drizzle-orm');
+    const { unstable_update } = await import('@/app/(auth)/auth');
+
+    const PLAN_MAP: Record<string, 'basic' | 'gemiddeld' | 'top' | undefined> = {
+      'basic-model': 'basic',
+      'gemiddeld-model': 'gemiddeld',
+      'top-model': 'top',
+    };
+
+    const type = PLAN_MAP[planId];
+    if (type) {
+      await db.update(userTable).set({ type }).where(eq(userTable.id, session.user.id));
+      await unstable_update({ user: { type } });
+    }
+
+    redirect('/');
+  }
+
   if (!session) {
     redirect('/api/auth/guest');
   }

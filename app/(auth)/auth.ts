@@ -11,8 +11,7 @@ import {
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
-
-export type UserType = 'guest' | 'regular' | 'basic' | 'gemiddeld' | 'top';
+import type { UserType } from '@/lib/user-types';
 
 /* ─── Type augmentations ───────────────────────────────────────────── */
 declare module 'next-auth' {
@@ -54,16 +53,16 @@ const providers = [
         return null;
       }
 
-      const [user] = users;
-      if (!user.password) {
+      const [dbUser] = users;
+      if (!dbUser.password) {
         await compare(password, DUMMY_PASSWORD);
         return null;
       }
 
-      const passwordsMatch = await compare(password, user.password);
+      const passwordsMatch = await compare(password, dbUser.password);
       if (!passwordsMatch) return null;
 
-      return { ...user, type: 'regular' };
+      return { ...dbUser };
     },
   }),
 
@@ -94,6 +93,7 @@ export const {
   auth,
   signIn,
   signOut,
+  unstable_update,
 } = NextAuth({
   /** ENV: set AUTH_SECRET & (optionally) AUTH_URL  */
   trustHost:
@@ -110,11 +110,12 @@ export const {
         const [existingUser] = await getUser(user.email);
         if (existingUser) {
           user.id = existingUser.id;
+          (user as any).type = existingUser.type;
         } else {
           const newUser = await createUser(user.email, randomUUID());
           user.id = newUser.id;
+          (user as any).type = newUser.type;
         }
-        (user as any).type = 'regular';
       }
       return true;
     },

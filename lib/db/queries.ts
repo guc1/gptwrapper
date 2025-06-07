@@ -107,7 +107,7 @@ export async function createUser(email: string, password: string): Promise<User>
   try {
     const [createdUser] = await db
       .insert(user)
-      .values({ email, password: hashedPassword })
+      .values({ email, password: hashedPassword, type: 'regular' })
       .returning();
     if (!createdUser) {
         throw new Error('User creation failed to return the created user.');
@@ -124,10 +124,13 @@ export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'
   const password = generateHashedPassword(generateUUID());
 
   try {
-    return await db.insert(user).values({ email, password }).returning({
-      id: user.id,
-      email: user.email,
-    });
+    return await db
+      .insert(user)
+      .values({ email, password, type: 'guest' })
+      .returning({
+        id: user.id,
+        email: user.email,
+      });
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
