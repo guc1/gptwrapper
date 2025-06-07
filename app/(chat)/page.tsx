@@ -23,13 +23,8 @@ export default async function Page({
       : null;
 
   if (success && planId && session?.user?.id) {
-    const { updateUserTypeAfterCheckout } = await import('./actions');
-    await updateUserTypeAfterCheckout({
-      userId: session.user.id,
-      planId,
-    });
-
-    redirect('/');
+    const { PostCheckoutUpdater } = await import('@/components/post-checkout-updater');
+    return <PostCheckoutUpdater userId={session.user.id} planId={planId} />;
   }
 
   if (!session) {
