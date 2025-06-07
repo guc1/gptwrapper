@@ -17,4 +17,19 @@ export const chatModels: Array<ChatModel> = [
     name: 'Reasoning model',
     description: 'Uses advanced reasoning',
   },
+  {
+    id: 'basic-model',
+    name: 'BASIC MODEL',
+    description: 'The fast and reliable model. Unlimited access.',
+  },
+  {
+    id: 'gemiddeld-model',
+    name: 'GEMMIDDELD MODEL',
+    description: 'Very good model capable of most tasks. Unlimited access.',
+  },
+  {
+    id: 'top-model',
+    name: 'TOP MODEL',
+    description: 'State of the art model capable of everything. Unlimited access.',
+  },
 ];

@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
 import { MessageLimitIndicator } from './message-limit-indicator'; // Added
+import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 
 function PureChatHeader({
   chatId,
@@ -30,6 +31,7 @@ function PureChatHeader({
 }) {
   const router = useRouter();
   const { open } = useSidebar();
+  const { openPopup: openUpgradePopup } = useUpgradePopup();
 
   const { width: windowWidth } = useWindowSize();
 
@@ -79,6 +81,15 @@ function PureChatHeader({
 
       <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
 
+      {session?.user?.type === 'regular' && (
+        <Button
+          variant="outline"
+          className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"
+          onClick={() => openUpgradePopup()}
+        >
+          Upgrade
+        </Button>
+      )}
 
       <Button
         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-5 ml-2" // order-4 to order-last/5 and ml-auto to ml-2
