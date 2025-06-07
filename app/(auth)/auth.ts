@@ -12,7 +12,7 @@ import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
 
-export type UserType = 'guest' | 'regular';
+export type UserType = 'guest' | 'regular' | 'basic' | 'gemiddeld' | 'top';
 
 /* ─── Type augmentations ───────────────────────────────────────────── */
 declare module 'next-auth' {

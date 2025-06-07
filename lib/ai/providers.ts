@@ -18,6 +18,9 @@ export const myProvider = isTestEnvironment
       languageModels: {
         'chat-model': chatModel,
         'chat-model-reasoning': reasoningModel,
+        'basic-model': chatModel,
+        'gemiddeld-model': chatModel,
+        'top-model': chatModel,
         'title-model': titleModel,
         'artifact-model': artifactModel,
       },
@@ -27,6 +30,10 @@ export const myProvider = isTestEnvironment
       languageModels: {
         /* flagship model for normal chat                                */
         'chat-model': openai('gpt-4.1'),             // GPT‑4.1 :contentReference[oaicite:4]{index=4}
+
+        'basic-model': openai('gpt-4.1'),
+        'gemiddeld-model': openai('gpt-4.1'),
+        'top-model': openai('gpt-4.1'),
 
         /* reasoning stream with <think> traces, using 4o‑mini           */
         'chat-model-reasoning': wrapLanguageModel({

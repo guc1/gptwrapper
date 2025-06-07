@@ -22,6 +22,7 @@ import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
+import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import type { UserType } from '@/app/(auth)/auth';
 
 type ChatRequestOptions = CoreChatRequestOptions;
@@ -54,6 +55,7 @@ export function Chat({
 }) {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { openPopup: openLoginSignupPopup } = useLoginSignupPopup();
+  const { openPopup: openUpgradePopup } = useUpgradePopup();
   const hasSetInitialInputRef = useRef(false);
 
   const { visibilityType } = useChatVisibility({
@@ -158,13 +160,17 @@ export function Chat({
     // Allow calling without an event when submitting programmatically
     eOrForm?.preventDefault?.();
     
-    if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0 && input.trim() !== '')) {
-      if (session.user?.id) {
-        openLoginSignupPopup({
-          chatId: id,
-          guestUserId: session.user.id,
-          unsentPrompt: input,
-        });
+    if (messageStatus && messageStatus.messagesLeft <= 0 && input.trim() !== '') {
+      if (messageStatus.userType === 'guest') {
+        if (session.user?.id) {
+          openLoginSignupPopup({
+            chatId: id,
+            guestUserId: session.user.id,
+            unsentPrompt: input,
+          });
+        }
+      } else {
+        openUpgradePopup();
       }
       return;
     }
@@ -181,18 +187,22 @@ export function Chat({
     // The first argument to useChat's handleSubmit can be an event or options.
     // If eOrForm is an event, it's passed. If it's undefined (programmatic call), pass undefined.
     internalUseChatHandleSubmit(eOrForm, optionsWithAttachments);
-  }, [messageStatus, openLoginSignupPopup, internalUseChatHandleSubmit, id, attachments, input, session.user?.id]);
+  }, [messageStatus, openLoginSignupPopup, openUpgradePopup, internalUseChatHandleSubmit, id, attachments, input, session.user?.id]);
 
 
   const append: UseChatHelpers['append'] = useCallback(
     async (message, chatRequestOptions) => {
-    if (messageStatus?.userType === 'guest' && (messageStatus.messagesLeft <= 0)) {
-       if (session.user?.id) {
-         openLoginSignupPopup({
-           chatId: id,
-           guestUserId: session.user.id,
-           unsentPrompt: typeof message.content === 'string' ? message.content : input,
-         });
+    if (messageStatus && messageStatus.messagesLeft <= 0) {
+       if (messageStatus.userType === 'guest') {
+         if (session.user?.id) {
+           openLoginSignupPopup({
+             chatId: id,
+             guestUserId: session.user.id,
+             unsentPrompt: typeof message.content === 'string' ? message.content : input,
+           });
+         }
+       } else {
+         openUpgradePopup();
        }
       return null;
     }
@@ -202,7 +212,7 @@ export function Chat({
     }
     return internalUseChatAppend(message, chatRequestOptions);
   // Dependencies for the outer useCallback wrapper for `append`
-  }, [messageStatus?.userType, messageStatus?.messagesLeft, session?.user?.id, openLoginSignupPopup, id, input, internalUseChatAppend]);
+  }, [messageStatus, session?.user?.id, openLoginSignupPopup, openUpgradePopup, id, input, internalUseChatAppend]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
