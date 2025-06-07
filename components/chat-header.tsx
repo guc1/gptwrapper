@@ -33,6 +33,11 @@ function PureChatHeader({
   const { open } = useSidebar();
   const { openPopup: openUpgradePopup } = useUpgradePopup();
 
+  const purchasedModels = (session?.user as any)?.models as string[] | undefined;
+  const remainingPlans = ['basic-model', 'gemiddeld-model', 'top-model'].filter(
+    (id) => !purchasedModels?.includes(id),
+  );
+
   const { width: windowWidth } = useWindowSize();
 
   return (
@@ -81,7 +86,7 @@ function PureChatHeader({
 
       <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
 
-      {session?.user?.type === 'regular' && (
+      {remainingPlans.length > 0 && (
         <Button
           variant="outline"
           className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"

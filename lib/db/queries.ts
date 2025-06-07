@@ -107,7 +107,7 @@ export async function createUser(email: string, password: string): Promise<User>
   try {
     const [createdUser] = await db
       .insert(user)
-      .values({ email, password: hashedPassword, type: 'regular' })
+      .values({ email, password: hashedPassword, type: 'regular', models: [] })
       .returning();
     if (!createdUser) {
         throw new Error('User creation failed to return the created user.');
@@ -126,7 +126,7 @@ export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'
   try {
     return await db
       .insert(user)
-      .values({ email, password, type: 'guest' })
+      .values({ email, password, type: 'guest', models: [] })
       .returning({
         id: user.id,
         email: user.email,

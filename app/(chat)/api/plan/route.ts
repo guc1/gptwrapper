@@ -21,8 +21,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
   }
 
-  await db.update(user).set({ type }).where(eq(user.id, session.user.id));
-  await unstable_update({ user: { type } });
+  const [existing] = await db
+    .select({ models: user.models })
+    .from(user)
+    .where(eq(user.id, session.user.id));
+  const models = Array.from(new Set([...(existing?.models ?? []), planId]));
+
+  await db
+    .update(user)
+    .set({ type, models })
+    .where(eq(user.id, session.user.id));
+  await unstable_update({ user: { type, models } });
 
   return NextResponse.json({ success: true });
 }

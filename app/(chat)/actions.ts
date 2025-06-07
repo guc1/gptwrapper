@@ -74,6 +74,16 @@ export async function updateUserTypeAfterCheckout({
   const type = PLAN_MAP[planId];
   if (!type) return;
 
-  await db.update(userTable).set({ type }).where(eq(userTable.id, userId));
-  await unstable_update({ user: { type } });
+  const [existing] = await db
+    .select({ models: userTable.models })
+    .from(userTable)
+    .where(eq(userTable.id, userId));
+
+  const models = Array.from(new Set([...(existing?.models ?? []), planId]));
+
+  await db
+    .update(userTable)
+    .set({ type, models })
+    .where(eq(userTable.id, userId));
+  await unstable_update({ user: { type, models } });
 }
