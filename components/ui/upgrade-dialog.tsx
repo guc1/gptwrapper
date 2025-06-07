@@ -1,6 +1,13 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogOverlay } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogOverlay,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import { useState } from 'react';
@@ -14,9 +21,27 @@ interface Plan {
 }
 
 const plans: Array<Plan> = [
-  { id: 'basic-model', name: 'BASIC MODEL', description: 'The fast and reliable model.', price: '€4.99', image: '/placeholder.png' },
-  { id: 'gemiddeld-model', name: 'GEMMIDDELD MODEL', description: 'Very good model capable of most tasks.', price: '€9.99', image: '/placeholder.png' },
-  { id: 'top-model', name: 'TOP MODEL', description: 'Best state of the art model capable of everything.', price: '€19.99', image: '/placeholder.png' },
+  {
+    id: 'basic-model',
+    name: 'BASIC MODEL',
+    description: 'The fast and reliable model.',
+    price: '€4.99',
+    image: '/placeholder.png',
+  },
+  {
+    id: 'gemiddeld-model',
+    name: 'GEMMIDDELD MODEL',
+    description: 'Very good model capable of most tasks.',
+    price: '€9.99',
+    image: '/placeholder.png',
+  },
+  {
+    id: 'top-model',
+    name: 'TOP MODEL',
+    description: 'Best state of the art model capable of everything.',
+    price: '€19.99',
+    image: '/placeholder.png',
+  },
 ];
 
 export function UpgradeDialog() {
@@ -45,16 +70,31 @@ export function UpgradeDialog() {
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Upgrade Account</DialogTitle>
-          <DialogDescription>Select a model to unlock unlimited access.</DialogDescription>
+          <DialogDescription>
+            Select a model to unlock unlimited access.
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 mt-4">
+        <div className="flex flex-wrap gap-4 mt-4">
           {plans.map((plan) => (
-            <div key={plan.id} className="border rounded-md p-4 flex flex-col items-start">
-              <img src={plan.image} alt={plan.name} className="h-24 w-full object-cover rounded" />
+            <div
+              key={plan.id}
+              className="border rounded-md p-4 flex flex-col items-start w-full sm:w-1/3"
+            >
+              <img
+                src={plan.image}
+                alt={plan.name}
+                className="h-24 w-full object-cover rounded"
+              />
               <h3 className="mt-2 font-semibold">{plan.name}</h3>
-              <p className="text-sm text-muted-foreground">{plan.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {plan.description}
+              </p>
               <p className="font-bold mt-2">{plan.price}</p>
-              <Button className="mt-2 w-full" onClick={() => checkout(plan.id)} disabled={loadingId === plan.id}>
+              <Button
+                className="mt-2 w-full"
+                onClick={() => checkout(plan.id)}
+                disabled={loadingId === plan.id}
+              >
                 {loadingId === plan.id ? 'Loading...' : 'Purchase'}
               </Button>
             </div>
