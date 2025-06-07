@@ -86,7 +86,7 @@ export function MessageLimitIndicator({
     );
   }
 
-   if (data.userType !== 'guest') {
+   if (data.userType !== 'guest' && data.userType !== 'regular') {
      return null;
    }
 

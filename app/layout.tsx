@@ -5,7 +5,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
-import { LoginSignupDialog } from '@/components/ui/login-signup-dialog'; // Added
+import { LoginSignupDialog } from '@/components/ui/login-signup-dialog';
+import { UpgradeDialog } from '@/components/ui/upgrade-dialog';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
@@ -77,7 +78,8 @@ export default async function RootLayout({
           <Toaster position="top-center" />
           <SessionProvider>
             {children}
-            <LoginSignupDialog /> {/* Added Dialog Here */}
+            <LoginSignupDialog />
+            <UpgradeDialog />
           </SessionProvider>
         </ThemeProvider>
       </body>
