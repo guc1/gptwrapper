@@ -42,3 +42,12 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    * TODO: For users with an account and a paid membership
    */
 };
+
+export function getAvailableChatModels(
+  userType: UserType,
+  purchasedModels: Array<ChatModel['id']> | undefined,
+): Array<ChatModel['id']> {
+  const defaults = entitlementsByUserType[userType].availableChatModelIds;
+  if (!purchasedModels || purchasedModels.length === 0) return defaults;
+  return Array.from(new Set(['chat-model', ...purchasedModels]));
+}

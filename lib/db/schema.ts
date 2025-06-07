@@ -20,6 +20,7 @@ export const user = pgTable('User', {
   })
     .notNull()
     .default('regular'),
+  models: json('models').$type<string[]>().notNull().default('[]'),
 });
 
 export type User = InferSelectModel<typeof user>;
