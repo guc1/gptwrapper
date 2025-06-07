@@ -101,6 +101,18 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
+export async function getUserById(id: string): Promise<User | null> {
+  try {
+    const [foundUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, id));
+    return foundUser ?? null;
+  } catch (error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to get user by id');
+  }
+}
+
 export async function createUser(email: string, password: string): Promise<User> {
   const hashedPassword = generateHashedPassword(password);
 

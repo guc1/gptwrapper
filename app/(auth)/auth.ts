@@ -7,6 +7,7 @@ import {
   createGuestUser,
   getUser,
   createUser,
+  getUserById,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
@@ -71,8 +72,21 @@ const providers = [
   Credentials({
     id: 'guest', // matches signIn('guest')
     name: 'Guest account',
-    credentials: {},
-    async authorize() {
+    credentials: {
+      guestId: { label: 'Guest ID', type: 'text', required: false },
+    },
+    async authorize(credentials) {
+      if (credentials?.guestId) {
+        try {
+          const user = await getUserById(credentials.guestId);
+          if (user) {
+            return { ...user, type: 'guest' };
+          }
+        } catch (error) {
+          console.error('Failed restoring guest user:', error);
+        }
+      }
+
       const [guestUser] = await createGuestUser();
       return { ...guestUser, type: 'guest' };
     },
