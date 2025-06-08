@@ -29,6 +29,7 @@ import {
   type DBMessage,
   type Chat,
   stream,
+  userModel,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 import { generateUUID } from '../utils';
@@ -647,4 +648,39 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
 
     return inserted;
   });
+}
+
+export async function addUserModel({
+  userId,
+  modelId,
+}: {
+  userId: string;
+  modelId: string;
+}) {
+  try {
+    await db
+      .insert(userModel)
+      .values({ userId, modelId })
+      .onConflictDoNothing();
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to add user model',
+    );
+  }
+}
+
+export async function getUserModelIds({ userId }: { userId: string }) {
+  try {
+    const rows = await db
+      .select({ modelId: userModel.modelId })
+      .from(userModel)
+      .where(eq(userModel.userId, userId));
+    return rows.map((r) => r.modelId);
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get user models',
+    );
+  }
 }

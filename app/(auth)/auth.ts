@@ -7,6 +7,7 @@ import {
   createGuestUser,
   getUser,
   createUser,
+  getUserModelIds,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
@@ -19,6 +20,7 @@ declare module 'next-auth' {
     user: {
       id: string;
       type: UserType;
+      models: string[];
     } & DefaultSession['user'];
   }
 
@@ -26,6 +28,7 @@ declare module 'next-auth' {
     id?: string;
     email?: string | null;
     type: UserType;
+    models?: string[];
   }
 }
 
@@ -33,6 +36,7 @@ declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id: string;
     type: UserType;
+    models: string[];
   }
 }
 
@@ -62,7 +66,9 @@ const providers = [
       const passwordsMatch = await compare(password, dbUser.password);
       if (!passwordsMatch) return null;
 
-      return { ...dbUser };
+      const models = await getUserModelIds({ userId: dbUser.id });
+
+      return { ...dbUser, models };
     },
   }),
 
@@ -73,7 +79,7 @@ const providers = [
     credentials: {},
     async authorize() {
       const [guestUser] = await createGuestUser();
-      return { ...guestUser, type: 'guest' };
+      return { ...guestUser, type: 'guest', models: [] };
     },
   }),
 ];
@@ -111,10 +117,12 @@ export const {
         if (existingUser) {
           user.id = existingUser.id;
           (user as any).type = existingUser.type;
+          (user as any).models = await getUserModelIds({ userId: existingUser.id });
         } else {
           const newUser = await createUser(user.email, randomUUID());
           user.id = newUser.id;
           (user as any).type = newUser.type;
+          (user as any).models = [];
         }
       }
       return true;
@@ -123,6 +131,9 @@ export const {
       if (user) {
         token.id = (user as any).id;
         token.type = (user as any).type;
+        token.models = (user as any).models ?? [];
+      } else if (token.id && token.models === undefined) {
+        token.models = await getUserModelIds({ userId: token.id as string });
       }
       return token;
     },
@@ -130,6 +141,7 @@ export const {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.type = token.type as UserType;
+        session.user.models = (token.models as string[]) ?? [];
       }
       return session;
     },

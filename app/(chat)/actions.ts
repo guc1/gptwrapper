@@ -64,6 +64,7 @@ export async function updateUserTypeAfterCheckout({
   const userTable = schemaModule.user;
   const { eq } = await import('drizzle-orm');
   const { unstable_update } = await import('@/app/(auth)/auth');
+  const { addUserModel, getUserModelIds } = await import('@/lib/db/queries');
 
   const PLAN_MAP: Record<string, 'basic' | 'gemiddeld' | 'top' | undefined> = {
     'basic-model': 'basic',
@@ -75,5 +76,7 @@ export async function updateUserTypeAfterCheckout({
   if (!type) return;
 
   await db.update(userTable).set({ type }).where(eq(userTable.id, userId));
-  await unstable_update({ user: { type } });
+  await addUserModel({ userId, modelId: planId });
+  const models = await getUserModelIds({ userId });
+  await unstable_update({ user: { type, models } });
 }
