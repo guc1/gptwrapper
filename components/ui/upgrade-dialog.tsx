@@ -3,6 +3,9 @@
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -87,11 +90,11 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
-        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow">
-          <div className="text-center space-y-1">
-            <h2 className="text-xl font-medium">Upgrade Account</h2>
-            <p className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</p>
-          </div>
+        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105">
+          <DialogHeader className="text-center space-y-1">
+            <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
+          </DialogHeader>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
           {plans.map((plan) => {
