@@ -48,7 +48,7 @@ const plans: Plan[] = [
     id: 'coming-soon',
     name: 'COMING SOON',
     description: 'New model available soon.',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 05_03_41 PM.png',
   },
 ]
 
@@ -90,8 +90,8 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
-        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg text-center">
-          <DialogHeader className="space-y-1">
+        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg flex flex-col items-center justify-center text-center">
+          <DialogHeader className="space-y-1 text-center">
             <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
           </DialogHeader>
@@ -106,7 +106,7 @@ export function UpgradeDialog() {
                 className="group bg-white dark:bg-gray-800 rounded-[28px] shadow-lg transition-transform duration-200 ease-out hover:scale-[1.04] hover:shadow-2xl flex flex-col justify-between min-h-[460px] min-w-[240px] p-6"
               >
                 <div className="flex flex-col flex-1">
-                  <div className="relative w-full h-28 rounded-md overflow-hidden">
+                  <div className="relative w-full h-44 rounded-md overflow-hidden">
                     <Image
                       src={plan.image}
                       alt={plan.name}
