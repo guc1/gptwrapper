@@ -30,7 +30,10 @@ export function ModelSelector({
     useOptimistic(selectedModelId);
 
   const userType = session.user.type;
-  const { availableChatModelIds } = entitlementsByUserType[userType];
+  const userModels = session.user.models ?? [];
+  const baseModels = entitlementsByUserType[userType].availableChatModelIds;
+  const availableChatModelIds =
+    userModels.length > 0 ? userModels : baseModels;
 
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
@@ -49,14 +52,14 @@ export function ModelSelector({
       <DropdownMenuTrigger
         asChild
         className={cn(
-          'w-fit data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
+          'w-fit shrink-0 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
           className,
         )}
       >
         <Button
           data-testid="model-selector"
           variant="outline"
-          className="md:px-2 md:h-[34px]"
+          className="md:px-2 md:h-[34px] whitespace-nowrap"
         >
           {selectedChatModel?.name}
           <ChevronDownIcon />
