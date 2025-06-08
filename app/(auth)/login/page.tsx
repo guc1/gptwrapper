@@ -82,11 +82,12 @@ export default function Page() {
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/message-status'), undefined, { revalidate: true });
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/auth/session'), undefined, { revalidate: true });
 
-        if (planId && newSession?.user && newSession.user.type !== 'guest') {
+        const targetPlanId = state.planId ?? planId;
+        if (targetPlanId && newSession?.user && newSession.user.type !== 'guest') {
           const res = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ planId }),
+            body: JSON.stringify({ planId: targetPlanId }),
           });
           const data = await res.json();
           if (data.url) {
@@ -116,14 +117,15 @@ export default function Page() {
   }, [state]);
 
   useEffect(() => {
-    if (session?.user && session.user.type !== 'guest' && planId && state.status === 'idle') {
+    const targetPlanId = state.planId ?? planId;
+    if (session?.user && session.user.type !== 'guest' && targetPlanId && state.status === 'idle') {
       const proceed = async () => {
         const newSession = await updateSession();
         if (newSession?.user && newSession.user.type !== 'guest') {
           const res = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ planId }),
+            body: JSON.stringify({ planId: targetPlanId }),
           });
           const data = await res.json();
           if (data.url) {
@@ -140,13 +142,14 @@ export default function Page() {
       };
       proceed();
     }
-  }, [session, planId, updateSession, router, state.status]);
+  }, [session, planId, state.planId, updateSession, router, state.status]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
     if (chatIdToResume) formData.append('chatIdToResume', chatIdToResume);
     if (guestUserId) formData.append('guestUserId', guestUserId);
     if (unsentPrompt) formData.append('unsentPrompt', unsentPrompt);
+    if (planId) formData.append('planId', planId);
     hasShownSuccessToastRef.current = false;
     setIsSuccessful(false);
     formAction(formData);

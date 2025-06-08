@@ -15,6 +15,7 @@ const authFormSchema = z.object({
 export interface LoginActionState {
   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
   redirectTo?: string;
+  planId?: string;
 }
 
 export const login = async (
@@ -22,14 +23,15 @@ export const login = async (
   formData: FormData,
 ): Promise<LoginActionState> => {
   try {
-    const validatedData = authFormSchema.parse({
-      email: formData.get('email'),
-      password: formData.get('password'),
-    });
+  const validatedData = authFormSchema.parse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+  });
 
-    const chatIdToResume = formData.get('chatIdToResume') as string | null;
-    const guestUserId = formData.get('guestUserId') as string | null;
-    const unsentPrompt = formData.get('unsentPrompt') as string | null;
+  const chatIdToResume = formData.get('chatIdToResume') as string | null;
+  const guestUserId = formData.get('guestUserId') as string | null;
+  const unsentPrompt = formData.get('unsentPrompt') as string | null;
+  const planId = formData.get('planId') as string | null;
 
     // Attempt to sign in first. If successful, NextAuth.js will handle session creation.
     // The user object will be available in the session callback.
@@ -67,11 +69,11 @@ export const login = async (
       }
     }
     
-    const redirectTo = chatIdToResume 
-      ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
-      : '/';
+  const redirectTo = chatIdToResume
+    ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
+    : '/';
 
-    return { status: 'success', redirectTo };
+  return { status: 'success', redirectTo, planId: planId ?? undefined };
 
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -95,6 +97,7 @@ export interface RegisterActionState {
     | 'user_exists'
     | 'invalid_data';
   redirectTo?: string;
+  planId?: string;
 }
 
 export const register = async (
@@ -110,6 +113,7 @@ export const register = async (
     const chatIdToResume = formData.get('chatIdToResume') as string | null;
     const guestUserId = formData.get('guestUserId') as string | null;
     const unsentPrompt = formData.get('unsentPrompt') as string | null;
+    const planId = formData.get('planId') as string | null;
 
     const [existingUser] = await getUser(validatedData.email);
     if (existingUser) {
@@ -139,11 +143,11 @@ export const register = async (
       redirect: false,
     });
     
-    const redirectTo = chatIdToResume 
-      ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
-      : '/';
+  const redirectTo = chatIdToResume
+    ? `/chat/${chatIdToResume}${unsentPrompt ? `?prompt=${encodeURIComponent(unsentPrompt)}` : ''}`
+    : '/';
 
-    return { status: 'success', redirectTo };
+  return { status: 'success', redirectTo, planId: planId ?? undefined };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { status: 'invalid_data' };
