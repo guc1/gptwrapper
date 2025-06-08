@@ -79,4 +79,5 @@ export async function updateUserTypeAfterCheckout({
   await addUserModel({ userId, modelId: planId });
   const models = await getUserModelIds({ userId });
   await unstable_update({ user: { type, models } });
+  await saveChatModelAsCookie(planId);
 }
