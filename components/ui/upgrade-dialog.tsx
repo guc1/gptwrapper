@@ -50,12 +50,7 @@ export function UpgradeDialog() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const { data: session } = useSession();
 
-  const currentType = session?.user?.type;
-  const PLAN_TYPE_MAP: Record<string, string> = {
-    'basic-model': 'basic',
-    'gemiddeld-model': 'gemiddeld',
-    'top-model': 'top',
-  };
+  const ownedModels = session?.user?.models ?? [];
 
   async function checkout(planId: string) {
     setLoadingId(planId);
@@ -85,7 +80,7 @@ export function UpgradeDialog() {
         </DialogHeader>
         <div className="flex flex-wrap gap-4 mt-4">
           {plans.map((plan) => {
-            if (PLAN_TYPE_MAP[plan.id] === currentType) return null;
+            if (ownedModels.includes(plan.id)) return null;
             return (
               <div
                 key={plan.id}

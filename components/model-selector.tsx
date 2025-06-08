@@ -30,7 +30,10 @@ export function ModelSelector({
     useOptimistic(selectedModelId);
 
   const userType = session.user.type;
-  const { availableChatModelIds } = entitlementsByUserType[userType];
+  const userModels = session.user.models ?? [];
+  const baseModels = entitlementsByUserType[userType].availableChatModelIds;
+  const availableChatModelIds =
+    userModels.length > 0 ? userModels : baseModels;
 
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
