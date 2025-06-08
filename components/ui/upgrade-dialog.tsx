@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Plan {
   id: string;
@@ -49,10 +50,22 @@ export function UpgradeDialog() {
   const { isOpen, closePopup } = useUpgradePopup();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const { data: session } = useSession();
+  const router = useRouter();
 
   const ownedModels = session?.user?.models ?? [];
 
   async function checkout(planId: string) {
+    if (!session?.user || session.user.type === 'guest') {
+      closePopup();
+      try {
+        sessionStorage.setItem('pendingPlanId', planId);
+      } catch {
+        // ignore
+      }
+      router.push(`/login?planId=${planId}`);
+      return;
+    }
+
     setLoadingId(planId);
     const res = await fetch('/api/checkout', {
       method: 'POST',

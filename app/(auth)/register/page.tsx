@@ -37,6 +37,26 @@ export default function Page() {
   const chatIdToResume = searchParams.get('chatIdToResume');
   const guestUserId = searchParams.get('guestUserId');
   const unsentPrompt = searchParams.get('unsentPrompt');
+  const [planId, setPlanId] = useState<string | null>(
+    searchParams.get('planId'),
+  );
+
+  useEffect(() => {
+    if (!planId) {
+      try {
+        const stored = sessionStorage.getItem('pendingPlanId');
+        if (stored) setPlanId(stored);
+      } catch {
+        // ignore
+      }
+    } else {
+      try {
+        sessionStorage.setItem('pendingPlanId', planId);
+      } catch {
+        // ignore
+      }
+    }
+  }, [planId]);
 
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
@@ -77,12 +97,29 @@ export default function Page() {
       setIsSuccessful(true);
       
       const performRedirectAndRefresh = async () => {
-        await updateSession(); 
+        const newSession = await updateSession();
         
         // Revalidate SWR caches that might depend on the new session
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/message-status'), undefined, { revalidate: true });
         await globalSWRMutate((key) => typeof key === 'string' && key.startsWith('/api/auth/session'), undefined, { revalidate: true });
 
+        if (planId && newSession?.user && newSession.user.type !== 'guest') {
+          const res = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ planId }),
+          });
+          const data = await res.json();
+          if (data.url) {
+            try {
+              sessionStorage.removeItem('pendingPlanId');
+            } catch {
+              // ignore
+            }
+            window.location.href = data.url as string;
+            return;
+          }
+        }
 
         if (state.redirectTo) {
           router.replace(state.redirectTo);
@@ -114,7 +151,8 @@ export default function Page() {
     if (chatIdToResume) params.set('chatIdToResume', chatIdToResume);
     if (guestUserId) params.set('guestUserId', guestUserId);
     if (unsentPrompt) params.set('unsentPrompt', unsentPrompt);
-    const callbackUrl = params.size ? `/?${params.toString()}` : '/';
+    if (planId) params.set('planId', planId);
+    const callbackUrl = `/login?${params.toString()}`;
     signIn('google', { callbackUrl });
   };
 
@@ -144,7 +182,12 @@ export default function Page() {
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {'Already have an account? '}
             <Link
-              href={`/login${chatIdToResume ? `?chatIdToResume=${chatIdToResume}&guestUserId=${guestUserId || ''}&unsentPrompt=${encodeURIComponent(unsentPrompt || '')}` : ''}`}
+              href={`/login${chatIdToResume || guestUserId || unsentPrompt || planId ? `?${[
+                chatIdToResume ? `chatIdToResume=${chatIdToResume}` : null,
+                guestUserId ? `guestUserId=${guestUserId}` : null,
+                unsentPrompt ? `unsentPrompt=${encodeURIComponent(unsentPrompt)}` : null,
+                planId ? `planId=${planId}` : null,
+              ].filter(Boolean).join('&')}` : ''}`}
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
               Sign in
