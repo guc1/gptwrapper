@@ -79,6 +79,7 @@ export default function Page() {
         if (chatIdToResume) loginLink.searchParams.set('chatIdToResume', chatIdToResume);
         if (guestUserId) loginLink.searchParams.set('guestUserId', guestUserId);
         if (unsentPrompt) loginLink.searchParams.set('unsentPrompt', unsentPrompt);
+        if (planId) loginLink.searchParams.set('planId', planId);
         router.replace(loginLink.toString());
       }
     } else if (state.status === 'failed') {
