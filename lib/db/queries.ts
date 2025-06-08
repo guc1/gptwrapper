@@ -684,3 +684,18 @@ export async function getUserModelIds({ userId }: { userId: string }) {
     );
   }
 }
+
+export async function getUserTypeById({ userId }: { userId: string }) {
+  try {
+    const [row] = await db
+      .select({ type: user.type })
+      .from(user)
+      .where(eq(user.id, userId));
+    return row?.type ?? 'regular';
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get user type',
+    );
+  }
+}

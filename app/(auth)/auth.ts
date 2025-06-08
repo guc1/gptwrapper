@@ -8,6 +8,7 @@ import {
   getUser,
   createUser,
   getUserModelIds,
+  getUserTypeById,
 } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
@@ -130,11 +131,13 @@ export const {
     async jwt({ token, user }) {
       if (user) {
         token.id = (user as any).id;
-        token.type = (user as any).type;
-        token.models = (user as any).models ?? [];
-      } else if (token.id && token.models === undefined) {
+      }
+
+      if (token.id) {
+        token.type = await getUserTypeById({ userId: token.id as string });
         token.models = await getUserModelIds({ userId: token.id as string });
       }
+
       return token;
     },
     async session({ session, token }) {
