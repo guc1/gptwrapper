@@ -16,6 +16,8 @@ import type { Session } from 'next-auth';
 import { MessageLimitIndicator } from './message-limit-indicator'; // Added
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 
+const plansLength = 3;
+
 function PureChatHeader({
   chatId,
   selectedModelId,
@@ -63,7 +65,7 @@ function PureChatHeader({
         <ModelSelector
           session={session}
           selectedModelId={selectedModelId}
-          className="order-1 md:order-2"
+          className="order-1 md:order-2 shrink-0"
         />
       )}
 
@@ -81,7 +83,7 @@ function PureChatHeader({
 
       <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
 
-      {session?.user?.type === 'regular' && (
+      {session?.user && session.user.models?.length !== plansLength && (
         <Button
           variant="outline"
           className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"

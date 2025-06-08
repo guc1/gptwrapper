@@ -173,3 +173,18 @@ export const stream = pgTable(
 );
 
 export type Stream = InferSelectModel<typeof stream>;
+
+export const userModel = pgTable(
+  'UserModel',
+  {
+    userId: uuid('userId')
+      .notNull()
+      .references(() => user.id),
+    modelId: varchar('modelId', { length: 64 }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.modelId] }),
+  }),
+);
+
+export type UserModel = InferSelectModel<typeof userModel>;
