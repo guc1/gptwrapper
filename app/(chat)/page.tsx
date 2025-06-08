@@ -21,6 +21,10 @@ export default async function Page({
     typeof resolvedSearchParams?.planId === 'string'
       ? resolvedSearchParams.planId
       : null;
+  const selectedModelIdParam =
+    typeof resolvedSearchParams?.modelId === 'string'
+      ? resolvedSearchParams.modelId
+      : null;
 
   if (success && planId && session?.user?.id) {
     const { PostCheckoutUpdater } = await import('@/components/post-checkout-updater');
@@ -54,24 +58,7 @@ export default async function Page({
 
   const id = generateUUID();
   const modelIdFromCookie = cookieStore.get('chat-model');
-
-  if (!modelIdFromCookie) {
-    return (
-      <>
-        <Chat
-          key={id}
-          id={id}
-          initialMessages={[]}
-          initialChatModel={DEFAULT_CHAT_MODEL}
-          initialVisibilityType="private"
-          isReadonly={false}
-          session={session}
-          autoResume={false}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
-  }
+  const initialModelId = selectedModelIdParam ?? modelIdFromCookie?.value ?? DEFAULT_CHAT_MODEL;
 
   return (
     <>
@@ -79,7 +66,7 @@ export default async function Page({
         key={id}
         id={id}
         initialMessages={[]}
-        initialChatModel={modelIdFromCookie.value}
+        initialChatModel={initialModelId}
         initialVisibilityType="private"
         isReadonly={false}
         session={session}

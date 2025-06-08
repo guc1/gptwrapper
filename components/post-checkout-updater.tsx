@@ -17,8 +17,9 @@ export function PostCheckoutUpdater({
     async function update() {
       try {
         await updateUserTypeAfterCheckout({ userId, planId });
+        document.cookie = `chat-model=${planId}; path=/`;
       } finally {
-        router.replace('/');
+        router.replace(`/?modelId=${planId}`);
       }
     }
 
