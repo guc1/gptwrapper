@@ -9,6 +9,7 @@ import {
   DialogOverlay,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
@@ -18,7 +19,7 @@ interface Plan {
   id: string;
   name: string;
   description: string;
-  price: string;
+  price?: string;
   image: string;
 }
 
@@ -28,21 +29,27 @@ const plans: Array<Plan> = [
     name: 'BASIC MODEL',
     description: 'The fast and reliable model.',
     price: '€4.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
   },
   {
     id: 'gemiddeld-model',
     name: 'GEMMIDDELD MODEL',
     description: 'Very good model capable of most tasks.',
     price: '€9.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
   },
   {
     id: 'top-model',
     name: 'TOP MODEL',
     description: 'Best state of the art model capable of everything.',
     price: '€19.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
+  },
+  {
+    id: 'coming-soon',
+    name: 'COMING SOON',
+    description: 'New model available soon.',
+    image: '/placeholder.png', // replace with your image path
   },
 ];
 
@@ -84,38 +91,48 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogOverlay className="backdrop-blur-sm" />
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-4xl p-6">
         <DialogHeader>
           <DialogTitle>Upgrade Account</DialogTitle>
           <DialogDescription>
             Select a model to unlock unlimited access.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-wrap gap-4 mt-4">
+        <div className="grid gap-6 mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((plan) => {
             if (ownedModels.includes(plan.id)) return null;
+            const isComingSoon = plan.id === 'coming-soon';
             return (
               <div
                 key={plan.id}
-                className="border rounded-md p-4 flex flex-col items-start w-full sm:w-1/3"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col"
               >
-                <img
+                <Image
                   src={plan.image}
                   alt={plan.name}
-                  className="h-24 w-full object-cover rounded"
+                  width={300}
+                  height={96}
+                  className="h-24 w-full rounded object-cover"
                 />
-              <h3 className="mt-2 font-semibold">{plan.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {plan.description}
-              </p>
-              <p className="font-bold mt-2">{plan.price}</p>
-              <Button
-                className="mt-2 w-full"
-                onClick={() => checkout(plan.id)}
-                disabled={loadingId === plan.id}
-              >
-                {loadingId === plan.id ? 'Loading...' : 'Purchase'}
-              </Button>
+                <h3 className="mt-4 font-semibold">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {plan.description}
+                </p>
+                {!isComingSoon && (
+                  <>
+                    <p className="font-bold mb-2">{plan.price}</p>
+                    <Button
+                      className="w-full"
+                      onClick={() => checkout(plan.id)}
+                      disabled={loadingId === plan.id}
+                    >
+                      {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                    </Button>
+                  </>
+                )}
+                {isComingSoon && (
+                  <p className="font-bold">COMING SOON</p>
+                )}
               </div>
             );
           })}
