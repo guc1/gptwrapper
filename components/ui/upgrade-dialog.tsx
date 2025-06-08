@@ -28,21 +28,28 @@ const plans: Array<Plan> = [
     name: 'BASIC MODEL',
     description: 'The fast and reliable model.',
     price: '€4.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
   },
   {
     id: 'gemiddeld-model',
     name: 'GEMMIDDELD MODEL',
     description: 'Very good model capable of most tasks.',
     price: '€9.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
   },
   {
     id: 'top-model',
     name: 'TOP MODEL',
     description: 'Best state of the art model capable of everything.',
     price: '€19.99',
-    image: '/placeholder.png',
+    image: '/placeholder.png', // replace with your image path
+  },
+  {
+    id: 'coming-soon',
+    name: 'COMING SOON',
+    description: 'New model available soon.',
+    price: '',
+    image: '/placeholder.png', // replace with your image path
   },
 ];
 
@@ -84,20 +91,20 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogOverlay className="backdrop-blur-sm" />
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-4xl p-6">
         <DialogHeader>
           <DialogTitle>Upgrade Account</DialogTitle>
           <DialogDescription>
             Select a model to unlock unlimited access.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-wrap gap-4 mt-4">
+        <div className="flex flex-wrap gap-6 mt-6">
           {plans.map((plan) => {
             if (ownedModels.includes(plan.id)) return null;
             return (
               <div
                 key={plan.id}
-                className="border rounded-md p-4 flex flex-col items-start w-full sm:w-1/3"
+                className="border rounded-md bg-white dark:bg-gray-800 p-6 flex flex-col items-start w-full sm:w-1/2 md:w-1/4"
               >
                 <img
                   src={plan.image}
@@ -108,14 +115,20 @@ export function UpgradeDialog() {
               <p className="text-sm text-muted-foreground">
                 {plan.description}
               </p>
-              <p className="font-bold mt-2">{plan.price}</p>
-              <Button
-                className="mt-2 w-full"
-                onClick={() => checkout(plan.id)}
-                disabled={loadingId === plan.id}
-              >
-                {loadingId === plan.id ? 'Loading...' : 'Purchase'}
-              </Button>
+              {plan.id !== 'coming-soon' ? (
+                <>
+                  <p className="font-bold mt-2">{plan.price}</p>
+                  <Button
+                    className="mt-2 w-full"
+                    onClick={() => checkout(plan.id)}
+                    disabled={loadingId === plan.id}
+                  >
+                    {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                  </Button>
+                </>
+              ) : (
+                <p className="font-bold mt-2 text-center w-full">COMING SOON</p>
+              )}
               </div>
             );
           })}
