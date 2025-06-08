@@ -28,21 +28,21 @@ const plans: Plan[] = [
     name: 'BASIC MODEL',
     description: 'The fast and reliable model.',
     price: '€4.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_07_35 PM.png',
   },
   {
     id: 'gemiddeld-model',
     name: 'GEMMIDDELD MODEL',
     description: 'Very good model capable of most tasks.',
     price: '€9.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_08_58 PM.png',
   },
   {
     id: 'top-model',
     name: 'TOP MODEL',
     description: 'Best state of the art model capable of everything.',
     price: '€19.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_00_45 PM.png',
   },
   {
     id: 'coming-soon',
@@ -90,8 +90,8 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
-        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105">
-          <DialogHeader className="text-center space-y-1">
+        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg text-center">
+          <DialogHeader className="space-y-1">
             <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
           </DialogHeader>
@@ -111,7 +111,7 @@ export function UpgradeDialog() {
                       src={plan.image}
                       alt={plan.name}
                       fill
-                      className="object-cover transition-transform duration-200 ease-out group-hover:scale-105"
+                      className="object-contain transition-transform duration-200 ease-out group-hover:scale-105"
                     />
                   </div>
                   <h3 className="font-semibold text-lg leading-tight mt-4">{plan.name}</h3>
