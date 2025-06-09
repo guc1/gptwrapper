@@ -28,27 +28,27 @@ const plans: Plan[] = [
     name: 'BASIC MODEL',
     description: 'The fast and reliable model.',
     price: '€4.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_07_35 PM.png',
   },
   {
     id: 'gemiddeld-model',
     name: 'GEMMIDDELD MODEL',
     description: 'Very good model capable of most tasks.',
     price: '€9.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_08_58 PM.png',
   },
   {
     id: 'top-model',
     name: 'TOP MODEL',
     description: 'Best state of the art model capable of everything.',
     price: '€19.99',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 04_00_45 PM.png',
   },
   {
     id: 'coming-soon',
     name: 'COMING SOON',
     description: 'New model available soon.',
-    image: '/placeholder.png', // replace with your image path
+    image: '/images/ChatGPT Image Jun 8, 2025, 05_03_41 PM.png',
   },
 ]
 
@@ -90,8 +90,8 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
-        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105">
-          <DialogHeader className="text-center space-y-1">
+        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg flex flex-col items-center justify-center text-center">
+          <DialogHeader className="upgrade-header space-y-1 text-center">
             <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
           </DialogHeader>
@@ -103,17 +103,16 @@ export function UpgradeDialog() {
             return (
               <div
                 key={plan.id}
-                className="group bg-white dark:bg-gray-800 rounded-[28px] shadow-lg transition-transform duration-200 ease-out hover:scale-[1.04] hover:shadow-2xl flex flex-col justify-between min-h-[460px] min-w-[240px] p-6"
+                className="model-card group bg-white dark:bg-gray-800 rounded-[28px] shadow-lg transition-transform duration-200 ease-out hover:scale-[1.04] hover:shadow-2xl flex flex-col justify-between p-4 m-2"
               >
                 <div className="flex flex-col flex-1">
-                  <div className="relative w-full h-28 rounded-md overflow-hidden">
-                    <Image
-                      src={plan.image}
-                      alt={plan.name}
-                      fill
-                      className="object-cover transition-transform duration-200 ease-out group-hover:scale-105"
-                    />
-                  </div>
+                  <Image
+                    src={plan.image}
+                    alt={plan.name}
+                    width={300}
+                    height={176}
+                    className="object-cover rounded-t-lg transition-transform duration-200 ease-out group-hover:scale-105"
+                  />
                   <h3 className="font-semibold text-lg leading-tight mt-4">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                   {!comingSoon && plan.price && (
