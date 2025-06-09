@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useOptimistic, useState } from 'react';
+import { useMemo, useOptimistic, useState, startTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -76,7 +76,7 @@ export function ModelSelector({
               onSelect={() => {
                 setOpen(false);
 
-                setOptimisticModelId(id);
+                startTransition(() => setOptimisticModelId(id));
                 onModelChange?.(id);
                 document.cookie = `chat-model=${id}; path=/`;
               }}
