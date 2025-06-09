@@ -90,13 +90,13 @@ export function UpgradeDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
-        <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg flex flex-col items-center justify-center text-center">
+        <div className="upgrade-container mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg flex flex-col items-center justify-center text-center">
           <DialogHeader className="upgrade-header space-y-1 text-center">
             <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
           </DialogHeader>
         </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
+        <div className="model-grid w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
           {plans.map((plan) => {
             if (ownedModels.includes(plan.id)) return null
             const comingSoon = plan.id === 'coming-soon'
@@ -120,19 +120,24 @@ export function UpgradeDialog() {
                   )}
                 </div>
                 {!comingSoon ? (
-                  <Button
-                    className="mt-4 w-full"
-                    onClick={() => checkout(plan.id)}
-                    disabled={loadingId === plan.id}
-                  >
-                    {loadingId === plan.id ? 'Loading...' : 'Purchase'}
-                  </Button>
+                  <>
+                    <Button
+                      className="mt-4 w-full"
+                      onClick={() => checkout(plan.id)}
+                      disabled={loadingId === plan.id}
+                    >
+                      {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                    </Button>
+                    <div className="compare-link">
+                      <a href="{{COMPARE_URL}}" target="_blank">Compare Models</a>
+                    </div>
+                  </>
                 ) : (
                   <p className="mt-4 text-center text-sm text-muted-foreground font-semibold">COMING SOON</p>
                 )}
               </div>
             )
-          })}
+          })
         </div>
       </DialogContent>
     </Dialog>
