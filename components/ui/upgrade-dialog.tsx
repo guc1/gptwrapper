@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import Image from 'next/image'
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup'
 import { useState } from 'react'
@@ -120,13 +121,21 @@ export function UpgradeDialog() {
                   )}
                 </div>
                 {!comingSoon ? (
-                  <Button
-                    className="mt-4 w-full"
-                    onClick={() => checkout(plan.id)}
-                    disabled={loadingId === plan.id}
-                  >
-                    {loadingId === plan.id ? 'Loading...' : 'Purchase'}
-                  </Button>
+                  <>
+                    <Button
+                      className="mt-4 w-full"
+                      onClick={() => checkout(plan.id)}
+                      disabled={loadingId === plan.id}
+                    >
+                      {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                    </Button>
+                    <Link
+                      href="/compare"
+                      className="mt-2 text-center text-sm font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+                    >
+                      Compare models
+                    </Link>
+                  </>
                 ) : (
                   <p className="mt-4 text-center text-sm text-muted-foreground font-semibold">COMING SOON</p>
                 )}
