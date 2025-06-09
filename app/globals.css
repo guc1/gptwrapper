@@ -177,13 +177,30 @@
 @layer components {
     .upgrade-header {
         @apply flex flex-col items-center w-fit mx-auto;
+        transform: scale(0.75);
+        transform-origin: top center;
+        margin-top: 1rem;
     }
 
     .model-card {
-        @apply inline-block w-fit max-w-[300px] p-4 m-2;
+        @apply inline-block w-fit max-w-[300px];
+        margin-top: 0.5rem;
+        padding: 1rem 0.75rem;
+        min-height: 420px;
+        vertical-align: top;
     }
 
     .model-card img {
         @apply block w-full object-cover rounded-t-lg;
+    }
+
+    .compare-link {
+        @apply text-center my-4;
+    }
+
+    .compare-link a {
+        font-size: 0.9rem;
+        color: var(--primary-text);
+        text-decoration: underline;
     }
 }
