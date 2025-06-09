@@ -96,6 +96,9 @@ export function UpgradeDialog() {
             <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
           </DialogHeader>
         </div>
+        <div className="compare-link">
+          <a href={process.env.NEXT_PUBLIC_COMPARE_URL ?? '#'} target="_blank" rel="noopener noreferrer">Compare Models</a>
+        </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
           {plans.map((plan) => {
             if (ownedModels.includes(plan.id)) return null
@@ -103,7 +106,7 @@ export function UpgradeDialog() {
             return (
               <div
                 key={plan.id}
-                className="model-card group bg-white dark:bg-gray-800 rounded-[28px] shadow-lg transition-transform duration-200 ease-out hover:scale-[1.04] hover:shadow-2xl flex flex-col justify-between p-4 m-2"
+                className="model-card group bg-white dark:bg-gray-800 rounded-[28px] shadow-lg transition-transform duration-200 ease-out hover:scale-[1.04] hover:shadow-2xl flex flex-col justify-between"
               >
                 <div className="flex flex-col flex-1">
                   <Image
