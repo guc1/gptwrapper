@@ -58,6 +58,8 @@ export function Chat({
   const { openPopup: openUpgradePopup } = useUpgradePopup();
   const hasSetInitialInputRef = useRef(false);
 
+  const [chatModelId, setChatModelId] = useState(initialChatModel);
+
   const { visibilityType } = useChatVisibility({
     chatId: id,
     initialVisibilityType,
@@ -100,7 +102,7 @@ export function Chat({
     experimental_prepareRequestBody: (body) => ({
       id,
       message: body.messages.at(-1),
-      selectedChatModel: initialChatModel,
+      selectedChatModel: chatModelId,
       selectedVisibilityType: visibilityType,
     }),
     onFinish: () => {
@@ -234,7 +236,8 @@ export function Chat({
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
           chatId={id}
-          selectedModelId={initialChatModel}
+          selectedModelId={chatModelId}
+          onModelChange={setChatModelId}
           selectedVisibilityType={visibilityType}
           isReadonly={isReadonly}
           session={session}
