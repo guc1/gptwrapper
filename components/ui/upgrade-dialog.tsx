@@ -120,22 +120,24 @@ export function UpgradeDialog() {
                   )}
                 </div>
                 {!comingSoon ? (
-                  <Button
-                    className="mt-4 w-full"
-                    onClick={() => checkout(plan.id)}
-                    disabled={loadingId === plan.id}
-                  >
-                    {loadingId === plan.id ? 'Loading...' : 'Purchase'}
-                  </Button>
-                  <div className="compare-link">
-                    <a href="{{COMPARE_URL}}" target="_blank">Compare Models</a>
-                  </div>
+                  <>
+                    <Button
+                      className="mt-4 w-full"
+                      onClick={() => checkout(plan.id)}
+                      disabled={loadingId === plan.id}
+                    >
+                      {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                    </Button>
+                    <div className="compare-link">
+                      <a href="{{COMPARE_URL}}" target="_blank">Compare Models</a>
+                    </div>
+                  </>
                 ) : (
                   <p className="mt-4 text-center text-sm text-muted-foreground font-semibold">COMING SOON</p>
                 )}
               </div>
             )
-          })}
+          })
         </div>
       </DialogContent>
     </Dialog>
