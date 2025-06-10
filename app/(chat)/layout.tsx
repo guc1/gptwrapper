@@ -15,6 +15,13 @@ export default async function Layout({
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get('sidebar:state')?.value === 'false';
 
+  if (session?.user?.type === 'guest') {
+    cookieStore.set('guestUserId', session.user.id, {
+      path: '/',
+      maxAge: 60 * 60 * 24,
+    });
+  }
+
   return (
     <>
       <Script
