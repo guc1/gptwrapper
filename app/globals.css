@@ -121,11 +121,12 @@
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
         --radius: 0.5rem;
-        --sidebar-background: 25 60% 88%;
+        /* sidebar uses soft orange #fcf5ed */
+        --sidebar-background: 32 71% 95.9%;
         --sidebar-foreground: 24 37% 8%;
         --sidebar-primary: 25 90% 55%;
         --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 23 37% 93%;
+        --sidebar-accent: 29 100% 77%;
         --sidebar-accent-foreground: 24 37% 8%;
         --sidebar-border: 30 10% 90%;
         --sidebar-ring: 25 90% 55%;
@@ -224,14 +225,15 @@
     }
 
     /* Orange theme component tweaks */
-    .orange [data-role="assistant"] [data-testid="message-content"] {
-        background-color: hsl(30 40% 90%);
+    .orange [data-role="assistant"] [data-testid="message-content"],
+    .orange .chat-response {
+        background-color: #ffd4ad;
         padding: 0.5rem 0.75rem;
         border-radius: 0.75rem;
     }
 
     .orange [data-testid="attachments-button"] svg {
-        color: hsl(25 80% 50%);
+        color: hsl(var(--primary));
     }
 
     .orange header button,
@@ -257,5 +259,16 @@
     .orange [data-testid="upgrade-button"]:hover {
         background-color: hsl(25 90% 55%);
         border-color: hsl(25 90% 55%);
+    }
+
+    .orange .sidebar .new-chat-button {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        border-color: hsl(var(--primary));
+    }
+
+    /* send message input background */
+    .orange [data-testid="multimodal-input"] {
+        background-color: #fcedde; /* lighter orange */
     }
 }
