@@ -121,7 +121,7 @@
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
         --radius: 0.5rem;
-        --sidebar-background: 25 60% 88%;
+        --sidebar-background: #F6E9DD;
         --sidebar-foreground: 24 37% 8%;
         --sidebar-primary: 25 90% 55%;
         --sidebar-primary-foreground: 0 0% 100%;
@@ -224,14 +224,15 @@
     }
 
     /* Orange theme component tweaks */
-    .orange [data-role="assistant"] [data-testid="message-content"] {
-        background-color: hsl(30 40% 90%);
+    .orange [data-role="assistant"] [data-testid="message-content"],
+    .orange .chat-response {
+        background-color: #F3ECE8;
         padding: 0.5rem 0.75rem;
         border-radius: 0.75rem;
     }
 
     .orange [data-testid="attachments-button"] svg {
-        color: hsl(25 80% 50%);
+        color: hsl(var(--primary));
     }
 
     .orange header button,
@@ -257,5 +258,9 @@
     .orange [data-testid="upgrade-button"]:hover {
         background-color: hsl(25 90% 55%);
         border-color: hsl(25 90% 55%);
+    }
+
+    .orange .sidebar .new-chat-button {
+        color: hsl(var(--primary));
     }
 }
