@@ -43,7 +43,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <Button
                   variant="ghost"
                   type="button"
-                  className="p-2 h-fit"
+                  className="new-chat-button p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
                     router.push('/');
