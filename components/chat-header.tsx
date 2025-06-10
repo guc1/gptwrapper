@@ -47,6 +47,7 @@ function PureChatHeader({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              data-testid="new-chat-button"
               variant="outline"
               type="button"
               className="order-2 md:order-1 md:px-2 px-2 md:h-[34px] ml-auto md:ml-0" // md:h-fit changed to md:h-[34px] for consistency
@@ -88,6 +89,7 @@ function PureChatHeader({
 
       {session?.user && session.user.models?.length !== plansLength && (
         <Button
+          data-testid="upgrade-button"
           variant="outline"
           className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"
           onClick={() => openUpgradePopup()}
