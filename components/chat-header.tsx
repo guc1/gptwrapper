@@ -88,6 +88,7 @@ function PureChatHeader({
 
       {session?.user && session.user.models?.length !== plansLength && (
         <Button
+          data-testid="upgrade-button"
           variant="outline"
           className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"
           onClick={() => openUpgradePopup()}

@@ -94,6 +94,42 @@
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
     }
+
+    .orange {
+        --background: 30 40% 98%;
+        --foreground: 24 37% 8%;
+        --card: 23 37% 93%;
+        --card-foreground: 24 37% 8%;
+        --popover: 23 37% 93%;
+        --popover-foreground: 24 37% 8%;
+        --primary: 25 90% 55%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 23 37% 93%;
+        --secondary-foreground: 24 37% 8%;
+        --muted: 23 37% 93%;
+        --muted-foreground: 25 36% 45%;
+        --accent: 23 37% 93%;
+        --accent-foreground: 24 37% 8%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 30 10% 90%;
+        --input: 23 37% 93%;
+        --ring: 25 90% 55%;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+        --radius: 0.5rem;
+        --sidebar-background: 25 60% 88%;
+        --sidebar-foreground: 24 37% 8%;
+        --sidebar-primary: 25 90% 55%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 23 37% 93%;
+        --sidebar-accent-foreground: 24 37% 8%;
+        --sidebar-border: 30 10% 90%;
+        --sidebar-ring: 25 90% 55%;
+    }
 }
 
 @layer base {
@@ -185,5 +221,41 @@
 
     .model-card img {
         @apply block w-full object-cover rounded-t-lg;
+    }
+
+    /* Orange theme component tweaks */
+    .orange [data-role="assistant"] [data-testid="message-content"] {
+        background-color: hsl(30 40% 90%);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+    }
+
+    .orange [data-testid="attachments-button"] svg {
+        color: hsl(25 80% 50%);
+    }
+
+    .orange header button,
+    .orange [data-testid="message-upvote"],
+    .orange [data-testid="message-downvote"] {
+        border-color: hsl(var(--primary));
+        color: hsl(var(--primary));
+    }
+
+    .orange header button:hover,
+    .orange [data-testid="message-upvote"]:hover,
+    .orange [data-testid="message-downvote"]:hover {
+        background-color: hsl(25 90% 55%);
+        color: hsl(var(--primary-foreground));
+    }
+
+    .orange [data-testid="upgrade-button"] {
+        background-color: hsl(25 100% 60%);
+        color: #fff;
+        border-color: hsl(25 100% 60%);
+    }
+
+    .orange [data-testid="upgrade-button"]:hover {
+        background-color: hsl(25 90% 55%);
+        border-color: hsl(25 90% 55%);
     }
 }

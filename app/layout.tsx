@@ -32,6 +32,7 @@ const geistMono = Geist_Mono({
 
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
 const DARK_THEME_COLOR = 'hsl(240deg 10% 3.92%)';
+const ORANGE_THEME_COLOR = 'hsl(30 40% 98%)';
 const THEME_COLOR_SCRIPT = `\
 (function() {
   var html = document.documentElement;
@@ -42,8 +43,14 @@ const THEME_COLOR_SCRIPT = `\
     document.head.appendChild(meta);
   }
   function updateThemeColor() {
-    var isDark = html.classList.contains('dark');
-    meta.setAttribute('content', isDark ? '${DARK_THEME_COLOR}' : '${LIGHT_THEME_COLOR}');
+    var classes = html.classList;
+    if (classes.contains('dark')) {
+      meta.setAttribute('content', '${DARK_THEME_COLOR}');
+    } else if (classes.contains('orange')) {
+      meta.setAttribute('content', '${ORANGE_THEME_COLOR}');
+    } else {
+      meta.setAttribute('content', '${LIGHT_THEME_COLOR}');
+    }
   }
   var observer = new MutationObserver(updateThemeColor);
   observer.observe(html, { attributes: true, attributeFilter: ['class'] });
@@ -71,9 +78,10 @@ export default async function RootLayout({
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="orange"
           enableSystem
           disableTransitionOnChange
+          themes={["light", "dark", "orange"]}
         >
           <Toaster position="top-center" />
           <SessionProvider>
