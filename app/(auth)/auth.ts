@@ -5,6 +5,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { randomUUID } from 'node:crypto';
 import {
   createGuestUser,
+  getUserById,
   getUser,
   createUser,
   getUserModelIds,
@@ -77,10 +78,16 @@ const providers = [
   Credentials({
     id: 'guest', // matches signIn('guest')
     name: 'Guest account',
-    credentials: {},
-    async authorize() {
+    credentials: { guestUserId: { label: 'guestUserId', type: 'text' } },
+    async authorize(credentials) {
+      if (credentials?.guestUserId) {
+        const existing = await getUserById(credentials.guestUserId);
+        if (existing) {
+          return { ...existing, type: 'guest', models: [] } as any;
+        }
+      }
       const [guestUser] = await createGuestUser();
-      return { ...guestUser, type: 'guest', models: [] };
+      return { ...guestUser, type: 'guest', models: [] } as any;
     },
   }),
 ];
