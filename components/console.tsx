@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 import { useArtifactSelector } from '@/hooks/use-artifact';
+import { useTranslation } from '@/lib/i18n';
 
 export interface ConsoleOutputContent {
   type: 'text' | 'image';
@@ -31,6 +32,7 @@ export function Console({ consoleOutputs, setConsoleOutputs }: ConsoleProps) {
   const [height, setHeight] = useState<number>(300);
   const [isResizing, setIsResizing] = useState(false);
   const consoleEndRef = useRef<HTMLDivElement>(null);
+  const t = useTranslation();
 
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
@@ -100,7 +102,7 @@ export function Console({ consoleOutputs, setConsoleOutputs }: ConsoleProps) {
             <div className="text-muted-foreground">
               <TerminalWindowIcon />
             </div>
-            <div>Console</div>
+            <div>{t('console')}</div>
           </div>
           <Button
             variant="ghost"

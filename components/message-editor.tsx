@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Textarea } from './ui/textarea';
 import { deleteTrailingMessages } from '@/app/(chat)/actions';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { useTranslation } from '@/lib/i18n';
 
 export type MessageEditorProps = {
   message: Message;
@@ -21,6 +22,7 @@ export function MessageEditor({
   reload,
 }: MessageEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const t = useTranslation();
 
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -61,7 +63,7 @@ export function MessageEditor({
             setMode('view');
           }}
         >
-          Cancel
+          {t('cancel')}
         </Button>
         <Button
           data-testid="message-editor-send-button"
@@ -96,7 +98,7 @@ export function MessageEditor({
             reload();
           }}
         >
-          {isSubmitting ? 'Sending...' : 'Send'}
+          {isSubmitting ? t('sending') : t('send')}
         </Button>
       </div>
     </div>
