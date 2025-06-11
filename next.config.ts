@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
+    turbo: {},
   },
   i18n: {
     locales: ['en', 'nl'],
