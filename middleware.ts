@@ -7,6 +7,8 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 const intlMiddleware = createIntlMiddleware(i18nConfig);
 
 export async function middleware(request: NextRequest) {
+  // Normalize potential non-string pathnames in Next.js 15
+  request.nextUrl.pathname = String(request.nextUrl.pathname);
   const { pathname } = request.nextUrl;
   const intlResponse = intlMiddleware(request);
 
