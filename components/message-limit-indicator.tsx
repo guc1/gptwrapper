@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict, format, isPast } from 'date-fns';
 import type { UserType } from '@/lib/user-types';
 import { LoaderIcon } from './icons';
+import { useTranslations } from 'next-intl';
 
 interface MessageStatus {
   messagesLeft: number;
@@ -30,6 +31,7 @@ export function MessageLimitIndicator({
       revalidateOnFocus: true,
     },
   );
+  const t = useTranslations();
   const [tooltipContent, setTooltipContent] = useState<string>('');
   const [displayMessagesLeft, setDisplayMessagesLeft] = useState<string>('...');
 
@@ -38,31 +40,33 @@ export function MessageLimitIndicator({
       const { messagesLeft, maxMessages, nextResetTimestamp, userType } = data;
 
       if (userType === 'guest') {
-        setDisplayMessagesLeft(`${messagesLeft} free message${messagesLeft === 1 ? '' : 's'} left`);
+        setDisplayMessagesLeft(
+          t('free_messages_left', { count: messagesLeft })
+        );
         if (nextResetTimestamp) {
           if (isPast(new Date(nextResetTimestamp))) {
-            setTooltipContent('Messages have reset. You can send a message.');
+            setTooltipContent(t('messages_have_reset'));
           } else {
             setTooltipContent(
               `Resets ${formatDistanceToNowStrict(new Date(nextResetTimestamp), { addSuffix: true })} (at ${format(new Date(nextResetTimestamp), 'p')})`,
             );
           }
         } else {
-           setTooltipContent(`1 free message per day. Resets daily.`);
+           setTooltipContent(t('one_free_per_day'));
         }
       } else {
         setDisplayMessagesLeft(`${messagesLeft} of ${maxMessages} left`);
         // For registered users, we might not have a precise 'nextResetTimestamp' if it's just "daily"
         // The API would need to provide a consistent timestamp for this if precise countdown is desired.
         // For now, a general message.
-        setTooltipContent(`Message limit resets daily.`);
+      setTooltipContent(t('limit_resets_daily'));
       }
     } else if (error) {
-      setDisplayMessagesLeft('Limit N/A');
-      setTooltipContent('Could not load message limit.');
+      setDisplayMessagesLeft(t('limit_na'));
+      setTooltipContent(t('could_not_load_limit'));
     } else if (isLoading) {
       setDisplayMessagesLeft('...');
-      setTooltipContent('Loading message limit...');
+      setTooltipContent(t('loading_message_limit'));
     }
   }, [data, error, isLoading]);
 
@@ -73,7 +77,7 @@ export function MessageLimitIndicator({
         'text-xs text-muted-foreground px-2 py-1 animate-pulse flex items-center gap-1',
         className,
       )}>
-        <LoaderIcon size={12} /> Loading...
+        <LoaderIcon size={12} /> {t('loading')}
       </div>
     );
   }
@@ -81,7 +85,7 @@ export function MessageLimitIndicator({
   if (error || !data) {
     return (
       <div className={cn('text-xs text-muted-foreground px-2 py-1', className)}>
-        Limit N/A
+        {t('limit_na')}
       </div>
     );
   }

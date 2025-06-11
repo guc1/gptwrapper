@@ -2,6 +2,8 @@ import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { cookies } from 'next/headers';
+import { NextIntlClientProvider } from 'next-intl';
 
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
@@ -62,9 +64,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = cookies().get('NEXT_LOCALE')?.value ?? 'en';
+  const messages = (await import(`../locales/${locale}.json`)).default;
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className={`${geist.variable} ${geistMono.variable}`}
     >
@@ -85,9 +89,11 @@ export default async function RootLayout({
         >
           <Toaster position="top-center" />
           <SessionProvider>
-            {children}
-            <LoginSignupDialog />
-            <UpgradeDialog />
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              {children}
+              <LoginSignupDialog />
+              <UpgradeDialog />
+            </NextIntlClientProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>
