@@ -41,3 +41,7 @@ yarn-error.log*
 /playwright-report/
 /blob-report/
 /playwright/*
+
+# local images not included in repository
+public/images/ChatGPT Image Jun 11, 2025, 12_27_46 PM.png
+public/images/ChatGPT Image Jun 11, 2025, 12_30_18 PM.png
