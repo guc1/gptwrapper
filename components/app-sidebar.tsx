@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { useTranslation } from '@/lib/i18n';
 
@@ -36,9 +37,14 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               }}
               className="flex flex-row gap-3 items-center"
             >
-              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                Chatbot
-              </span>
+              <Image
+                src="/images/ChatGPT Image Jun 11, 2025, 12_30_18 PM.png"
+                alt="NLmodel"
+                width={160}
+                height={160}
+                className="w-40 h-40 object-contain"
+                style={{ marginTop: '-60px' }}
+              />
             </Link>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -46,6 +52,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   variant="ghost"
                   type="button"
                   className="new-chat-button p-2 h-fit"
+                  style={{ marginTop: '-60px' }}
                   onClick={() => {
                     setOpenMobile(false);
                     router.push('/');
