@@ -16,11 +16,13 @@ import { LogoGoogle } from '@/components/icons';
 import Link from 'next/link';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 // import { X } from 'lucide-react'; // No longer needed here if DialogContent provides it
 // import { useEffect } from 'react'; // No longer needed for body blur
 
 export function LoginSignupDialog() {
   const { isOpen, closePopup, chatContext } = useLoginSignupPopup();
+  const t = useTranslations();
 
   // Removed useEffect for body class manipulation
 
@@ -67,9 +69,9 @@ export function LoginSignupDialog() {
         onEscapeKeyDown={closePopup} // This will be handled by DialogPrimitive.Content now
       >
         <DialogHeader>
-          <DialogTitle>Continue Chatting</DialogTitle>
+          <DialogTitle>{t('continue_chatting_title')}</DialogTitle>
           <DialogDescription>
-            You've used your free message for today. Please log in or create an account to continue chatting.
+            {t('continue_chatting_desc')}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col sm:gap-2 pt-4">
@@ -81,13 +83,13 @@ export function LoginSignupDialog() {
               closePopup();
             }}
           >
-            <LogoGoogle /> Continue with Google
+            <LogoGoogle /> {t('sign_in_google')}
           </Button>
           <Button asChild onClick={closePopup} className="w-full">
-            <Link href={getAuthLink('/login')}>Login</Link>
+            <Link href={getAuthLink('/login')}>{t('login_button_text')}</Link>
           </Button>
           <Button variant="outline" asChild onClick={closePopup} className="w-full">
-            <Link href={getAuthLink('/register')}>Create Account</Link>
+            <Link href={getAuthLink('/register')}>{t('create_account_button_text')}</Link>
           </Button>
         </DialogFooter>
         {/* The DialogClose button is now implicitly part of DialogContent from shadcn/ui */}

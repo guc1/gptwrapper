@@ -14,6 +14,7 @@ import { useUpgradePopup } from '@/hooks/use-upgrade-popup'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface Plan {
   id: string
@@ -55,6 +56,7 @@ const plans: Plan[] = [
 
 export function UpgradeDialog() {
   const { isOpen, closePopup } = useUpgradePopup()
+  const t = useTranslations()
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const { data: session } = useSession()
   const router = useRouter()
@@ -93,8 +95,8 @@ export function UpgradeDialog() {
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none sm:rounded-none">
         <div className="mx-auto mb-10 bg-white/90 dark:bg-gray-900/90 px-6 py-3 rounded-full backdrop-blur-md shadow transition-transform duration-200 hover:scale-105 w-full max-w-lg flex flex-col items-center justify-center text-center">
           <DialogHeader className="upgrade-header space-y-1 text-center">
-            <DialogTitle className="text-xl font-medium">Upgrade Account</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">Select a model to unlock unlimited access.</DialogDescription>
+            <DialogTitle className="text-xl font-medium">{t('upgrade_account_title')}</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">{t('upgrade_description')}</DialogDescription>
           </DialogHeader>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
@@ -127,17 +129,17 @@ export function UpgradeDialog() {
                       onClick={() => checkout(plan.id)}
                       disabled={loadingId === plan.id}
                     >
-                      {loadingId === plan.id ? 'Loading...' : 'Purchase'}
+                      {loadingId === plan.id ? t('loading') : t('purchase_button')}
                     </Button>
                     <Link
                       href="/compare"
                       className="mt-2 text-center text-sm font-semibold text-gray-800 hover:underline dark:text-zinc-200"
                     >
-                      Compare models
+                      {t('compare_models_link')}
                     </Link>
                   </>
                 ) : (
-                  <p className="mt-4 text-center text-sm text-muted-foreground font-semibold">COMING SOON</p>
+                  <p className="mt-4 text-center text-sm text-muted-foreground font-semibold">{t('coming_soon')}</p>
                 )}
               </div>
             )
