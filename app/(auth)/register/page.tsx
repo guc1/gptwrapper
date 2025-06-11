@@ -15,6 +15,7 @@ import { register } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession, signIn } from 'next-auth/react';
 import { useSWRConfig } from 'swr';
+import { useTranslations } from 'next-intl';
 
 const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
 
@@ -30,6 +31,7 @@ export interface RegisterActionState {
 }
 
 export default function Page() {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { mutate: globalSWRMutate } = useSWRConfig();
@@ -73,7 +75,7 @@ export default function Page() {
 
   useEffect(() => {
     if (state.status === 'user_exists') {
-      toast({ type: 'error', description: 'Account already exists!' });
+      toast({ type: 'error', description: t('account_exists') });
       if (state.redirectTo) {
         const loginLink = new URL(state.redirectTo, window.location.origin);
         if (chatIdToResume) loginLink.searchParams.set('chatIdToResume', chatIdToResume);
@@ -82,16 +84,16 @@ export default function Page() {
         router.replace(loginLink.toString());
       }
     } else if (state.status === 'failed') {
-      toast({ type: 'error', description: 'Failed to create account!' });
+      toast({ type: 'error', description: t('failed_create_account') });
       hasShownSuccessToastRef.current = false;
       setIsSuccessful(false); // Reset button state
     } else if (state.status === 'invalid_data') {
-      toast({ type: 'error', description: 'Failed validating your submission!' });
+      toast({ type: 'error', description: t('failed_validating') });
       hasShownSuccessToastRef.current = false;
       setIsSuccessful(false); // Reset button state
     } else if (state.status === 'success') {
       if (!hasShownSuccessToastRef.current) {
-        toast({ type: 'success', description: 'Account created successfully!' });
+        toast({ type: 'success', description: t('account_created_successfully') });
         hasShownSuccessToastRef.current = true;
       }
       setIsSuccessful(true);
@@ -160,9 +162,9 @@ export default function Page() {
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
+          <h3 className="text-xl font-semibold dark:text-zinc-50">{t('sign_up_header')}</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Create an account with your email and password
+            {t('sign_up_desc')}
           </p>
         </div>
         {googleEnabled && (
@@ -172,15 +174,15 @@ export default function Page() {
               className="w-full"
               onClick={handleGoogleSignIn}
             >
-              <LogoGoogle /> Continue with Google
+              <LogoGoogle /> {t('sign_up_google_button')}
             </Button>
           </div>
         )}
         <Separator className="my-6" />
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
+          <SubmitButton isSuccessful={isSuccessful}>{t('sign_up_button')}</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {'Already have an account? '}
+            {t('already_have_account_prefix')}
             <Link
               href={`/login${chatIdToResume || guestUserId || unsentPrompt || planId ? `?${[
                 chatIdToResume ? `chatIdToResume=${chatIdToResume}` : null,
@@ -190,9 +192,9 @@ export default function Page() {
               ].filter(Boolean).join('&')}` : ''}`}
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
-              Sign in
+              {t('sign_in_link_text')}
             </Link>
-            {' instead.'}
+            {t('sign_in_instead_suffix')}
           </p>
         </AuthForm>
       </div>
