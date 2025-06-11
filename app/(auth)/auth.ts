@@ -123,7 +123,7 @@ export const {
   callbacks: {
     async signIn({ user, account }) {
       if ((user as any).id && (user as any).type === 'guest') {
-        const store = cookies();
+        const store = await cookies();
         store.set('guestUserId', (user as any).id, {
           path: '/',
           maxAge: 60 * 60 * 24,

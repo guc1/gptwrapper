@@ -62,3 +62,6 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
+### Internationalization
+
+The application now supports English and Dutch. Use the language selector in the header to switch between locales. To add new translations, create a JSON file in `locales/` with the locale code and provide the appropriate keys.

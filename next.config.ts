@@ -1,8 +1,15 @@
 import type { NextConfig } from 'next';
+import createIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createIntlPlugin('./next-intl.config.ts');
 
 const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
+  },
+  i18n: {
+    locales: ['en', 'nl'],
+    defaultLocale: 'en',
   },
   env: {
     NEXT_PUBLIC_GOOGLE_AUTH_ENABLED: process.env.GOOGLE_CLIENT_ID &&
@@ -22,4 +29,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

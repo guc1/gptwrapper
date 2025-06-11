@@ -57,6 +57,7 @@ function PureMultimodalInput({
   className?: string;
   selectedVisibilityType: VisibilityType;
 }) {
+  const t = useTranslations();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
 
@@ -270,7 +271,7 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder={t('placeholder_message')}
         value={input}
         onChange={handleInput}
         className={cx(
@@ -288,7 +289,7 @@ function PureMultimodalInput({
             event.preventDefault();
 
             if (status !== 'ready') {
-              toast.error('Please wait for the model to finish its response!');
+              toast.error(t('please_wait_for_model'));
             } else {
               submitForm();
             }

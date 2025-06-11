@@ -24,6 +24,7 @@ import { ChatSDKError } from '@/lib/errors';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import type { UserType } from '@/lib/user-types';
+import { useTranslations } from 'next-intl';
 
 type ChatRequestOptions = CoreChatRequestOptions;
 
@@ -56,6 +57,7 @@ export function Chat({
   const { mutate: mutateGlobal } = useSWRConfig();
   const { openPopup: openLoginSignupPopup } = useLoginSignupPopup();
   const { openPopup: openUpgradePopup } = useUpgradePopup();
+  const t = useTranslations();
   const hasSetInitialInputRef = useRef(false);
 
   const [chatModelId, setChatModelId] = useState(initialChatModel);
@@ -136,7 +138,7 @@ export function Chat({
       } else {
         toast({
           type: 'error',
-          description: 'An unexpected error occurred. Please try again.',
+          description: t('unexpected_error'),
         });
       }
     },
