@@ -15,6 +15,7 @@ import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
 import { MessageLimitIndicator } from './message-limit-indicator'; // Added
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
+import { useTranslation } from '@/lib/i18n';
 
 const plansLength = 3;
 
@@ -36,6 +37,7 @@ function PureChatHeader({
   const router = useRouter();
   const { open } = useSidebar();
   const { openPopup: openUpgradePopup } = useUpgradePopup();
+  const t = useTranslation();
 
   const { width: windowWidth } = useWindowSize();
 
@@ -56,10 +58,10 @@ function PureChatHeader({
               }}
             >
               <PlusIcon />
-              <span className="hidden md:inline ml-1">New Chat</span> {/* Changed sr-only to hidden md:inline */}
+              <span className="hidden md:inline ml-1">{t('newChat')}</span> {/* Changed sr-only to hidden md:inline */}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>New Chat</TooltipContent>
+          <TooltipContent>{t('newChat')}</TooltipContent>
         </Tooltip>
       )}
 
@@ -93,7 +95,7 @@ function PureChatHeader({
           className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"
           onClick={() => openUpgradePopup()}
         >
-          Upgrade
+          {t('upgrade')}
         </Button>
       )}
 
@@ -106,7 +108,7 @@ function PureChatHeader({
           target="_blank" // Corrected target
         >
           <VercelIcon size={16} />
-          Deploy
+          {t('deploy')}
         </Link>
       </Button>
     </header>

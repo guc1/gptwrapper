@@ -17,10 +17,12 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useTranslation } from '@/lib/i18n';
 
 export function AppSidebar({ user }: { user: User | undefined }) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
+  const t = useTranslation();
 
   return (
     <Sidebar className="group-data-[side=left]:border-r-0">
@@ -53,7 +55,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   <PlusIcon />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent align="end">New Chat</TooltipContent>
+              <TooltipContent align="end">{t('newChat')}</TooltipContent>
             </Tooltip>
           </div>
         </SidebarMenu>

@@ -2,6 +2,9 @@ import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { cookies } from 'next/headers';
+import { LanguageProvider } from '@/components/language-provider';
+import type { Language } from '@/lib/i18n';
 
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
@@ -62,9 +65,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const langCookie = cookieStore.get('language');
+  const lang = (langCookie?.value === 'nl' ? 'nl' : 'en') as Language;
   return (
     <html
-      lang="en"
+      lang={lang}
       suppressHydrationWarning
       className={`${geist.variable} ${geistMono.variable}`}
     >
@@ -76,6 +82,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <LanguageProvider defaultLang={lang}>
         <ThemeProvider
           attribute="class"
           defaultTheme="orange"
@@ -90,6 +97,7 @@ export default async function RootLayout({
             <UpgradeDialog />
           </SessionProvider>
         </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

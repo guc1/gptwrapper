@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict, format, isPast } from 'date-fns';
 import type { UserType } from '@/lib/user-types';
 import { LoaderIcon } from './icons';
+import { useTranslation } from '@/lib/i18n';
 
 interface MessageStatus {
   messagesLeft: number;
@@ -32,37 +33,51 @@ export function MessageLimitIndicator({
   );
   const [tooltipContent, setTooltipContent] = useState<string>('');
   const [displayMessagesLeft, setDisplayMessagesLeft] = useState<string>('...');
+  const t = useTranslation();
 
   useEffect(() => {
     if (data) {
       const { messagesLeft, maxMessages, nextResetTimestamp, userType } = data;
 
       if (userType === 'guest') {
-        setDisplayMessagesLeft(`${messagesLeft} free message${messagesLeft === 1 ? '' : 's'} left`);
+        setDisplayMessagesLeft(
+          t('freeMessagesLeft', {
+            count: messagesLeft.toString(),
+            plural: messagesLeft === 1 ? '' : 's',
+          }),
+        );
         if (nextResetTimestamp) {
           if (isPast(new Date(nextResetTimestamp))) {
-            setTooltipContent('Messages have reset. You can send a message.');
+            setTooltipContent(t('messagesReset'));
           } else {
             setTooltipContent(
-              `Resets ${formatDistanceToNowStrict(new Date(nextResetTimestamp), { addSuffix: true })} (at ${format(new Date(nextResetTimestamp), 'p')})`,
+              t('resetsAt', {
+                duration: formatDistanceToNowStrict(new Date(nextResetTimestamp), { addSuffix: true }),
+                time: format(new Date(nextResetTimestamp), 'p'),
+              }),
             );
           }
         } else {
-           setTooltipContent(`1 free message per day. Resets daily.`);
+           setTooltipContent(t('oneFreeMessageInfo'));
         }
       } else {
-        setDisplayMessagesLeft(`${messagesLeft} of ${maxMessages} left`);
+        setDisplayMessagesLeft(
+          t('messagesLeftOf', {
+            count: messagesLeft.toString(),
+            max: maxMessages.toString(),
+          }),
+        );
         // For registered users, we might not have a precise 'nextResetTimestamp' if it's just "daily"
         // The API would need to provide a consistent timestamp for this if precise countdown is desired.
         // For now, a general message.
-        setTooltipContent(`Message limit resets daily.`);
+        setTooltipContent(t('messageLimitResets'));
       }
     } else if (error) {
-      setDisplayMessagesLeft('Limit N/A');
-      setTooltipContent('Could not load message limit.');
+      setDisplayMessagesLeft(t('limitNA'));
+      setTooltipContent(t('couldNotLoadMessageLimit'));
     } else if (isLoading) {
       setDisplayMessagesLeft('...');
-      setTooltipContent('Loading message limit...');
+      setTooltipContent(t('loadingMessageLimit'));
     }
   }, [data, error, isLoading]);
 
@@ -73,7 +88,7 @@ export function MessageLimitIndicator({
         'text-xs text-muted-foreground px-2 py-1 animate-pulse flex items-center gap-1',
         className,
       )}>
-        <LoaderIcon size={12} /> Loading...
+        <LoaderIcon size={12} /> {t('loading')}
       </div>
     );
   }
@@ -81,7 +96,7 @@ export function MessageLimitIndicator({
   if (error || !data) {
     return (
       <div className={cn('text-xs text-muted-foreground px-2 py-1', className)}>
-        Limit N/A
+        {t('limitNA')}
       </div>
     );
   }

@@ -1,0 +1,174 @@
+export type Language = 'en' | 'nl';
+
+export const translations = {
+  en: {
+    newChat: 'New Chat',
+    deploy: 'Deploy',
+    upgrade: 'Upgrade',
+    loadingAuthStatus: 'Loading auth status',
+    guest: 'Guest',
+    toggleMode: 'Toggle {mode} mode',
+    loginToAccount: 'Login to your account',
+    signOut: 'Sign out',
+    switchToDutch: 'Switch to Dutch',
+    switchToEnglish: 'Switch to English',
+    editMessage: 'Edit message',
+    copyToClipboardNoText: "There's no text to copy!",
+    copiedToClipboard: 'Copied to clipboard!',
+    copy: 'Copy',
+    upvotingResponse: 'Upvoting Response...',
+    upvoteResponse: 'Upvote Response',
+    failedUpvote: 'Failed to upvote response.',
+    upvotedResponse: 'Upvoted Response!',
+    downvotingResponse: 'Downvoting Response...',
+    downvoteResponse: 'Downvote Response',
+    failedDownvote: 'Failed to downvote response.',
+    downvotedResponse: 'Downvoted Response!',
+    toggleSidebar: 'Toggle Sidebar',
+    reachedEndHistory: 'You have reached the end of your chat history.',
+    loadingChats: 'Loading Chats...',
+    areYouSure: 'Are you absolutely sure?',
+    deleteWarning:
+      'This action cannot be undone. This will permanently delete your chat and remove it from our servers.',
+    cancel: 'Cancel',
+    continue: 'Continue',
+    loginHistoryNotice: 'Login to save and revisit previous chats!',
+    conversationsAppearHere:
+      'Your conversations will appear here once you start chatting!',
+    today: 'Today',
+    yesterday: 'Yesterday',
+    last7days: 'Last 7 days',
+    last30days: 'Last 30 days',
+    olderThanLastMonth: 'Older than last month',
+    login: 'Login',
+    createAccount: 'Create Account',
+    continueChatting: 'Continue Chatting',
+    usedFreeMessage:
+      "You've used your free message for today. Please log in or create an account to continue chatting.",
+    continueWithGoogle: 'Continue with Google',
+    sending: 'Sending...',
+    send: 'Send',
+    upgradeAccount: 'Upgrade Account',
+    selectModel: 'Select a model to unlock unlimited access.',
+    loading: 'Loading...',
+    purchase: 'Purchase',
+    compareModels: 'Compare models',
+    comingSoon: 'COMING SOON',
+    freeMessagesLeft: '{count} free message{plural} left',
+    messagesReset: 'Messages have reset. You can send a message.',
+    resetsAt: 'Resets {duration} (at {time})',
+    oneFreeMessageInfo: '1 free message per day. Resets daily.',
+    messagesLeftOf: '{count} of {max} left',
+    messageLimitResets: 'Message limit resets daily.',
+    couldNotLoadMessageLimit: 'Could not load message limit.',
+    loadingMessageLimit: 'Loading message limit...',
+    limitNA: 'Limit N/A',
+    console: 'Console',
+    apply: 'Apply',
+    assistant: 'Assistant',
+    share: 'Share',
+    more: 'More',
+    private: 'Private',
+    public: 'Public',
+    delete: 'Delete',
+  },
+  nl: {
+    newChat: 'Nieuw gesprek',
+    deploy: 'Deploy',
+    upgrade: 'Upgrade',
+    loadingAuthStatus: 'Authenticatiestatus laden',
+    guest: 'Gast',
+    toggleMode: 'Schakel naar {mode}-modus',
+    loginToAccount: 'Inloggen op je account',
+    signOut: 'Uitloggen',
+    switchToDutch: 'Schakel naar Nederlands',
+    switchToEnglish: 'Schakel naar Engels',
+    editMessage: 'Bericht bewerken',
+    copyToClipboardNoText: 'Er is geen tekst om te kopiëren!',
+    copiedToClipboard: 'Gekopieerd naar klembord!',
+    copy: 'Kopiëren',
+    upvotingResponse: 'Antwoord omhoogstemmen...',
+    upvoteResponse: 'Stem antwoord omhoog',
+    failedUpvote: 'Upvoten mislukt.',
+    upvotedResponse: 'Antwoord omhooggestemd!',
+    downvotingResponse: 'Antwoord omlaagstemmen...',
+    downvoteResponse: 'Stem antwoord omlaag',
+    failedDownvote: 'Downvoten mislukt.',
+    downvotedResponse: 'Antwoord omlaaggestemd!',
+    toggleSidebar: 'Zijbalk tonen/verbergen',
+    reachedEndHistory: 'Je hebt het einde van je chathistorie bereikt.',
+    loadingChats: 'Chats laden...',
+    areYouSure: 'Weet je het zeker?',
+    deleteWarning:
+      'Deze actie kan niet ongedaan worden gemaakt. Dit verwijdert je chat permanent van onze servers.',
+    cancel: 'Annuleren',
+    continue: 'Doorgaan',
+    loginHistoryNotice: 'Log in om eerdere chats op te slaan en te bekijken!',
+    conversationsAppearHere:
+      'Je gesprekken verschijnen hier zodra je begint te chatten!',
+    today: 'Vandaag',
+    yesterday: 'Gisteren',
+    last7days: 'Laatste 7 dagen',
+    last30days: 'Laatste 30 dagen',
+    olderThanLastMonth: 'Ouder dan afgelopen maand',
+    login: 'Inloggen',
+    createAccount: 'Account aanmaken',
+    continueChatting: 'Verder chatten',
+    usedFreeMessage:
+      'Je hebt je gratis bericht voor vandaag gebruikt. Log in of maak een account om verder te chatten.',
+    continueWithGoogle: 'Verder met Google',
+    sending: 'Verzenden...',
+    send: 'Verzenden',
+    upgradeAccount: 'Account upgraden',
+    selectModel: 'Selecteer een model voor onbeperkte toegang.',
+    loading: 'Laden...',
+    purchase: 'Kopen',
+    compareModels: 'Vergelijk modellen',
+    comingSoon: 'BINNENKORT',
+    freeMessagesLeft: '{count} gratis bericht{plural} over',
+    messagesReset: 'Berichten zijn gereset. Je kunt een bericht sturen.',
+    resetsAt: 'Reset {duration} (om {time})',
+    oneFreeMessageInfo: '1 gratis bericht per dag. Resets elke dag.',
+    messagesLeftOf: '{count} van {max} over',
+    messageLimitResets: 'Berichtlimiet wordt dagelijks gereset.',
+    couldNotLoadMessageLimit: 'Kan berichtlimiet niet laden.',
+    loadingMessageLimit: 'Berichtlimiet laden...',
+    limitNA: 'Limiet N/B',
+    console: 'Console',
+    apply: 'Toepassen',
+    assistant: 'Assistent',
+    share: 'Delen',
+    more: 'Meer',
+    private: 'Privé',
+    public: 'Publiek',
+    delete: 'Verwijderen',
+  },
+} as const;
+
+export type TranslationKey = keyof typeof translations.en;
+
+export function translate(
+  lang: Language,
+  key: TranslationKey,
+  vars?: Record<string, string>,
+): string {
+  let text = translations[lang][key] as string;
+  if (vars) {
+    Object.entries(vars).forEach(([k, v]) => {
+      text = text.replace(`{${k}}`, v);
+    });
+  }
+  return text;
+}
+
+import { useLanguage } from '@/components/language-provider';
+import React from 'react';
+
+export function useTranslation() {
+  const { lang } = useLanguage();
+  return React.useCallback(
+    (key: TranslationKey, vars?: Record<string, string>) =>
+      translate(lang, key, vars),
+    [lang],
+  );
+}
