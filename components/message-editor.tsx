@@ -3,6 +3,7 @@
 import { ChatRequestOptions, Message } from 'ai';
 import { Button } from './ui/button';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Textarea } from './ui/textarea';
 import { deleteTrailingMessages } from '@/app/(chat)/actions';
 import { UseChatHelpers } from '@ai-sdk/react';
@@ -20,6 +21,7 @@ export function MessageEditor({
   setMessages,
   reload,
 }: MessageEditorProps) {
+  const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [draftContent, setDraftContent] = useState<string>(message.content);
@@ -61,7 +63,7 @@ export function MessageEditor({
             setMode('view');
           }}
         >
-          Cancel
+          {t('cancel')}
         </Button>
         <Button
           data-testid="message-editor-send-button"
@@ -96,7 +98,7 @@ export function MessageEditor({
             reload();
           }}
         >
-          {isSubmitting ? 'Sending...' : 'Send'}
+          {isSubmitting ? t('sending') : t('send')}
         </Button>
       </div>
     </div>
