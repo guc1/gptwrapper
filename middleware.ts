@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import createIntlMiddleware from 'next-intl/middleware';
 import i18nConfig from './next-intl.config';
@@ -7,8 +7,10 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 const intlMiddleware = createIntlMiddleware(i18nConfig);
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const intlResponse = intlMiddleware(request);
+  // Clone request to normalize pathname for `next-intl`
+  const normalized = new NextRequest(request.nextUrl.toString(), request);
+  const { pathname } = normalized.nextUrl;
+  const intlResponse = intlMiddleware(normalized);
 
   /*
    * Playwright starts the dev server and requires a 200 status to
@@ -25,7 +27,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const token = await getToken({
-    req: request,
+    req: normalized,
     secret: process.env.AUTH_SECRET,
     secureCookie: !isDevelopmentEnvironment,
   });
