@@ -5,6 +5,8 @@ import Image from 'next/image';
 import type { User } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '@/components/language-provider';
+import { useTranslation } from '@/lib/i18n';
 
 import {
   DropdownMenu,
@@ -27,6 +29,8 @@ export function SidebarUserNav({ user }: { user: User }) {
   const router = useRouter();
   const { data, status } = useSession();
   const { setTheme, theme } = useTheme();
+  const { lang, setLang } = useLanguage();
+  const t = useTranslation();
 
   const isGuest = guestRegex.test(data?.user?.email ?? '');
 
@@ -40,7 +44,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                 <div className="flex flex-row gap-2">
                   <div className="size-6 bg-zinc-500/30 rounded-full animate-pulse" />
                   <span className="bg-zinc-500/30 text-transparent rounded-md animate-pulse">
-                    Loading auth status
+                    {t('loadingAuthStatus')}
                   </span>
                 </div>
                 <div className="animate-spin text-zinc-500">
@@ -60,7 +64,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   className="rounded-full"
                 />
                 <span data-testid="user-email" className="truncate">
-                  {isGuest ? 'Guest' : user?.email}
+                  {isGuest ? t('guest') : user?.email}
                 </span>
                 <ChevronUp className="ml-auto" />
               </SidebarMenuButton>
@@ -79,7 +83,14 @@ export function SidebarUserNav({ user }: { user: User }) {
                 setTheme(next);
               }}
             >
-              {`Toggle ${theme === 'dark' ? 'light' : theme === 'light' ? 'orange' : 'dark'} mode`}
+              {t('toggleMode', { mode: theme === 'dark' ? 'light' : theme === 'light' ? 'orange' : 'dark' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              data-testid="user-nav-item-lang"
+              className="cursor-pointer"
+              onSelect={() => setLang(lang === 'en' ? 'nl' : 'en')}
+            >
+              {lang === 'en' ? t('switchToDutch') : t('switchToEnglish')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild data-testid="user-nav-item-auth">
@@ -106,7 +117,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   }
                 }}
               >
-                {isGuest ? 'Login to your account' : 'Sign out'}
+                {isGuest ? t('loginToAccount') : t('signOut')}
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
