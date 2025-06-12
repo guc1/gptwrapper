@@ -1,4 +1,9 @@
-import { GoogleGenAI, type GenerationConfig, type SafetySetting } from '@google/genai';
+import {
+  GoogleGenAI,
+  type GenerationConfig,
+  type SafetySetting,
+  type GenerateContentParameters,
+} from '@google/genai';
 
 /* ------------------------------------------------------------------ */
 /* 0. Bootstrapping                                                   */
@@ -9,16 +14,30 @@ const genAI = new GoogleGenAI({
 });
 
 const MODEL_BASE = 'gemini-2.5-flash-preview-05-20';
-const MODEL_THINKING_ID = `${MODEL_BASE}:thinking`;
 
 /**
  * Retrieve a handle to the Gemini model.
- * @param useThinking Enable reasoning by switching to the :thinking variant.
+ * @param useThinking Enable reasoning with a non-zero thinkingBudget.
  * @returns Gemini GenerativeModel instance.
  */
 export function getModel(useThinking = false) {
-  const modelId = useThinking ? MODEL_THINKING_ID : MODEL_BASE;
-  return genAI.getGenerativeModel({ model: modelId });
+  const modelId = MODEL_BASE;
+  return {
+    generateContent(params: Omit<GenerateContentParameters, 'model'>) {
+      const { generationConfig, ...rest } = params;
+      const config = { ...generationConfig } as Record<string, any>;
+      if (!useThinking) {
+        config.thinkingBudget = 0;
+      } else if (config.thinkingBudget === undefined) {
+        config.thinkingBudget = undefined;
+      }
+      return genAI.models.generateContent({
+        ...rest,
+        generationConfig: config,
+        model: modelId,
+      });
+    },
+  };
 }
 
 /** Default generation options mirroring Google defaults.
@@ -49,9 +68,9 @@ export async function explainTopic(topic: string, deep = false) {
   const config = { ...defaultGenerationConfig };
   if (!deep) config.thinkingBudget = 0;
   const res = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: `Explain ${topic}` }]}],
+    contents: [{ role: 'user', parts: [{ text: `Explain ${topic}` }] }],
     generationConfig: config,
     safetySettings: defaultSafety,
   });
-  return res.text();
+  return res.text;
 }
