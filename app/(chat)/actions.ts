@@ -66,9 +66,9 @@ export async function updateUserTypeAfterCheckout({
   const { unstable_update } = await import('@/app/(auth)/auth');
   const { addUserModel, getUserModelIds } = await import('@/lib/db/queries');
 
-  const PLAN_MAP: Record<string, 'basic' | 'gemiddeld' | 'top' | undefined> = {
-    'basic-model': 'basic',
-    'gemiddeld-model': 'gemiddeld',
+  const PLAN_MAP: Record<string, 'basis' | 'plus' | 'top' | undefined> = {
+    'basis-model': 'basis',
+    'plus-model': 'plus',
     'top-model': 'top',
   };
 
