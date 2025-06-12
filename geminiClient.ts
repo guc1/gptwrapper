@@ -1,4 +1,9 @@
-import { GoogleGenAI, type GenerationConfig, type SafetySetting } from '@google/genai';
+import {
+  GoogleGenAI,
+  type GenerationConfig,
+  type SafetySetting,
+  type GenerateContentParameters,
+} from '@google/genai';
 
 /* ------------------------------------------------------------------ */
 /* 0. Bootstrapping                                                   */
@@ -18,7 +23,11 @@ const MODEL_THINKING_ID = `${MODEL_BASE}:thinking`;
  */
 export function getModel(useThinking = false) {
   const modelId = useThinking ? MODEL_THINKING_ID : MODEL_BASE;
-  return genAI.getGenerativeModel({ model: modelId });
+  return {
+    generateContent(params: Omit<GenerateContentParameters, 'model'>) {
+      return genAI.models.generateContent({ ...params, model: modelId });
+    },
+  };
 }
 
 /** Default generation options mirroring Google defaults.
@@ -49,7 +58,7 @@ export async function explainTopic(topic: string, deep = false) {
   const config = { ...defaultGenerationConfig };
   if (!deep) config.thinkingBudget = 0;
   const res = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: `Explain ${topic}` }]}],
+    contents: [{ role: 'user', parts: [{ text: `Explain ${topic}` }] }],
     generationConfig: config,
     safetySettings: defaultSafety,
   });
