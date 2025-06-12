@@ -3,13 +3,18 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
-import { openai } from '@ai-sdk/openai';         // 👈 switched from xai
+import { openai } from '@ai-sdk/openai'; // 👈 switched from xai
+import { createPartFromText } from '@google/genai';
 import type {
   LanguageModelV1,
   LanguageModelV1CallOptions,
   LanguageModelV1StreamPart,
 } from 'ai';
-import { getModel, defaultGenerationConfig, defaultSafety } from '@/geminiClient';
+import {
+  getModel,
+  defaultGenerationConfig,
+  defaultSafety,
+} from '@/geminiClient';
 import { isTestEnvironment } from '../constants';
 import {
   artifactModel,
@@ -30,21 +35,32 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
       const genModel = getModel(useThinking);
       const config = { ...defaultGenerationConfig };
       if (!useThinking) config.thinkingBudget = 0;
-      const contents = prompt.map(({ role, content }) => ({
-        role,
-        parts: [{ text: content }],
-      }));
-      const res = await genModel.generateContent({
-        contents,
-        generationConfig: config,
-        safetySettings: defaultSafety,
+      const contents = prompt.map(({ role, content, parts }) => {
+        let text = content as string | undefined;
+        if (!text && Array.isArray(parts)) {
+          const partWithText = (parts as Array<{ text?: string }>).find(
+            (p) => typeof p.text === 'string',
+          );
+          text = partWithText?.text;
+        }
+        return { role, parts: [createPartFromText(text ?? '')] };
       });
-      return {
-        text: res.text(),
-        finishReason: 'stop',
-        usage: { promptTokens: 0, completionTokens: 0 },
-        rawCall: { rawPrompt: contents, rawSettings: config },
-      };
+      try {
+        const res = await genModel.generateContent({
+          contents,
+          config,
+          safetySettings: defaultSafety,
+        });
+        return {
+          text: res.text(),
+          finishReason: 'stop',
+          usage: { promptTokens: 0, completionTokens: 0 },
+          rawCall: { rawPrompt: contents, rawSettings: config },
+        };
+      } catch (err) {
+        console.error('Gemini request failed:', err);
+        throw err;
+      }
     },
     async doStream(options: LanguageModelV1CallOptions) {
       const { text } = await this.doGenerate(options);
@@ -60,8 +76,8 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
 }
 
 export const myProvider = isTestEnvironment
-  /* ——————————————————————  MOCKS FOR AUTOMATED TESTS  ——————————————————— */
-  ? customProvider({
+  ? /* ——————————————————————  MOCKS FOR AUTOMATED TESTS  ——————————————————— */
+    customProvider({
       languageModels: {
         'chat-model': chatModel,
         'chat-model-reasoning': reasoningModel,
@@ -72,11 +88,11 @@ export const myProvider = isTestEnvironment
         'artifact-model': artifactModel,
       },
     })
-  /* ——————————————————————  PRODUCTION (OpenAI)  ———————————————————————— */
-  : customProvider({
+  : /* ——————————————————————  PRODUCTION (OpenAI)  ———————————————————————— */
+    customProvider({
       languageModels: {
         /* flagship model for normal chat                                */
-        'chat-model': openai('gpt-4.1'),             // GPT‑4.1 :contentReference[oaicite:4]{index=4}
+        'chat-model': openai('gpt-4.1'), // GPT‑4.1 :contentReference[oaicite:4]{index=4}
 
         'basis-model': openai('gpt-4.1'),
         'plus-model': geminiLanguageModel(false),
@@ -84,17 +100,17 @@ export const myProvider = isTestEnvironment
 
         /* reasoning stream with <think> traces, using 4o‑mini           */
         'chat-model-reasoning': wrapLanguageModel({
-          model: openai('gpt-4o-mini'),              // GPT‑4o mini :contentReference[oaicite:5]{index=5}
+          model: openai('gpt-4o-mini'), // GPT‑4o mini :contentReference[oaicite:5]{index=5}
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
 
         /* tiny, cheap models for titles & document help                 */
-        'title-model': openai('gpt-4o-mini'),        // single‑shot tasks :contentReference[oaicite:6]{index=6}
-        'artifact-model': openai('gpt-4o-mini'),     // doc summaries etc. :contentReference[oaicite:7]{index=7}
+        'title-model': openai('gpt-4o-mini'), // single‑shot tasks :contentReference[oaicite:6]{index=6}
+        'artifact-model': openai('gpt-4o-mini'), // doc summaries etc. :contentReference[oaicite:7]{index=7}
       },
 
       imageModels: {
         /* DALL·E 3 remains OpenAI’s production image model              */
-        'small-model': openai.image('dall-e-3'),     // image gen :contentReference[oaicite:8]{index=8}
+        'small-model': openai.image('dall-e-3'), // image gen :contentReference[oaicite:8]{index=8}
       },
     });
