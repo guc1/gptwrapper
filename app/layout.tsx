@@ -69,7 +69,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const langCookie = cookieStore.get('language');
   const lang = (langCookie?.value === 'nl' ? 'nl' : 'en') as Language;
   return (
