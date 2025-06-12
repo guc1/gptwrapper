@@ -4,9 +4,9 @@ import { db } from '@/lib/db/drizzle-client';
 import { user } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-const PLAN_MAP: Record<string, 'basic' | 'gemiddeld' | 'top' | undefined> = {
-  'basic-model': 'basic',
-  'gemiddeld-model': 'gemiddeld',
+const PLAN_MAP: Record<string, 'basis' | 'plus' | 'top' | undefined> = {
+  'basis-model': 'basis',
+  'plus-model': 'plus',
   'top-model': 'top',
 };
 
