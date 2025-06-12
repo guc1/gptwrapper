@@ -56,14 +56,11 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
           text = part?.text;
         }
         const geminiRole = role === 'assistant' ? 'model' : role;
-        const message = {
-          role: geminiRole,
-          parts: [createPartFromText(text ?? '')],
-        };
+        const parts = [createPartFromText(text ?? '')];
         if (geminiRole === 'system') {
-          systemInstruction = message;
+          systemInstruction = { parts };
         } else {
-          contents.push(message);
+          contents.push({ role: geminiRole, parts });
         }
       }
       const params: Record<string, any> = {
