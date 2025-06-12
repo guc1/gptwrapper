@@ -103,7 +103,10 @@ export async function POST(request: Request) {
     });
 
     if (!userMessage) {
-      return new ChatSDKError('limit_exceeded:chat', 'Message limit reached for the day.').toResponse();
+      return new ChatSDKError(
+        'limit_exceeded:chat',
+        'Message limit reached for the day.',
+      ).toResponse();
     }
 
     const { longitude, latitude, city, country } = geolocation(request);
@@ -176,7 +179,10 @@ export async function POST(request: Request) {
         result.consumeStream();
         result.mergeIntoDataStream(dataStream, { sendReasoning: true });
       },
-      onError: () => 'Oops, an error occurred!',
+      onError: (error) => {
+        console.error('createDataStream error:', error);
+        return 'Oops, an error occurred!';
+      },
     });
 
     const streamContext = getStreamContext();
@@ -206,7 +212,10 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return new ChatSDKError('bad_request:api', 'Chat ID is required.').toResponse();
+      return new ChatSDKError(
+        'bad_request:api',
+        'Chat ID is required.',
+      ).toResponse();
     }
 
     const chat = await getChatById({ id });
@@ -216,12 +225,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (chat.userId !== session.user.id) {
-      return new ChatSDKError('forbidden:chat', 'You do not own this chat.').toResponse();
+      return new ChatSDKError(
+        'forbidden:chat',
+        'You do not own this chat.',
+      ).toResponse();
     }
 
     const deletedChat = await deleteChatById({ id });
     return NextResponse.json(deletedChat, { status: 200 });
-
   } catch (err) {
     console.error('DELETE /api/chat failed:', err);
     if (err instanceof ChatSDKError) {
@@ -238,7 +249,10 @@ export async function GET(request: NextRequest) {
     const streamId = searchParams.get('streamId');
 
     if (!chatId) {
-      return new ChatSDKError('bad_request:api', 'chatId is required.').toResponse();
+      return new ChatSDKError(
+        'bad_request:api',
+        'chatId is required.',
+      ).toResponse();
     }
 
     const session = await auth();
@@ -256,15 +270,21 @@ export async function GET(request: NextRequest) {
 
     const streamContext = getStreamContext();
     if (!streamContext) {
-      return new ChatSDKError('bad_request:api', 'Resumable streams not configured.').toResponse();
+      return new ChatSDKError(
+        'bad_request:api',
+        'Resumable streams not configured.',
+      ).toResponse();
     }
 
     // The fallback function MUST return a Promise<ReadableStream | Response> or ReadableStream | Response
-    const resumedStream = await streamContext.resumableStream(streamId || chatId, async () => {
-      const data = new StreamData();
-      data.close(); // Close the StreamData instance, making its stream end.
-      return data.stream; // This is a ReadableStream
-    });
+    const resumedStream = await streamContext.resumableStream(
+      streamId || chatId,
+      async () => {
+        const data = new StreamData();
+        data.close(); // Close the StreamData instance, making its stream end.
+        return data.stream; // This is a ReadableStream
+      },
+    );
 
     return new Response(resumedStream);
   } catch (err) {
