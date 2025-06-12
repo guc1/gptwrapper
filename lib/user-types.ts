@@ -1,1 +1,1 @@
-export type UserType = 'guest' | 'regular' | 'basic' | 'gemiddeld' | 'top';
+export type UserType = 'guest' | 'regular' | 'basic' | 'plus' | 'top';

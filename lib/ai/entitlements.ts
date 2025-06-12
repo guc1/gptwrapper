@@ -28,9 +28,9 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
     availableChatModelIds: ['basic-model'],
   },
 
-  gemiddeld: {
+  plus: {
     maxMessagesPerDay: Number.MAX_SAFE_INTEGER,
-    availableChatModelIds: ['gemiddeld-model'],
+    availableChatModelIds: ['plus-model'],
   },
 
   top: {

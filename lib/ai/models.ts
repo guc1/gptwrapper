@@ -23,8 +23,8 @@ export const chatModels: Array<ChatModel> = [
     description: 'The fast and reliable model. Unlimited access.',
   },
   {
-    id: 'gemiddeld-model',
-    name: 'GEMMIDDELD MODEL',
+    id: 'plus-model',
+    name: 'PLUS MODEL',
     description: 'Very good model capable of most tasks. Unlimited access.',
   },
   {
