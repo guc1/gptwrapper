@@ -16,7 +16,7 @@ export const user = pgTable('User', {
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
   type: varchar('type', {
-    enum: ['guest', 'regular', 'basic', 'gemiddeld', 'top'],
+    enum: ['guest', 'regular', 'basis', 'plus', 'top'],
   })
     .notNull()
     .default('regular'),

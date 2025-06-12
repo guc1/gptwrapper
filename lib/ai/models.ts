@@ -18,13 +18,13 @@ export const chatModels: Array<ChatModel> = [
     description: 'Uses advanced reasoning',
   },
   {
-    id: 'basic-model',
-    name: 'BASIC MODEL',
+    id: 'basis-model',
+    name: 'BASIS MODEL',
     description: 'The fast and reliable model. Unlimited access.',
   },
   {
-    id: 'gemiddeld-model',
-    name: 'GEMMIDDELD MODEL',
+    id: 'plus-model',
+    name: 'PLUS MODEL',
     description: 'Very good model capable of most tasks. Unlimited access.',
   },
   {

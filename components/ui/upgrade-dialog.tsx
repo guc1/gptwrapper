@@ -26,15 +26,15 @@ interface Plan {
 
 const plans: Plan[] = [
   {
-    id: 'basic-model',
-    name: 'BASIC MODEL',
+    id: 'basis-model',
+    name: 'BASIS MODEL',
     description: 'The fast and reliable model.',
     price: '€4.99',
     image: '/images/ChatGPT Image Jun 8, 2025, 04_07_35 PM.png',
   },
   {
-    id: 'gemiddeld-model',
-    name: 'GEMMIDDELD MODEL',
+    id: 'plus-model',
+    name: 'PLUS MODEL',
     description: 'Very good model capable of most tasks.',
     price: '€9.99',
     image: '/images/ChatGPT Image Jun 8, 2025, 04_08_58 PM.png',

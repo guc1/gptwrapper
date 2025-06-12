@@ -3,8 +3,8 @@ import stripe from '@/lib/stripe';
 import { auth } from '@/app/(auth)/auth';
 
 const PRICE_MAP: Record<string, string | undefined> = {
-  'basic-model': process.env.STRIPE_PRICE_BASIC_ID,
-  'gemiddeld-model': process.env.STRIPE_PRICE_GEMIDDELD_ID,
+  'basis-model': process.env.STRIPE_PRICE_BASIS_ID,
+  'plus-model': process.env.STRIPE_PRICE_PLUS_ID,
   'top-model': process.env.STRIPE_PRICE_TOP_ID,
 };
 
