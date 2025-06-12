@@ -1,7 +1,12 @@
-import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from 'ai';
+import type {
+  CoreAssistantMessage,
+  CoreToolMessage,
+  UIMessage,
+  Attachment,
+} from 'ai';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { Document } from '@/lib/db/schema';
+import type { Document, DBMessage } from '@/lib/db/schema';
 import { ChatSDKError, type ErrorCode } from './errors';
 
 export function cn(...inputs: ClassValue[]) {
@@ -95,4 +100,20 @@ export function getTrailingMessageId({
 
 export function sanitizeText(text: string) {
   return text.replace('<has_function_call>', '');
+}
+
+export function convertDBMessagesToUIMessages(
+  messages: Array<DBMessage>,
+): Array<UIMessage> {
+  return messages.map((message) => ({
+    id: message.id,
+    parts: message.parts as UIMessage['parts'],
+    role: message.role as UIMessage['role'],
+    content:
+      (message.parts as Array<{ type: string; text?: string }>).find(
+        (p) => p.type === 'text',
+      )?.text || '',
+    createdAt: message.createdAt,
+    experimental_attachments: (message.attachments as Array<Attachment>) ?? [],
+  }));
 }
