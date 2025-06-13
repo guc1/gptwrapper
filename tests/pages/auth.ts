@@ -5,11 +5,17 @@ export class AuthPage {
   constructor(private page: Page) {}
 
   async gotoLogin() {
+    await this.page.context().addCookies([
+      { name: 'language', value: 'en', domain: 'localhost', path: '/' },
+    ]);
     await this.page.goto('/login');
     await expect(this.page.getByRole('heading')).toContainText('Sign In');
   }
 
   async gotoRegister() {
+    await this.page.context().addCookies([
+      { name: 'language', value: 'en', domain: 'localhost', path: '/' },
+    ]);
     await this.page.goto('/register');
     await expect(this.page.getByRole('heading')).toContainText('Sign Up');
   }

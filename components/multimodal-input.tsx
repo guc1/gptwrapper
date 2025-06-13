@@ -27,6 +27,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from './visibility-selector';
+import { useTranslation } from '@/lib/i18n';
 
 function PureMultimodalInput({
   chatId,
@@ -59,6 +60,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const t = useTranslation();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -270,7 +272,7 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder={t('sendMessagePlaceholder')}
         value={input}
         onChange={handleInput}
         className={cx(
