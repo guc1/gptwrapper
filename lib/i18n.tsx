@@ -71,6 +71,12 @@ export const translations = {
     private: 'Private',
     public: 'Public',
     delete: 'Delete',
+    settings: 'Settings',
+    manageSubscriptions: 'Manage Subscriptions',
+    cancelSubscription: 'Cancel subscription',
+    confirmCancelQuestion: 'Are you sure you want to cancel this subscription?',
+    validUntil: 'Valid until {date} at {time}',
+    reasonPlaceholder: 'Reason (optional)',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -142,6 +148,12 @@ export const translations = {
     private: 'Privé',
     public: 'Publiek',
     delete: 'Verwijderen',
+    settings: 'Instellingen',
+    manageSubscriptions: 'Beheer abonnementen',
+    cancelSubscription: 'Abonnement opzeggen',
+    confirmCancelQuestion: 'Weet je zeker dat je dit abonnement wilt opzeggen?',
+    validUntil: 'Geldig tot {date} om {time}',
+    reasonPlaceholder: 'Reden (optioneel)',
   },
 } as const;
 
