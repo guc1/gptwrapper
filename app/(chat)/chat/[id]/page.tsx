@@ -80,7 +80,7 @@ export default async function Page({
   const userModels = session.user.models ?? [];
   const baseModels =
     entitlementsByUserType[session.user.type].availableChatModelIds;
-  const availableModels = userModels.length > 0 ? userModels : baseModels;
+  const availableModels = Array.from(new Set([...baseModels, ...userModels]));
   const isModelAvailable = availableModels.includes(chat.modelId);
 
   const chatComponentProps = {
