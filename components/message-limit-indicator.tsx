@@ -8,6 +8,7 @@ import { formatDistanceToNowStrict, format, isPast } from 'date-fns';
 import type { UserType } from '@/lib/user-types';
 import { LoaderIcon } from './icons';
 import { useTranslation } from '@/lib/i18n';
+import { useLanguage } from './language-provider';
 
 interface MessageStatus {
   messagesLeft: number;
@@ -34,6 +35,7 @@ export function MessageLimitIndicator({
   const [tooltipContent, setTooltipContent] = useState<string>('');
   const [displayMessagesLeft, setDisplayMessagesLeft] = useState<string>('...');
   const t = useTranslation();
+  const { lang } = useLanguage();
 
   useEffect(() => {
     if (data) {
@@ -43,7 +45,14 @@ export function MessageLimitIndicator({
         setDisplayMessagesLeft(
           t('freeMessagesLeft', {
             count: messagesLeft.toString(),
-            plural: messagesLeft === 1 ? '' : 's',
+            plural:
+              lang === 'nl'
+                ? messagesLeft === 1
+                  ? ''
+                  : 'en'
+                : messagesLeft === 1
+                  ? ''
+                  : 's',
           }),
         );
         if (nextResetTimestamp) {

@@ -68,9 +68,9 @@ export function ManageSubscriptions() {
         return (
           <div key={plan.id} className="model-card bg-white dark:bg-gray-800 rounded-[28px] shadow-lg flex flex-col justify-between p-4 m-2">
             <div className="flex flex-col flex-1">
-              <Image src={plan.image} alt={plan.name} width={300} height={176} className="object-cover rounded-t-lg" />
-              <h3 className="font-semibold text-lg leading-tight mt-4">{plan.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+              <Image src={plan.image} alt={t(plan.nameKey)} width={300} height={176} className="object-cover rounded-t-lg" />
+              <h3 className="font-semibold text-lg leading-tight mt-4">{t(plan.nameKey)}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{t(plan.descriptionKey)}</p>
               {!comingSoon && plan.price && <p className="mt-4 font-bold text-base">{plan.price}</p>}
               {canceledSub?.expiresAt && (
                 <p className="mt-2 text-sm">

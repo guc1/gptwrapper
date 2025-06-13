@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/lib/i18n';
 
 export const Greeting = () => {
+  const t = useTranslation();
   return (
     <div
       key="overview"
@@ -13,7 +15,7 @@ export const Greeting = () => {
         transition={{ delay: 0.5 }}
         className="text-2xl font-semibold"
       >
-        Hello there!
+        {t('greetingHello')}
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -22,7 +24,7 @@ export const Greeting = () => {
         transition={{ delay: 0.6 }}
         className="text-2xl text-zinc-500"
       >
-        How can I help you today?
+        {t('greetingPrompt')}
       </motion.div>
     </div>
   );

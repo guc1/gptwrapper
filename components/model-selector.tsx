@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { chatModels } from '@/lib/ai/models';
+import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
@@ -44,6 +45,7 @@ export function ModelSelector({
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
     [optimisticModelId],
   );
+  const t = useTranslation();
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -60,7 +62,7 @@ export function ModelSelector({
           className="md:px-2 md:h-[34px]"
         >
           <span className="mr-1 truncate max-w-[8rem]">
-            {selectedChatModel?.name}
+            {selectedChatModel ? t(selectedChatModel.nameKey) : null}
           </span>
           <ChevronDownIcon />
         </Button>
@@ -88,9 +90,9 @@ export function ModelSelector({
                 className="gap-4 group/item flex flex-row justify-between items-center w-full"
               >
                 <div className="flex flex-col gap-1 items-start">
-                  <div>{chatModel.name}</div>
+                  <div>{t(chatModel.nameKey)}</div>
                   <div className="text-xs text-muted-foreground">
-                    {chatModel.description}
+                    {t(chatModel.descriptionKey)}
                   </div>
                 </div>
 
