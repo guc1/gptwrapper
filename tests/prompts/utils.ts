@@ -125,7 +125,7 @@ export const getResponseChunksByPrompt = (
     ];
   } else if (compareMessages(recentMessage, TEST_PROMPTS.USER_NEXTJS)) {
     return [
-      ...textToDeltas('With Next.js, you can ship fast!'),
+      ...textToDeltas('The Netherlands is famous for its windmills!'),
 
       {
         type: 'finish',

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { memo } from 'react';
+import { useLanguage } from './language-provider';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { VisibilityType } from './visibility-selector';
 
@@ -17,28 +18,54 @@ function PureSuggestedActions({
   append,
   selectedVisibilityType,
 }: SuggestedActionsProps) {
-  const suggestedActions = [
-    {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
-    },
-    {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
-    },
-    {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
-    },
-    {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
-    },
-  ];
+  const { lang } = useLanguage();
+
+  const suggestedActions =
+    lang === 'nl'
+      ? [
+          {
+            title: 'Vertel mij een feitje',
+            label: 'over Nederland',
+            action: 'Vertel mij een feitje over Nederland',
+          },
+          {
+            title: 'Waarom is de Nederlandse',
+            label: 'vlag rood, wit en blauw?',
+            action: 'Waarom is de Nederlandse vlag rood, wit en blauw?',
+          },
+          {
+            title: 'Wat is het weer',
+            label: 'in Amsterdam vandaag?',
+            action: 'Wat is het weer in Amsterdam vandaag?',
+          },
+          {
+            title: 'Schrijf een gedicht',
+            label: 'over een koe',
+            action: 'Schrijf een gedicht over een koe',
+          },
+        ]
+      : [
+          {
+            title: 'Tell me a fact',
+            label: 'about the Netherlands',
+            action: 'Tell me a fact about the Netherlands',
+          },
+          {
+            title: 'Why is the Dutch flag',
+            label: 'red, white, and blue?',
+            action: 'Why is the Dutch flag red, white, and blue?',
+          },
+          {
+            title: "What's the weather",
+            label: 'in Amsterdam today?',
+            action: "What's the weather in Amsterdam today?",
+          },
+          {
+            title: 'Write a poem',
+            label: 'about a cow',
+            action: 'Write a poem about a cow',
+          },
+        ];
 
   return (
     <div
