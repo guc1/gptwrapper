@@ -16,7 +16,9 @@ export function SubscriptionIndicator({ className }: { className?: string }) {
   const t = useTranslation();
 
   if (!data) return null;
-  const subs = data.subscriptions.filter((s) => !s.canceled && s.expiresAt);
+  const subs = data.subscriptions.filter(
+    (s) => s.canceled && s.expiresAt && new Date(s.expiresAt) > new Date(),
+  );
   if (subs.length === 0) return null;
   const earliest = subs.sort((a, b) => (new Date(a.expiresAt as string).getTime() > new Date(b.expiresAt as string).getTime() ? 1 : -1))[0];
   const date = format(new Date(earliest.expiresAt as string), 'PPP');
