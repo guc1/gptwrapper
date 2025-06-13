@@ -25,17 +25,17 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 
   basis: {
     maxMessagesPerDay: Number.MAX_SAFE_INTEGER,
-    availableChatModelIds: ['basis-model'],
+    availableChatModelIds: ['basis-model', 'chat-model'],
   },
 
   plus: {
     maxMessagesPerDay: Number.MAX_SAFE_INTEGER,
-    availableChatModelIds: ['plus-model'],
+    availableChatModelIds: ['plus-model', 'chat-model'],
   },
 
   top: {
     maxMessagesPerDay: Number.MAX_SAFE_INTEGER,
-    availableChatModelIds: ['top-model'],
+    availableChatModelIds: ['top-model', 'chat-model'],
   },
 
   /*

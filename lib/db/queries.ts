@@ -772,7 +772,11 @@ export async function getUserTypeById({ userId }: { userId: string }) {
       .where(eq(user.id, userId));
     let currentType: UserType = (row?.type as UserType) ?? 'regular';
 
-    if (currentType !== 'regular') {
+    if (
+      currentType === 'basis' ||
+      currentType === 'plus' ||
+      currentType === 'top'
+    ) {
       const active = await db
         .select({ modelId: userModel.modelId })
         .from(userModel)
