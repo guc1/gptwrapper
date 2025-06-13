@@ -104,7 +104,7 @@ export const myProvider = isTestEnvironment
   ? /* ——————————————————————  MOCKS FOR AUTOMATED TESTS  ——————————————————— */
     customProvider({
       languageModels: {
-        'chat-model': chatModel,
+        'free-model': chatModel,
         'chat-model-reasoning': reasoningModel,
         'basis-model': chatModel,
         'plus-model': chatModel,
@@ -117,7 +117,7 @@ export const myProvider = isTestEnvironment
     customProvider({
       languageModels: {
         /* flagship model for normal chat                                */
-        'chat-model': openai('gpt-4.1'), // GPT‑4.1 :contentReference[oaicite:4]{index=4}
+        'free-model': openai('gpt-4.1'), // GPT‑4.1 :contentReference[oaicite:4]{index=4}
 
         'basis-model': openai('gpt-4.1'),
         'plus-model': geminiLanguageModel(false),

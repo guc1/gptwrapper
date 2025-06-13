@@ -1,1 +1,1 @@
-ALTER TABLE "Chat" ADD COLUMN IF NOT EXISTS "modelId" varchar(64) NOT NULL DEFAULT 'chat-model';
+ALTER TABLE "Chat" ADD COLUMN IF NOT EXISTS "modelId" varchar(64) NOT NULL DEFAULT 'free-model';

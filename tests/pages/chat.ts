@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chatModels } from '@/lib/ai/models';
+import { translate } from '@/lib/i18n';
 import { expect, type Page } from '@playwright/test';
 
 export class ChatPage {
@@ -27,6 +28,9 @@ export class ChatPage {
   }
 
   async createNewChat() {
+    await this.page.context().addCookies([
+      { name: 'language', value: 'en', domain: 'localhost', path: '/' },
+    ]);
     await this.page.goto('/');
   }
 
@@ -112,7 +116,8 @@ export class ChatPage {
 
     await this.page.getByTestId('model-selector').click();
     await this.page.getByTestId(`model-selector-item-${chatModelId}`).click();
-    expect(await this.getSelectedModel()).toBe(chatModel.name);
+    const expectedName = translate('en', chatModel.nameKey);
+    expect(await this.getSelectedModel()).toBe(expectedName);
   }
 
   public async getSelectedVisibility() {
