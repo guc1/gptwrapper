@@ -673,8 +673,11 @@ export async function addUserModel({
   try {
     await db
       .insert(userModel)
-      .values({ userId, modelId, expiresAt })
-      .onConflictDoNothing();
+      .values({ userId, modelId, expiresAt, canceled: false })
+      .onConflictDoUpdate({
+        target: [userModel.userId, userModel.modelId],
+        set: { expiresAt, canceled: false },
+      });
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
@@ -691,7 +694,7 @@ export async function getUserModelIds({ userId }: { userId: string }) {
       .where(
         and(
           eq(userModel.userId, userId),
-          eq(userModel.canceled, false),
+          or(eq(userModel.canceled, false), gt(userModel.expiresAt, new Date())),
           or(isNull(userModel.expiresAt), gt(userModel.expiresAt, new Date())),
         ),
       );
@@ -741,7 +744,27 @@ export async function getUserTypeById({ userId }: { userId: string }) {
       .select({ type: user.type })
       .from(user)
       .where(eq(user.id, userId));
-    return row?.type ?? 'regular';
+    let currentType: UserType = (row?.type as UserType) ?? 'regular';
+
+    if (currentType !== 'regular') {
+      const active = await db
+        .select({ modelId: userModel.modelId })
+        .from(userModel)
+        .where(
+          and(
+            eq(userModel.userId, userId),
+            or(eq(userModel.canceled, false), gt(userModel.expiresAt, new Date())),
+            or(isNull(userModel.expiresAt), gt(userModel.expiresAt, new Date())),
+          ),
+        )
+        .limit(1);
+      if (active.length === 0) {
+        await db.update(user).set({ type: 'regular' }).where(eq(user.id, userId));
+        currentType = 'regular';
+      }
+    }
+
+    return currentType;
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
