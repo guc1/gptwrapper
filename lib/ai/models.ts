@@ -1,35 +1,37 @@
-export const DEFAULT_CHAT_MODEL: string = 'chat-model';
+export const DEFAULT_CHAT_MODEL: string = 'free-model';
+
+import type { TranslationKey } from '@/lib/i18n';
 
 export interface ChatModel {
   id: string;
-  name: string;
-  description: string;
+  nameKey: TranslationKey;
+  descriptionKey: TranslationKey;
 }
 
 export const chatModels: Array<ChatModel> = [
   {
-    id: 'chat-model',
-    name: 'Chat model',
-    description: 'Primary model for all-purpose chat',
+    id: 'free-model',
+    nameKey: 'freeModelName',
+    descriptionKey: 'freeModelDescription',
   },
   {
     id: 'chat-model-reasoning',
-    name: 'Reasoning model',
-    description: 'Uses advanced reasoning',
+    nameKey: 'reasoningModelName',
+    descriptionKey: 'reasoningModelDescription',
   },
   {
     id: 'basis-model',
-    name: 'BASIS MODEL',
-    description: 'The fast and reliable model. Unlimited access.',
+    nameKey: 'basisModelName',
+    descriptionKey: 'basisModelDescription',
   },
   {
     id: 'plus-model',
-    name: 'PLUS MODEL',
-    description: 'Very good model capable of most tasks. Unlimited access.',
+    nameKey: 'plusModelName',
+    descriptionKey: 'plusModelDescription',
   },
   {
     id: 'top-model',
-    name: 'TOP MODEL',
-    description: 'State of the art model capable of everything. Unlimited access.',
+    nameKey: 'topModelName',
+    descriptionKey: 'topModelDescription',
   },
 ];

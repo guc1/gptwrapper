@@ -6,7 +6,7 @@ import type { User } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useLanguage } from '@/components/language-provider';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, translate } from '@/lib/i18n';
 import Link from 'next/link';
 
 import {
@@ -91,7 +91,9 @@ export function SidebarUserNav({ user }: { user: User }) {
               className="cursor-pointer"
               onSelect={() => setLang(lang === 'en' ? 'nl' : 'en')}
             >
-              {lang === 'en' ? t('switchToDutch') : t('switchToEnglish')}
+              {lang === 'en'
+                ? translate('nl', 'switchToDutch')
+                : translate('en', 'switchToEnglish')}
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/settings" className="w-full cursor-pointer">
