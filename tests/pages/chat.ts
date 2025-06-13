@@ -27,6 +27,9 @@ export class ChatPage {
   }
 
   async createNewChat() {
+    await this.page.context().addCookies([
+      { name: 'language', value: 'en', domain: 'localhost', path: '/' },
+    ]);
     await this.page.goto('/');
   }
 
