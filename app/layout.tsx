@@ -71,7 +71,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const langCookie = cookieStore.get('language');
-  const lang = (langCookie?.value === 'nl' ? 'nl' : 'en') as Language;
+  const lang = (langCookie?.value === 'en' ? 'en' : 'nl') as Language;
   return (
     <html
       lang={lang}

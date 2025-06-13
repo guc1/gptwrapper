@@ -74,13 +74,13 @@ export function UpgradeDialog() {
                 <div className="flex flex-col flex-1">
                   <Image
                     src={plan.image}
-                    alt={plan.name}
+                    alt={t(plan.nameKey)}
                     width={300}
                     height={176}
                     className="object-cover rounded-t-lg transition-transform duration-200 ease-out group-hover:scale-105"
                   />
-                  <h3 className="font-semibold text-lg leading-tight mt-4">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                  <h3 className="font-semibold text-lg leading-tight mt-4">{t(plan.nameKey)}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{t(plan.descriptionKey)}</p>
                   {!comingSoon && plan.price && (
                     <p className="mt-4 font-bold text-base">{plan.price}</p>
                   )}
