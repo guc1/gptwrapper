@@ -1,12 +1,11 @@
 // app/(chat)/chat/[id]/page.tsx
-import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { auth } from '@/app/(auth)/auth';
 import { Chat } from '@/components/chat';
 import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
 import { DataStreamHandler } from '@/components/data-stream-handler';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { DBMessage } from '@/lib/db/schema';
 import type { Attachment, UIMessage } from 'ai';
 
@@ -23,7 +22,7 @@ export default async function Page({
     typeof resolvedSearchParams?.prompt === 'string'
       ? resolvedSearchParams.prompt
       : undefined;
-  
+
   const chat = await getChatById({ id: chatId });
 
   if (!chat) {
@@ -39,12 +38,12 @@ export default async function Page({
     if (initialPromptFromQuery) {
       redirectUrlQuery = `?prompt=${encodeURIComponent(initialPromptFromQuery)}`;
     }
-    
+
     const fullRedirectUrl = `${redirectBase}${currentPath}${redirectUrlQuery}`;
-    
+
     const guestAuthUrl = new URL('/api/auth/guest', redirectBase);
     guestAuthUrl.searchParams.set('redirectUrl', fullRedirectUrl);
-    
+
     redirect(guestAuthUrl.toString());
   }
 
@@ -68,22 +67,28 @@ export default async function Page({
       id: message.id,
       parts: message.parts as UIMessage['parts'],
       role: message.role as UIMessage['role'],
-      content: (message.parts as Array<{type: string, text?: string}>)?.find(p => p.type === 'text')?.text || '',
+      content:
+        (message.parts as Array<{ type: string; text?: string }>)?.find(
+          (p) => p.type === 'text',
+        )?.text || '',
       createdAt: message.createdAt,
       experimental_attachments:
         (message.attachments as Array<Attachment>) ?? [],
     }));
   }
 
-  const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
+  const userModels = session.user.models ?? [];
+  const baseModels =
+    entitlementsByUserType[session.user.type].availableChatModelIds;
+  const availableModels = userModels.length > 0 ? userModels : baseModels;
+  const isModelAvailable = availableModels.includes(chat.modelId);
 
   const chatComponentProps = {
     id: chat.id,
     initialMessages: convertToUIMessages(messagesFromDb),
-    initialChatModel: chatModelFromCookie?.value || DEFAULT_CHAT_MODEL,
+    initialChatModel: chat.modelId,
     initialVisibilityType: chat.visibility,
-    isReadonly: session?.user?.id !== chat.userId,
+    isReadonly: session?.user?.id !== chat.userId || !isModelAvailable,
     session: session, // session is guaranteed here
     autoResume: true,
     initialInput: initialPromptFromQuery,

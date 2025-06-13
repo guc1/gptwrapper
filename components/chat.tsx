@@ -1,7 +1,11 @@
 // components/chat.tsx
 'use client';
 
-import type { Attachment, UIMessage, ChatRequestOptions as CoreChatRequestOptions } from 'ai';
+import type {
+  Attachment,
+  UIMessage,
+  ChatRequestOptions as CoreChatRequestOptions,
+} from 'ai';
 import { useChat, type UseChatHelpers } from '@ai-sdk/react';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
@@ -17,7 +21,7 @@ import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
 import { toast } from './toast';
 import type { Session } from 'next-auth';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
@@ -58,7 +62,22 @@ export function Chat({
   const { openPopup: openUpgradePopup } = useUpgradePopup();
   const hasSetInitialInputRef = useRef(false);
 
+  const router = useRouter();
+
   const [chatModelId, setChatModelId] = useState(initialChatModel);
+
+  const handleModelChange = useCallback(
+    (modelId: string) => {
+      if (modelId === chatModelId) return;
+      const confirmSwitch = window.confirm(
+        'The context will not be taken into account. Start a new chat?',
+      );
+      if (confirmSwitch) {
+        router.push(`/?modelId=${modelId}`);
+      }
+    },
+    [chatModelId, router],
+  );
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -75,16 +94,15 @@ export function Chat({
 
   // SWR key for messageStatus uses the session.user.id from the props.
   // This is critical: if `session` prop updates correctly after login, this key will change.
-  const messageStatusSWRKey = session?.user?.id ? `/api/message-status?userId=${session.user.id}` : null;
-  const { data: messageStatus, mutate: mutateMessageStatus } = useSWR<MessageStatus>(
-    messageStatusSWRKey,
-    fetcher,
-    {
+  const messageStatusSWRKey = session?.user?.id
+    ? `/api/message-status?userId=${session.user.id}`
+    : null;
+  const { data: messageStatus, mutate: mutateMessageStatus } =
+    useSWR<MessageStatus>(messageStatusSWRKey, fetcher, {
       revalidateOnFocus: true,
       refreshInterval: 30000,
-    },
-  );
-  
+    });
+
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 
   const {
@@ -120,13 +138,13 @@ export function Chat({
     onError: (error) => {
       if (error instanceof ChatSDKError) {
         if (error.type === 'limit_exceeded' && error.surface === 'chat') {
-           if (session.user?.id) {
-             openLoginSignupPopup({
-               chatId: id,
-               guestUserId: session.user.id,
-               unsentPrompt: input,
-             });
-           }
+          if (session.user?.id) {
+            openLoginSignupPopup({
+              chatId: id,
+              guestUserId: session.user.id,
+              unsentPrompt: input,
+            });
+          }
           return;
         }
         toast({
@@ -147,82 +165,125 @@ export function Chat({
   const promptFromAuthRedirect = searchParams.get('prompt');
 
   useEffect(() => {
-    const promptToUse = propInitialInput || promptFromAuthRedirect || queryFromUrl;
+    const promptToUse =
+      propInitialInput || promptFromAuthRedirect || queryFromUrl;
     if (promptToUse && !hasSetInitialInputRef.current && status === 'ready') {
       const lastMessage = messages.at(-1);
-      if (!(lastMessage?.role === 'user' && lastMessage.content === promptToUse)) {
+      if (
+        !(lastMessage?.role === 'user' && lastMessage.content === promptToUse)
+      ) {
         setInput(promptToUse);
       }
       hasSetInitialInputRef.current = true;
       const newUrl = new URL(window.location.href);
       if (promptFromAuthRedirect) newUrl.searchParams.delete('prompt');
       if (queryFromUrl) newUrl.searchParams.delete('query');
-      if (newUrl.searchParams.toString() !== new URL(window.location.href).searchParams.toString()) {
+      if (
+        newUrl.searchParams.toString() !==
+        new URL(window.location.href).searchParams.toString()
+      ) {
         window.history.replaceState({}, '', newUrl.toString());
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [propInitialInput, promptFromAuthRedirect, queryFromUrl, setInput, status, messages.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    propInitialInput,
+    promptFromAuthRedirect,
+    queryFromUrl,
+    setInput,
+    status,
+    messages.length,
+  ]);
 
-
-   const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
+  const handleSubmit: UseChatHelpers['handleSubmit'] = useCallback(
     (eOrForm, chatRequestOptions) => {
-    // Allow calling without an event when submitting programmatically
-    eOrForm?.preventDefault?.();
-    
-    if (messageStatus && messageStatus.messagesLeft <= 0 && input.trim() !== '') {
-      if (messageStatus.userType === 'guest') {
-        if (session.user?.id) {
-          openLoginSignupPopup({
-            chatId: id,
-            guestUserId: session.user.id,
-            unsentPrompt: input,
-          });
+      // Allow calling without an event when submitting programmatically
+      eOrForm?.preventDefault?.();
+
+      if (
+        messageStatus &&
+        messageStatus.messagesLeft <= 0 &&
+        input.trim() !== ''
+      ) {
+        if (messageStatus.userType === 'guest') {
+          if (session.user?.id) {
+            openLoginSignupPopup({
+              chatId: id,
+              guestUserId: session.user.id,
+              unsentPrompt: input,
+            });
+          }
+        } else {
+          openUpgradePopup();
         }
-      } else {
-        openUpgradePopup();
+        return;
       }
-      return;
-    }
-    
-    const currentPath = `/chat/${id}`;
-    if (window.location.pathname !== currentPath || window.location.search !== '') {
-      window.history.replaceState({}, '', currentPath);
-    }
 
-    const optionsWithAttachments: ChatRequestOptions = {
-      ...chatRequestOptions,
-      experimental_attachments: attachments,
-    };
-    // The first argument to useChat's handleSubmit can be an event or options.
-    // If eOrForm is an event, it's passed. If it's undefined (programmatic call), pass undefined.
-    internalUseChatHandleSubmit(eOrForm, optionsWithAttachments);
-  }, [messageStatus, openLoginSignupPopup, openUpgradePopup, internalUseChatHandleSubmit, id, attachments, input, session.user?.id]);
+      const currentPath = `/chat/${id}`;
+      if (
+        window.location.pathname !== currentPath ||
+        window.location.search !== ''
+      ) {
+        window.history.replaceState({}, '', currentPath);
+      }
 
+      const optionsWithAttachments: ChatRequestOptions = {
+        ...chatRequestOptions,
+        experimental_attachments: attachments,
+      };
+      // The first argument to useChat's handleSubmit can be an event or options.
+      // If eOrForm is an event, it's passed. If it's undefined (programmatic call), pass undefined.
+      internalUseChatHandleSubmit(eOrForm, optionsWithAttachments);
+    },
+    [
+      messageStatus,
+      openLoginSignupPopup,
+      openUpgradePopup,
+      internalUseChatHandleSubmit,
+      id,
+      attachments,
+      input,
+      session.user?.id,
+    ],
+  );
 
   const append: UseChatHelpers['append'] = useCallback(
     async (message, chatRequestOptions) => {
-    if (messageStatus && messageStatus.messagesLeft <= 0) {
-       if (messageStatus.userType === 'guest') {
-         if (session.user?.id) {
-           openLoginSignupPopup({
-             chatId: id,
-             guestUserId: session.user.id,
-             unsentPrompt: typeof message.content === 'string' ? message.content : input,
-           });
-         }
-       } else {
-         openUpgradePopup();
-       }
-      return null;
-    }
-    const currentPath = `/chat/${id}`;
-    if (window.location.pathname !== currentPath || window.location.search !== '') {
+      if (messageStatus && messageStatus.messagesLeft <= 0) {
+        if (messageStatus.userType === 'guest') {
+          if (session.user?.id) {
+            openLoginSignupPopup({
+              chatId: id,
+              guestUserId: session.user.id,
+              unsentPrompt:
+                typeof message.content === 'string' ? message.content : input,
+            });
+          }
+        } else {
+          openUpgradePopup();
+        }
+        return null;
+      }
+      const currentPath = `/chat/${id}`;
+      if (
+        window.location.pathname !== currentPath ||
+        window.location.search !== ''
+      ) {
         window.history.replaceState({}, '', currentPath);
-    }
-    return internalUseChatAppend(message, chatRequestOptions);
-  // Dependencies for the outer useCallback wrapper for `append`
-  }, [messageStatus, session?.user?.id, openLoginSignupPopup, openUpgradePopup, id, input, internalUseChatAppend]);
+      }
+      return internalUseChatAppend(message, chatRequestOptions);
+      // Dependencies for the outer useCallback wrapper for `append`
+    },
+    [
+      messageStatus,
+      session?.user?.id,
+      openLoginSignupPopup,
+      openUpgradePopup,
+      id,
+      input,
+      internalUseChatAppend,
+    ],
+  );
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
@@ -245,7 +306,7 @@ export function Chat({
         <ChatHeader
           chatId={id}
           selectedModelId={chatModelId}
-          onModelChange={setChatModelId}
+          onModelChange={handleModelChange}
           selectedVisibilityType={visibilityType}
           isReadonly={isReadonly}
           session={session}
