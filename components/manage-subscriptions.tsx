@@ -57,6 +57,13 @@ export function ManageSubscriptions() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
       {plans.map((plan) => {
         const subscription = subs.find((s) => s.modelId === plan.id && !s.canceled);
+        const canceledSub = subs.find(
+          (s) =>
+            s.modelId === plan.id &&
+            s.canceled &&
+            s.expiresAt &&
+            new Date(s.expiresAt) > new Date(),
+        );
         const comingSoon = plan.id === 'coming-soon';
         return (
           <div key={plan.id} className="model-card bg-white dark:bg-gray-800 rounded-[28px] shadow-lg flex flex-col justify-between p-4 m-2">
@@ -65,8 +72,13 @@ export function ManageSubscriptions() {
               <h3 className="font-semibold text-lg leading-tight mt-4">{plan.name}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
               {!comingSoon && plan.price && <p className="mt-4 font-bold text-base">{plan.price}</p>}
-              {subscription?.expiresAt && (
-                <p className="mt-2 text-sm">{t('validUntil', { date: format(new Date(subscription.expiresAt), 'PPP'), time: format(new Date(subscription.expiresAt), 'p') })}</p>
+              {canceledSub?.expiresAt && (
+                <p className="mt-2 text-sm">
+                  {t('validUntil', {
+                    date: format(new Date(canceledSub.expiresAt), 'PPP'),
+                    time: format(new Date(canceledSub.expiresAt), 'p'),
+                  })}
+                </p>
               )}
             </div>
             {!comingSoon ? (

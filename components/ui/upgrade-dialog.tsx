@@ -64,7 +64,7 @@ export function UpgradeDialog() {
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 px-10 py-10">
           {plans.map((plan) => {
-            if (ownedModels.includes(plan.id)) return null
+            const owned = ownedModels.includes(plan.id)
             const comingSoon = plan.id === 'coming-soon'
             return (
               <div
@@ -87,13 +87,19 @@ export function UpgradeDialog() {
                 </div>
                 {!comingSoon ? (
                   <>
-                    <Button
-                      className="mt-4 w-full"
-                      onClick={() => checkout(plan.id)}
-                      disabled={loadingId === plan.id}
-                    >
-                      {loadingId === plan.id ? t('loading') : t('purchase')}
-                    </Button>
+                    {owned ? (
+                      <Button className="mt-4 w-full" disabled>
+                        {t('purchased')}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="mt-4 w-full"
+                        onClick={() => checkout(plan.id)}
+                        disabled={loadingId === plan.id}
+                      >
+                        {loadingId === plan.id ? t('loading') : t('purchase')}
+                      </Button>
+                    )}
                     <Link
                       href="/compare"
                       className="mt-2 text-center text-sm font-semibold text-gray-800 hover:underline dark:text-zinc-200"

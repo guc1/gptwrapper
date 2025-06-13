@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/?canceled=true`,
     customer_email: session.user.email ?? undefined,
     metadata: { userId: session.user.id, planId },
+    subscription_data: { metadata: { userId: session.user.id, planId } },
   });
 
   return NextResponse.json({ url: checkout.url });
