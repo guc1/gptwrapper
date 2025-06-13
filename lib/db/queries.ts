@@ -673,8 +673,11 @@ export async function addUserModel({
   try {
     await db
       .insert(userModel)
-      .values({ userId, modelId, expiresAt })
-      .onConflictDoNothing();
+      .values({ userId, modelId, expiresAt, canceled: false })
+      .onConflictDoUpdate({
+        target: [userModel.userId, userModel.modelId],
+        set: { expiresAt, canceled: false },
+      });
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
@@ -691,7 +694,7 @@ export async function getUserModelIds({ userId }: { userId: string }) {
       .where(
         and(
           eq(userModel.userId, userId),
-          eq(userModel.canceled, false),
+          or(eq(userModel.canceled, false), gt(userModel.expiresAt, new Date())),
           or(isNull(userModel.expiresAt), gt(userModel.expiresAt, new Date())),
         ),
       );
