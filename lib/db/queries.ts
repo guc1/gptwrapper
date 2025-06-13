@@ -45,7 +45,6 @@ if (!process.env.POSTGRES_URL) {
 const client = postgres(process.env.POSTGRES_URL);
 const db = drizzle(client);
 
-
 export async function transferChatOwnership(
   chatId: string,
   oldUserId: string, // This is the guestUserId
@@ -53,7 +52,9 @@ export async function transferChatOwnership(
 ) {
   try {
     if (!chatId || !oldUserId || !newUserId || oldUserId === newUserId) {
-      console.warn(`Invalid parameters for chat transfer: chatId=${chatId}, oldUserId=${oldUserId}, newUserId=${newUserId}`);
+      console.warn(
+        `Invalid parameters for chat transfer: chatId=${chatId}, oldUserId=${oldUserId}, newUserId=${newUserId}`,
+      );
       return null;
     }
 
@@ -70,7 +71,9 @@ export async function transferChatOwnership(
     }
 
     if (chatToTransfer.currentUserId !== oldUserId) {
-      console.warn(`Chat transfer: Chat ${chatId} belongs to user ${chatToTransfer.currentUserId}, not guest ${oldUserId}. Cannot transfer.`);
+      console.warn(
+        `Chat transfer: Chat ${chatId} belongs to user ${chatToTransfer.currentUserId}, not guest ${oldUserId}. Cannot transfer.`,
+      );
       return null;
     }
 
@@ -79,16 +82,26 @@ export async function transferChatOwnership(
       .set({ userId: newUserId })
       .where(and(eq(chat.id, chatId), eq(chat.userId, oldUserId))) // Double-check ownership during update
       .returning();
-    
+
     if (updatedChat) {
-        console.log(`Successfully transferred ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}`);
+      console.log(
+        `Successfully transferred ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}`,
+      );
     } else {
-        console.warn(`Failed to transfer ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}. Update returned no rows.`);
+      console.warn(
+        `Failed to transfer ownership of chat ${chatId} from guest ${oldUserId} to user ${newUserId}. Update returned no rows.`,
+      );
     }
     return updatedChat || null;
   } catch (error) {
-    console.error(`Error during transferChatOwnership for chat ${chatId}:`, error);
-    throw new ChatSDKError('bad_request:database', 'Failed to transfer chat ownership due to a database error.');
+    console.error(
+      `Error during transferChatOwnership for chat ${chatId}:`,
+      error,
+    );
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to transfer chat ownership due to a database error.',
+    );
   }
 }
 
@@ -104,7 +117,10 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
-export async function createUser(email: string, password: string): Promise<User> {
+export async function createUser(
+  email: string,
+  password: string,
+): Promise<User> {
   const hashedPassword = generateHashedPassword(password);
 
   try {
@@ -113,7 +129,7 @@ export async function createUser(email: string, password: string): Promise<User>
       .values({ email, password: hashedPassword, type: 'regular' })
       .returning();
     if (!createdUser) {
-        throw new Error('User creation failed to return the created user.');
+      throw new Error('User creation failed to return the created user.');
     }
     return createdUser;
   } catch (error) {
@@ -122,7 +138,9 @@ export async function createUser(email: string, password: string): Promise<User>
   }
 }
 
-export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'>>> {
+export async function createGuestUser(): Promise<
+  Array<Pick<User, 'id' | 'email'>>
+> {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
 
@@ -144,7 +162,11 @@ export async function createGuestUser(): Promise<Array<Pick<User, 'id' | 'email'
 
 export async function getUserById(id: string): Promise<User | null> {
   try {
-    const [foundUser] = await db.select().from(user).where(eq(user.id, id)).limit(1);
+    const [foundUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, id))
+      .limit(1);
     return foundUser ?? null;
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to get user by id');
@@ -156,11 +178,13 @@ export async function saveChat({
   userId,
   title,
   visibility,
+  modelId,
 }: {
   id: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
+  modelId: string;
 }) {
   try {
     return await db.insert(chat).values({
@@ -169,9 +193,10 @@ export async function saveChat({
       userId,
       title,
       visibility,
+      modelId,
     });
   } catch (error) {
-    console.error("Error saving chat:", error);
+    console.error('Error saving chat:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }
@@ -608,7 +633,8 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
       'Failed to get stream ids by chat id',
     );
   }
-}export async function saveUserMessageWithLimit({
+}
+export async function saveUserMessageWithLimit({
   userId,
   chatId,
   messageId,
@@ -679,10 +705,7 @@ export async function addUserModel({
         set: { expiresAt, canceled: false },
       });
   } catch (error) {
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to add user model',
-    );
+    throw new ChatSDKError('bad_request:database', 'Failed to add user model');
   }
 }
 
@@ -694,7 +717,10 @@ export async function getUserModelIds({ userId }: { userId: string }) {
       .where(
         and(
           eq(userModel.userId, userId),
-          or(eq(userModel.canceled, false), gt(userModel.expiresAt, new Date())),
+          or(
+            eq(userModel.canceled, false),
+            gt(userModel.expiresAt, new Date()),
+          ),
           or(isNull(userModel.expiresAt), gt(userModel.expiresAt, new Date())),
         ),
       );
@@ -753,22 +779,28 @@ export async function getUserTypeById({ userId }: { userId: string }) {
         .where(
           and(
             eq(userModel.userId, userId),
-            or(eq(userModel.canceled, false), gt(userModel.expiresAt, new Date())),
-            or(isNull(userModel.expiresAt), gt(userModel.expiresAt, new Date())),
+            or(
+              eq(userModel.canceled, false),
+              gt(userModel.expiresAt, new Date()),
+            ),
+            or(
+              isNull(userModel.expiresAt),
+              gt(userModel.expiresAt, new Date()),
+            ),
           ),
         )
         .limit(1);
       if (active.length === 0) {
-        await db.update(user).set({ type: 'regular' }).where(eq(user.id, userId));
+        await db
+          .update(user)
+          .set({ type: 'regular' })
+          .where(eq(user.id, userId));
         currentType = 'regular';
       }
     }
 
     return currentType;
   } catch (error) {
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to get user type',
-    );
+    throw new ChatSDKError('bad_request:database', 'Failed to get user type');
   }
 }

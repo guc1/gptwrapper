@@ -85,6 +85,7 @@ export async function POST(request: Request) {
         userId: session.user.id,
         title,
         visibility: selectedVisibilityType,
+        modelId: selectedChatModel,
       });
     } else if (chat.userId !== session.user.id) {
       return new ChatSDKError('forbidden:chat').toResponse();
