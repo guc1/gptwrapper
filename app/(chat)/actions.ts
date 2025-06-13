@@ -76,7 +76,9 @@ export async function updateUserTypeAfterCheckout({
   if (!type) return;
 
   await db.update(userTable).set({ type }).where(eq(userTable.id, userId));
-  await addUserModel({ userId, modelId: planId });
+  const expiresAt = new Date();
+  expiresAt.setMonth(expiresAt.getMonth() + 1);
+  await addUserModel({ userId, modelId: planId, expiresAt });
   const models = await getUserModelIds({ userId });
   await unstable_update({ user: { type, models } });
   await saveChatModelAsCookie(planId);

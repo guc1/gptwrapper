@@ -11,6 +11,7 @@ import {
   gte,
   inArray,
   lt,
+  or,
   sql,
   type SQL,
 } from 'drizzle-orm';
@@ -662,14 +663,16 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
 export async function addUserModel({
   userId,
   modelId,
+  expiresAt,
 }: {
   userId: string;
   modelId: string;
+  expiresAt: Date;
 }) {
   try {
     await db
       .insert(userModel)
-      .values({ userId, modelId })
+      .values({ userId, modelId, expiresAt })
       .onConflictDoNothing();
   } catch (error) {
     throw new ChatSDKError(
@@ -684,13 +687,51 @@ export async function getUserModelIds({ userId }: { userId: string }) {
     const rows = await db
       .select({ modelId: userModel.modelId })
       .from(userModel)
-      .where(eq(userModel.userId, userId));
+      .where(
+        and(
+          eq(userModel.userId, userId),
+          eq(userModel.canceled, false),
+          or(userModel.expiresAt.isNull(), gt(userModel.expiresAt, new Date())),
+        ),
+      );
     return rows.map((r) => r.modelId);
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get user models',
     );
+  }
+}
+
+export async function getUserSubscriptions({ userId }: { userId: string }) {
+  try {
+    return await db
+      .select({
+        modelId: userModel.modelId,
+        expiresAt: userModel.expiresAt,
+        canceled: userModel.canceled,
+      })
+      .from(userModel)
+      .where(eq(userModel.userId, userId));
+  } catch (error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to get subscriptions');
+  }
+}
+
+export async function cancelUserModel({
+  userId,
+  modelId,
+}: {
+  userId: string;
+  modelId: string;
+}) {
+  try {
+    await db
+      .update(userModel)
+      .set({ canceled: true })
+      .where(and(eq(userModel.userId, userId), eq(userModel.modelId, modelId)));
+  } catch (error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to cancel subscription');
   }
 }
 

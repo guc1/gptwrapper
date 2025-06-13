@@ -13,7 +13,8 @@ import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
-import { MessageLimitIndicator } from './message-limit-indicator'; // Added
+import { MessageLimitIndicator } from './message-limit-indicator';
+import { SubscriptionIndicator } from './subscription-indicator';
 import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 import { useTranslation } from '@/lib/i18n';
 
@@ -80,8 +81,10 @@ function PureChatHeader({
             chatId={chatId}
             selectedVisibilityType={selectedVisibilityType}
           />
-          {session?.user && (
-            <MessageLimitIndicator userId={session.user.id} />
+          {session?.user?.models?.length ? (
+            <SubscriptionIndicator />
+          ) : (
+            session?.user && <MessageLimitIndicator userId={session.user.id} />
           )}
         </div>
       )}
