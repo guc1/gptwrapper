@@ -32,7 +32,9 @@ export function ModelSelector({
   const userType = session.user.type;
   const userModels = session.user.models ?? [];
   const baseModels = entitlementsByUserType[userType].availableChatModelIds;
-  const availableChatModelIds = userModels.length > 0 ? userModels : baseModels;
+  const availableChatModelIds = Array.from(
+    new Set([...baseModels, ...userModels]),
+  );
 
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
