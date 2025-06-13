@@ -7,6 +7,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useLanguage } from '@/components/language-provider';
 import { useTranslation } from '@/lib/i18n';
+import Link from 'next/link';
 
 import {
   DropdownMenu,
@@ -91,6 +92,11 @@ export function SidebarUserNav({ user }: { user: User }) {
               onSelect={() => setLang(lang === 'en' ? 'nl' : 'en')}
             >
               {lang === 'en' ? t('switchToDutch') : t('switchToEnglish')}
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="w-full cursor-pointer">
+                {t('settings')}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild data-testid="user-nav-item-auth">

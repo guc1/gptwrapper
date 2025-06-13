@@ -181,6 +181,8 @@ export const userModel = pgTable(
       .notNull()
       .references(() => user.id),
     modelId: varchar('modelId', { length: 64 }).notNull(),
+    expiresAt: timestamp('expiresAt'),
+    canceled: boolean('canceled').default(false),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.modelId] }),
