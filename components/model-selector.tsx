@@ -32,19 +32,15 @@ export function ModelSelector({
   const userType = session.user.type;
   const userModels = session.user.models ?? [];
   const baseModels = entitlementsByUserType[userType].availableChatModelIds;
-  const availableChatModelIds =
-    userModels.length > 0 ? userModels : baseModels;
+  const availableChatModelIds = userModels.length > 0 ? userModels : baseModels;
 
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
   );
 
   const selectedChatModel = useMemo(
-    () =>
-      availableChatModels.find(
-        (chatModel) => chatModel.id === optimisticModelId,
-      ),
-    [optimisticModelId, availableChatModels],
+    () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
+    [optimisticModelId],
   );
 
   return (
@@ -61,7 +57,9 @@ export function ModelSelector({
           variant="outline"
           className="md:px-2 md:h-[34px]"
         >
-          <span className="mr-1 truncate max-w-[8rem]">{selectedChatModel?.name}</span>
+          <span className="mr-1 truncate max-w-[8rem]">
+            {selectedChatModel?.name}
+          </span>
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
