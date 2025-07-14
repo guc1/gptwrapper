@@ -106,7 +106,7 @@ export function ModelSelector({
                 type="button"
                 className={cn(
                   'gap-4 group/item flex flex-row justify-between items-center w-full',
-                  !owned && 'opacity-70',
+                  owned ? 'font-medium' : 'opacity-50 text-muted-foreground',
                 )}
               >
                 <div className="flex flex-col gap-1 items-start">
@@ -116,7 +116,7 @@ export function ModelSelector({
                   </div>
                 </div>
 
-                <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
+                <div className="text-foreground dark:text-foreground">
                   {owned ? <CheckCircleFillIcon /> : <LockIcon />}
                 </div>
               </button>
