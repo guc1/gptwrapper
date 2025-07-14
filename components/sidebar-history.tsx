@@ -20,6 +20,8 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
@@ -28,6 +30,7 @@ import { ChatItem } from './sidebar-history-item';
 import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from './icons';
 import { useTranslation } from '@/lib/i18n';
+import Link from 'next/link';
 
 type GroupedChats = {
   today: Chat[];
@@ -154,7 +157,16 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={false}>
+                <Link href="/introduction" onClick={() => setOpenMobile(false)}>
+                  <span>{t('introductionChatTitle')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2 mt-2">
             {t('loginHistoryNotice')}
           </div>
         </SidebarGroupContent>
