@@ -66,3 +66,21 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
+
+## Running tests
+
+Playwright tests require a running Postgres and Redis instance. Start the Docker
+services defined in `docker-compose.dev.yml`, install dependencies, and push the
+database schema before executing the test suite:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+pnpm install
+pnpm db:push
+pnpm test
+```
+
+If tests fail with `CallbackRouteError` during guest user creation, verify that
+PostgreSQL is running and that your `.env.local` `POSTGRES_URL` matches the
+connection string in `docker-compose.dev.yml` (for example
+`postgres://chatbot:secret@localhost:5433/chatbot`).

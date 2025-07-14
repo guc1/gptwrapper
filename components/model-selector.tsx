@@ -12,9 +12,11 @@ import { chatModels } from '@/lib/ai/models';
 import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
+import { CheckCircleFillIcon, ChevronDownIcon, LockIcon } from './icons';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { Session } from 'next-auth';
+import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
+import { useUpgradePopup } from '@/hooks/use-upgrade-popup';
 
 export function ModelSelector({
   session,
@@ -37,15 +39,20 @@ export function ModelSelector({
     new Set([...baseModels, ...userModels]),
   );
 
-  const availableChatModels = chatModels.filter((chatModel) =>
-    availableChatModelIds.includes(chatModel.id),
-  );
+  const showAllModels = userType === 'guest' || userType === 'regular';
+  const availableChatModels = showAllModels
+    ? chatModels
+    : chatModels.filter((chatModel) =>
+        availableChatModelIds.includes(chatModel.id),
+      );
 
   const selectedChatModel = useMemo(
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
     [optimisticModelId],
   );
   const t = useTranslation();
+  const { openPopup: openLoginSignupPopup } = useLoginSignupPopup();
+  const { openPopup: openUpgradePopup } = useUpgradePopup();
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -70,6 +77,7 @@ export function ModelSelector({
       <DropdownMenuContent align="start" className="min-w-[300px]">
         {availableChatModels.map((chatModel) => {
           const { id } = chatModel;
+          const owned = availableChatModelIds.includes(id);
 
           return (
             <DropdownMenuItem
@@ -77,6 +85,15 @@ export function ModelSelector({
               key={id}
               onSelect={() => {
                 setOpen(false);
+
+                if (!owned) {
+                  if (userType === 'guest') {
+                    openLoginSignupPopup();
+                  } else {
+                    openUpgradePopup();
+                  }
+                  return;
+                }
 
                 startTransition(() => setOptimisticModelId(id));
                 onModelChange?.(id);
@@ -87,7 +104,10 @@ export function ModelSelector({
             >
               <button
                 type="button"
-                className="gap-4 group/item flex flex-row justify-between items-center w-full"
+                className={cn(
+                  'gap-4 group/item flex flex-row justify-between items-center w-full',
+                  !owned && 'opacity-70',
+                )}
               >
                 <div className="flex flex-col gap-1 items-start">
                   <div>{t(chatModel.nameKey)}</div>
@@ -97,7 +117,7 @@ export function ModelSelector({
                 </div>
 
                 <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
-                  <CheckCircleFillIcon />
+                  {owned ? <CheckCircleFillIcon /> : <LockIcon />}
                 </div>
               </button>
             </DropdownMenuItem>
