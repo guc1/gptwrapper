@@ -13,6 +13,7 @@ import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 import { CheckCircleFillIcon, ChevronDownIcon, LockIcon } from './icons';
+import { Check } from 'lucide-react';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { Session } from 'next-auth';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
@@ -105,8 +106,9 @@ export function ModelSelector({
               <button
                 type="button"
                 className={cn(
-                  'gap-4 group/item flex flex-row justify-between items-center w-full',
+                  'gap-4 group/item flex flex-row justify-between items-center w-full rounded-md',
                   owned ? 'font-medium' : 'opacity-50 text-muted-foreground',
+                  id === optimisticModelId && 'border ring-1 ring-primary',
                 )}
               >
                 <div className="flex flex-col gap-1 items-start">
@@ -116,8 +118,19 @@ export function ModelSelector({
                   </div>
                 </div>
 
-                <div className="text-foreground dark:text-foreground">
-                  {owned ? <CheckCircleFillIcon /> : <LockIcon />}
+                <div className="text-foreground dark:text-foreground flex items-center gap-1">
+                  {owned ? (
+                    id === optimisticModelId ? (
+                      <>
+                        <CheckCircleFillIcon />
+                        <span className="text-xs font-semibold">{t('selected')}</span>
+                      </>
+                    ) : (
+                      <Check className="size-4 opacity-50" />
+                    )
+                  ) : (
+                    <LockIcon />
+                  )}
                 </div>
               </button>
             </DropdownMenuItem>
