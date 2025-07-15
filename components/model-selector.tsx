@@ -13,6 +13,7 @@ import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 import { CheckCircleFillIcon, ChevronDownIcon, LockIcon } from './icons';
+import { Check } from 'lucide-react';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { Session } from 'next-auth';
 import { useLoginSignupPopup } from '@/hooks/use-login-signup-popup';
@@ -117,7 +118,15 @@ export function ModelSelector({
                 </div>
 
                 <div className="text-foreground dark:text-foreground">
-                  {owned ? <CheckCircleFillIcon /> : <LockIcon />}
+                  {owned ? (
+                    id === optimisticModelId ? (
+                      <CheckCircleFillIcon />
+                    ) : (
+                      <Check className="size-4 opacity-50" />
+                    )
+                  ) : (
+                    <LockIcon />
+                  )}
                 </div>
               </button>
             </DropdownMenuItem>
