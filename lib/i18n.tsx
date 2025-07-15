@@ -103,9 +103,12 @@ export const translations = {
     basisModelName: 'Basic model',
     basisModelDescription: 'The fast and reliable model. Unlimited access.',
     plusModelName: 'Plus model',
-    plusModelDescription: 'Very good model capable of most tasks. Unlimited access.',
+    plusModelDescription:
+      'Very good model capable of most tasks. Unlimited access.',
     topModelName: 'Top model',
-    topModelDescription: 'State of the art model capable of everything. Unlimited access.',
+    topModelDescription:
+      'State of the art model capable of everything. Unlimited access.',
+    introductionChatTitle: 'Introduction chat',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -207,11 +210,15 @@ export const translations = {
     reasoningModelName: 'Redeneermodel',
     reasoningModelDescription: 'Gebruikt geavanceerde redenering',
     basisModelName: 'Basis model',
-    basisModelDescription: 'Het snelle en betrouwbare model. Onbeperkte toegang.',
+    basisModelDescription:
+      'Het snelle en betrouwbare model. Onbeperkte toegang.',
     plusModelName: 'Plus model',
-    plusModelDescription: 'Zeer goed model dat de meeste taken aankan. Onbeperkte toegang.',
+    plusModelDescription:
+      'Zeer goed model dat de meeste taken aankan. Onbeperkte toegang.',
     topModelName: 'Top model',
-    topModelDescription: 'State-of-the-art model dat alles aankan. Onbeperkte toegang.',
+    topModelDescription:
+      'State-of-the-art model dat alles aankan. Onbeperkte toegang.',
+    introductionChatTitle: 'Introductiechat',
   },
 } as const;
 
