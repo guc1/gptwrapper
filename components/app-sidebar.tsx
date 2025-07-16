@@ -51,7 +51,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <Button
                   variant="ghost"
                   type="button"
-                  className="new-chat-button p-2.5 h-fit"
+                  className="ripple new-chat-button p-2.5 h-fit"
                   style={{ marginTop: '-60px' }}
                   onClick={() => {
                     setOpenMobile(false);

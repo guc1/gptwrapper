@@ -285,6 +285,19 @@
         border-color: hsl(var(--primary));
     }
 
+    [data-sidebar="sidebar"] {
+        border-color: hsl(var(--sidebar-border) / 0.5);
+        background: radial-gradient(120% 100% at 20% -40%, var(--brand-accent), transparent 70%), linear-gradient(to bottom, hsl(var(--sidebar-background) / 0.85), hsl(var(--sidebar-background-light) / 0.85));
+        backdrop-filter: blur(20px) saturate(160%);
+    }
+
+    [data-sidebar="sidebar"] .new-chat-button {
+        background-image: linear-gradient(90deg, var(--brand-accent), #FFE3D2);
+        color: hsl(var(--sidebar-primary-foreground));
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+        border-color: transparent;
+    }
+
     /* send message input background */
     .orange [data-testid="multimodal-input"] {
         background-color: #fcedde; /* lighter orange */
