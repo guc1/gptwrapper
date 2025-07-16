@@ -308,8 +308,51 @@
         opacity: 0;
     }
 
-    .ripple:active:after {
-        animation: ripple 400ms ease-out;
+.ripple:active:after {
+    animation: ripple 400ms ease-out;
+}
+
+    .top-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding: 0.5rem 1rem;
+        background: hsl(var(--background));
+    }
+
+    .hero {
+        text-align: center;
+        margin-top: 3rem;
+        margin-bottom: 4rem;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        letter-spacing: -0.03em;
+    }
+
+    .hero .tagline {
+        font-size: clamp(1rem, 1.2vw, 1.25rem);
+        opacity: 0.8;
+        max-width: 52ch;
+        margin-inline: auto 2.5rem;
+    }
+
+    .hero .search {
+        margin-top: 2.25rem;
+    }
+
+    section {
+        margin-top: 4.5rem;
+    }
+
+    @media (max-width: 768px) {
+        section {
+            margin-top: 3rem;
+        }
     }
 
     .recommended {
