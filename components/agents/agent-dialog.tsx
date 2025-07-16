@@ -14,7 +14,8 @@ export function AgentDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none">
-        <div className="mx-auto w-full max-w-[52rem] p-6 sm:p-8 rounded-[28px] bg-white/90 dark:bg-gray-900/80 backdrop-blur-md shadow transition-transform duration-200 hover:scale-[1.02]">
+        <div className="relative mx-auto w-full max-w-[52rem] p-6 sm:p-8 rounded-[28px] bg-white/30 dark:bg-gray-900/80 backdrop-blur-md shadow transition-transform duration-200 hover:scale-[1.02]">
+          <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[#f0f0f0]" />
           <div className="h-60" />
           <div className="mt-6 flex justify-center">
             <Button className="bg-gradient-to-r from-[var(--brand-accent)] to-[#FFE3D2] text-white px-4 h-9 flex items-center shadow transition-shadow hover:shadow-[0_0_8px_rgba(255,255,255,0.5)]">
