@@ -10,6 +10,7 @@ import './globals.css';
 import { SessionProvider } from 'next-auth/react';
 import { LoginSignupDialog } from '@/components/ui/login-signup-dialog';
 import { UpgradeDialog } from '@/components/ui/upgrade-dialog';
+import { AgentDialog } from '@/components/agents/agent-dialog';
 
 export const metadata: Metadata = {
   title: 'Next.js Chatbot Template',
@@ -99,6 +100,7 @@ export default async function RootLayout({
             {children}
             <LoginSignupDialog />
             <UpgradeDialog />
+            <AgentDialog />
           </SessionProvider>
         </ThemeProvider>
         </LanguageProvider>
