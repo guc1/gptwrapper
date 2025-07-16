@@ -51,7 +51,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <Button
                   variant="ghost"
                   type="button"
-                  className="new-chat-button p-2 h-fit"
+                  className="new-chat-button p-2 h-10 w-10"
                   style={{ marginTop: '-60px' }}
                   onClick={() => {
                     setOpenMobile(false);
@@ -59,7 +59,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                     router.refresh();
                   }}
                 >
-                  <PlusIcon />
+                  <PlusIcon size={20} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent align="end">{t('newChat')}</TooltipContent>
