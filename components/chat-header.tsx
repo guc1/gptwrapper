@@ -6,6 +6,7 @@ import { useWindowSize } from 'usehooks-ts';
 
 import { ModelSelector } from '@/components/model-selector';
 import { SidebarToggle } from '@/components/sidebar-toggle';
+import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, VercelIcon } from './icons';
 import { useSidebar } from './ui/sidebar';
@@ -43,7 +44,7 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 border-b"> {/* Added border-b for separation */}
+    <SiteHeader showInfo={false} showUpgrade={false}>
       <SidebarToggle />
 
       {(!open || windowWidth < 768) && (
@@ -114,7 +115,7 @@ function PureChatHeader({
           {t('deploy')}
         </Link>
       </Button>
-    </header>
+    </SiteHeader>
   );
 }
 

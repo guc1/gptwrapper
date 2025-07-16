@@ -3,7 +3,6 @@
 import { AgentCard, type AgentCardProps } from '@/components/agents/agent-card';
 import { useTranslation } from '@/lib/i18n';
 import { SearchInput } from '@/components/search-input';
-import AssistentenHeader from '@/components/assistenten-header';
 import '../../../themes/assistenten.css';
 import { motion } from 'framer-motion';
 
@@ -28,7 +27,6 @@ export default function AssistentenPage() {
 
   return (
     <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
-      <AssistentenHeader />
       <header className="hero">
         <h1>{t('aiAgentsTitle')}</h1>
         <p className="tagline">{t('aiAgentsSubtitle')}</p>
