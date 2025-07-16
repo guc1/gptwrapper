@@ -5,9 +5,10 @@ import { MenuIcon, InfoIcon } from '@/components/icons';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
+import clsx from 'clsx';
 
 export default function AssistentenHeader() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, open: isSidebarOpen } = useSidebar();
   const t = useTranslation();
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -32,19 +33,22 @@ export default function AssistentenHeader() {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
-      className={`sticky top-0 z-[999] flex items-center px-4 md:px-6 h-14 md:h-16 border-b border-white/25 backdrop-blur-[14px] backdrop-saturate-[160%] bg-white/15 transition-transform duration-200 ease-out ${hidden ? '-translate-y-full' : ''}`}
+      className={clsx(
+        'stickyHeader px-4 md:px-6 h-14 md:h-16 transition-transform duration-200 ease-out',
+        { withSidebar: isSidebarOpen },
+        hidden && '-translate-y-full',
+      )}
       style={{ background: 'rgba(255,255,255,.15)' }}
     >
       <button
         type="button"
         onClick={toggleSidebar}
         aria-label={t('toggleSidebar')}
-        className="sidebar-toggle md:hidden mr-3 size-10 rounded-full backdrop-blur-sm bg-white/20 flex items-center justify-center hover:shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+        className="sidebar-toggle mr-3 size-10 rounded-full backdrop-blur-sm bg-white/20 flex items-center justify-center hover:shadow-[0_0_8px_rgba(255,255,255,0.5)]"
       >
         <MenuIcon size={28} />
       </button>
-      <div className="flex-1" />
-      <div className="actions flex items-center gap-2">
+      <div className="actions ml-auto flex items-center gap-2">
         <Link
           href="/agentupdate"
           className="btn info flex items-center gap-2 rounded-full border border-white/40 backdrop-blur-sm px-3 h-9 text-sm transition-colors hover:bg-gradient-to-r hover:from-[var(--brand-accent)] hover:to-[#FFE3D2] hover:text-white"
