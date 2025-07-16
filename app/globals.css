@@ -287,6 +287,26 @@
         background-color: #fcedde; /* lighter orange */
     }
 
+    /* glass effect for the sidebar */
+    [data-sidebar="sidebar"] {
+        @apply backdrop-blur-lg;
+    }
+
+    html.light [data-sidebar="sidebar"] {
+        background-color: hsl(var(--sidebar-background)/0.8);
+    }
+
+    html.dark [data-sidebar="sidebar"],
+    html.orange [data-sidebar="sidebar"] {
+        background-image: linear-gradient(
+            to bottom,
+            color-mix(in srgb, hsl(var(--sidebar-background)), white 0%),
+            color-mix(in srgb, hsl(var(--sidebar-background)), white 25%)
+        );
+        background-color: hsl(var(--sidebar-background)/0.85);
+    }
+
+
     /* Ripple effect for buttons */
     @keyframes ripple {
         from {
