@@ -5,11 +5,13 @@ import { SidebarLeftIcon, InfoIcon } from '@/components/icons';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
+import { useAgentPopup } from '@/hooks/use-agent-popup';
 import clsx from 'clsx';
 
 export default function AssistentenHeader() {
   const { toggleSidebar, open: isSidebarOpen } = useSidebar();
   const t = useTranslation();
+  const { isOpen: agentDialogOpen } = useAgentPopup();
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
 
@@ -38,7 +40,7 @@ export default function AssistentenHeader() {
         { withSidebar: isSidebarOpen },
         hidden && '-translate-y-full',
       )}
-      style={{ background: 'rgba(255,255,255,.15)' }}
+      style={{ background: 'rgba(255,255,255,.15)', zIndex: agentDialogOpen ? 40 : undefined }}
     >
       <button
         type="button"

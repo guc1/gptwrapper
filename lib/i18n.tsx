@@ -117,6 +117,7 @@ export const translations = {
     recommended: 'Recommended',
     agentUpdateInfo: 'Info about Assistants',
     upgradeModel: 'Upgrade model',
+    goToChat: 'Go to chat',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -234,6 +235,7 @@ export const translations = {
     recommended: 'Aanbevolen',
     agentUpdateInfo: 'Info over Assistenten',
     upgradeModel: 'Upgrade model',
+    goToChat: 'Ga naar chat',
   },
 } as const;
 
