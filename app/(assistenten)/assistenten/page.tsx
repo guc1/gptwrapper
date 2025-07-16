@@ -1,6 +1,8 @@
 'use client';
 
 import { AgentCard, type AgentCardProps } from '@/components/agents/agent-card';
+import { AgentPopup } from '@/components/agents/agent-popup';
+import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
 import { SearchInput } from '@/components/search-input';
 import AssistentenHeader from '@/components/assistenten-header';
@@ -9,6 +11,7 @@ import { motion } from 'framer-motion';
 
 export default function AssistentenPage() {
   const t = useTranslation();
+  const { openPopup } = useAgentPopup();
 
   const recentlyUsed: AgentCardProps[] = [
     { name: 'Luna', description: 'Creative writing assistant', avatar: 'https://avatar.vercel.sh/luna' },
@@ -46,7 +49,7 @@ export default function AssistentenPage() {
           className="grid gap-4 recent md:grid-cols-2"
         >
           {recentlyUsed.map((agent) => (
-            <AgentCard key={agent.name} {...agent} />
+            <AgentCard key={agent.name} {...agent} onClick={openPopup} />
           ))}
         </motion.div>
       </section>
@@ -62,7 +65,7 @@ export default function AssistentenPage() {
           className="grid gap-4 recommended"
         >
           {recommended.map((agent) => (
-            <AgentCard key={agent.name} {...agent} />
+            <AgentCard key={agent.name} {...agent} onClick={openPopup} />
           ))}
         </motion.div>
       </section>
@@ -107,6 +110,7 @@ export default function AssistentenPage() {
         }
       `}</style>
       </div>
+      <AgentPopup />
     </>
   );
 }
