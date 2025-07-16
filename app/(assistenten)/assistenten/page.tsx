@@ -27,8 +27,9 @@ export default function AssistentenPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
+    <>
       <AssistentenHeader />
+      <div className="mx-auto max-w-[1280px] px-[clamp(1rem,4vw,3rem)] pb-[clamp(1rem,4vw,3rem)]">
       <header className="hero">
         <h1>{t('aiAgentsTitle')}</h1>
         <p className="tagline">{t('aiAgentsSubtitle')}</p>
@@ -105,6 +106,7 @@ export default function AssistentenPage() {
           }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }
