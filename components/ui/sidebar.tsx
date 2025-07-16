@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 import { PanelLeft } from 'lucide-react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -256,10 +256,10 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col backdrop-blur-md backdrop-saturate-150 group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            className="flex h-full w-full flex-col border border-sidebar-border/50 backdrop-blur-lg backdrop-saturate-[180%] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-lg"
             style={{
               background:
-                'linear-gradient(to bottom, hsl(var(--sidebar-background)), hsl(var(--sidebar-background-light)))',
+                'radial-gradient(120% 100% at 20% -40%, var(--brand-accent), transparent 70%), linear-gradient(to bottom, hsl(var(--sidebar-background)/0.85), hsl(var(--sidebar-background-light)/0.85))',
             }}
           >
             {children}
