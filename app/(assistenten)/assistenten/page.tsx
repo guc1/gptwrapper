@@ -27,9 +27,10 @@ export default function AssistentenPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
+    <>
       <AssistentenHeader />
-      <header className="hero">
+      <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
+        <header className="hero">
         <h1>{t('aiAgentsTitle')}</h1>
         <p className="tagline">{t('aiAgentsSubtitle')}</p>
         <SearchInput placeholder={t('askAboutAgentsPlaceholder')} />
@@ -105,6 +106,7 @@ export default function AssistentenPage() {
           }
         }
       `}</style>
-    </div>
+        </div>
+      </>
   );
 }
