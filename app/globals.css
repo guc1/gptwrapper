@@ -317,6 +317,37 @@
         grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
     }
 
+    .hero {
+        text-align: center;
+        margin-top: 3rem;
+        margin-bottom: 4rem;
+    }
+    .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        letter-spacing: -0.03em;
+    }
+    .hero .tagline {
+        font-size: clamp(1rem, 1.2vw, 1.25rem);
+        opacity: 0.8;
+        max-width: 52ch;
+        margin-inline: auto 2.5rem;
+    }
+    .hero .search {
+        margin-top: 2.25rem;
+    }
+    .top-bar {
+        display: flex;
+        padding: 0.5rem;
+    }
+    section {
+        margin-top: 4.5rem;
+    }
+    @media (width <= 768px) {
+        section {
+            margin-top: 3rem;
+        }
+    }
+
     @media (width <= 1024px) {
         .recommended {
             grid-template-columns: repeat(2, 1fr);
