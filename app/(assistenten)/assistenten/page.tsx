@@ -3,13 +3,12 @@
 import { AgentCard, type AgentCardProps } from '@/components/agents/agent-card';
 import { useTranslation } from '@/lib/i18n';
 import { SearchInput } from '@/components/search-input';
-import { MenuIcon } from '@/components/icons';
-import { useSidebar } from '@/components/ui/sidebar';
+import AssistentenHeader from '@/components/assistenten-header';
+import '../../../themes/assistenten.css';
 import { motion } from 'framer-motion';
 
-export default function AgentsPage() {
+export default function AssistentenPage() {
   const t = useTranslation();
-  const { toggleSidebar, openMobile } = useSidebar();
 
   const recentlyUsed: AgentCardProps[] = [
     { name: 'Luna', description: 'Creative writing assistant', avatar: 'https://avatar.vercel.sh/luna' },
@@ -29,16 +28,7 @@ export default function AgentsPage() {
 
   return (
     <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
-      <header className="top-bar mb-4 flex items-center">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-label={t('toggleSidebar')}
-          className={`md:hidden rounded-md p-2 ${openMobile ? 'backdrop-blur-[6px] bg-background/70' : ''}`}
-        >
-          <MenuIcon />
-        </button>
-      </header>
+      <AssistentenHeader />
       <header className="hero">
         <h1>{t('aiAgentsTitle')}</h1>
         <p className="tagline">{t('aiAgentsSubtitle')}</p>
@@ -82,8 +72,20 @@ export default function AgentsPage() {
           margin-bottom: 4rem;
         }
         .hero h1 {
-          font-size: clamp(2.5rem, 5vw, 4rem);
+          font-size: clamp(2.75rem, 5vw, 4.25rem);
+          font-weight: 800;
           letter-spacing: -0.03em;
+          background: linear-gradient(90deg,#FFB98B 0%,#FF9FCE 50%,#FFF1A8 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shift 8s linear infinite;
+        }
+        .hero h1:hover {
+          font-variation-settings: "wght" 950, "slnt" -10;
+          transition: .25s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes shift {
+          to { background-position: 200% 0; }
         }
         .hero .tagline {
           font-size: clamp(1rem, 1.2vw, 1.25rem);
@@ -92,7 +94,7 @@ export default function AgentsPage() {
           margin-inline: auto 2.5rem;
         }
         .hero .search {
-          margin-top: 2.25rem;
+          margin-top: 0;
         }
         section {
           margin-top: 4.5rem;
