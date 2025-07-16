@@ -1,3 +1,36 @@
 /* Assistenten theme tweaks */
 .hero .tagline{margin-bottom:3rem;}
 @media(max-width:768px){.hero .tagline{margin-bottom:2.25rem;}}
+
+.stickyHeader{
+  position:sticky;
+  top:0;
+  left:0;
+  right:0;
+  display:flex;
+  align-items:center;
+  padding:0 1rem;
+  z-index:999;
+  backdrop-filter:blur(14px) saturate(160%);
+  background:rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.25);
+  transition:left .2s ease;
+}
+.stickyHeader.withSidebar{
+  left:var(--sidebar-width);
+}
+
+.assistenten-toggle{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9999px;
+  backdrop-filter:blur(8px);
+  background:rgba(255,255,255,.2);
+  transition:box-shadow .2s ease;
+}
+.assistenten-toggle:hover{
+  box-shadow:0 0 8px rgba(255,255,255,.5);
+}
