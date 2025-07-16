@@ -223,7 +223,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                           {t('today')}
                         </div>
-                        {groupedChats.today.map((chat) => (
+                        {groupedChats.today.map((chat, index) => (
                           <ChatItem
                             key={chat.id}
                             chat={chat}
@@ -233,6 +233,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               setShowDeleteDialog(true);
                             }}
                             setOpenMobile={setOpenMobile}
+                            index={index}
                           />
                         ))}
                       </div>
@@ -243,7 +244,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                           {t('yesterday')}
                         </div>
-                        {groupedChats.yesterday.map((chat) => (
+                        {groupedChats.yesterday.map((chat, index) => (
                           <ChatItem
                             key={chat.id}
                             chat={chat}
@@ -253,6 +254,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               setShowDeleteDialog(true);
                             }}
                             setOpenMobile={setOpenMobile}
+                            index={index}
                           />
                         ))}
                       </div>
@@ -263,7 +265,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                           {t('last7days')}
                         </div>
-                        {groupedChats.lastWeek.map((chat) => (
+                        {groupedChats.lastWeek.map((chat, index) => (
                           <ChatItem
                             key={chat.id}
                             chat={chat}
@@ -273,6 +275,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               setShowDeleteDialog(true);
                             }}
                             setOpenMobile={setOpenMobile}
+                            index={index}
                           />
                         ))}
                       </div>
@@ -283,7 +286,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                           {t('last30days')}
                         </div>
-                        {groupedChats.lastMonth.map((chat) => (
+                        {groupedChats.lastMonth.map((chat, index) => (
                           <ChatItem
                             key={chat.id}
                             chat={chat}
@@ -293,6 +296,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               setShowDeleteDialog(true);
                             }}
                             setOpenMobile={setOpenMobile}
+                            index={index}
                           />
                         ))}
                       </div>
@@ -303,7 +307,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                           {t('olderThanLastMonth')}
                         </div>
-                        {groupedChats.older.map((chat) => (
+                        {groupedChats.older.map((chat, index) => (
                           <ChatItem
                             key={chat.id}
                             chat={chat}
@@ -313,6 +317,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               setShowDeleteDialog(true);
                             }}
                             setOpenMobile={setOpenMobile}
+                            index={index}
                           />
                         ))}
                       </div>

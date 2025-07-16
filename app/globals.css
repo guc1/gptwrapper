@@ -59,7 +59,7 @@
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
         --brand-accent: #FFB98B;
-        --brand-beige: #F5EFEA;
+        --brand-beige: #fcf9f7;
         --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
@@ -285,6 +285,42 @@
     /* send message input background */
     .orange [data-testid="multimodal-input"] {
         background-color: #fcedde; /* lighter orange */
+    }
+
+    /* Sidebar redesign */
+    [data-sidebar="sidebar"] {
+        position: relative;
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(18px) saturate(160%);
+        -webkit-backdrop-filter: blur(18px) saturate(160%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 0 1px rgba(18,18,18,.06);
+    }
+
+    [data-sidebar="sidebar"]::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at center, rgba(255,255,255,.05), transparent 70%);
+    }
+
+    [data-sidebar="sidebar"]::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 6px;
+        pointer-events: none;
+        background: linear-gradient(90deg, #FFDEB7, #FFD4DB, #FFF6B7);
+        background-size: 200% 200%;
+        animation: sidebar-spine 30s linear infinite;
+    }
+
+    @keyframes sidebar-spine {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     /* Ripple effect for buttons */

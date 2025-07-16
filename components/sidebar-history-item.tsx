@@ -2,7 +2,6 @@ import type { Chat } from '@/lib/db/schema';
 import {
   SidebarMenuAction,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from './ui/sidebar';
 import Link from 'next/link';
 import {
@@ -24,6 +23,7 @@ import {
   TrashIcon,
 } from './icons';
 import { memo } from 'react';
+import { motion } from 'framer-motion';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useTranslation } from '@/lib/i18n';
 
@@ -32,11 +32,13 @@ const PureChatItem = ({
   isActive,
   onDelete,
   setOpenMobile,
+  index,
 }: {
   chat: Chat;
   isActive: boolean;
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
+  index?: number;
 }) => {
   const { visibilityType, setVisibilityType } = useChatVisibility({
     chatId: chat.id,
@@ -45,7 +47,13 @@ const PureChatItem = ({
   const t = useTranslation();
 
   return (
-    <SidebarMenuItem>
+    <motion.li
+      data-sidebar="menu-item"
+      className="group/menu-item relative"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index ? index * 0.08 : 0, duration: 0.3 }}
+    >
       <SidebarMenuButton asChild isActive={isActive}>
         <Link href={`/chat/${chat.id}`} onClick={() => setOpenMobile(false)}>
           <span>{chat.title}</span>
@@ -110,7 +118,7 @@ const PureChatItem = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </SidebarMenuItem>
+    </motion.li>
   );
 };
 
