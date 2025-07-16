@@ -1,0 +1,5 @@
+/* Assistenten theme tweaks */
+.hero .tagline{margin-bottom:3rem;}
+@media(max-width:768px){.hero .tagline{margin-bottom:2.25rem;}}
+.sticky-header{animation:headerReveal .18s ease-out;}
+@keyframes headerReveal{0%{opacity:0;transform:translateY(-8px);}100%{opacity:1;transform:translateY(0);}}
