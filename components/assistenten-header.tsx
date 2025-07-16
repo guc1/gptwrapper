@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { MenuIcon, InfoIcon } from '@/components/icons';
 import { useSidebar } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 
 export default function AssistentenHeader() {
-  const { toggleSidebar } = useSidebar();
+  const { open: isSidebarOpen, toggleSidebar } = useSidebar();
   const t = useTranslation();
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -32,7 +33,11 @@ export default function AssistentenHeader() {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
-      className={`sticky top-0 z-[999] flex items-center px-4 md:px-6 h-14 md:h-16 border-b border-white/25 backdrop-blur-[14px] backdrop-saturate-[160%] bg-white/15 transition-transform duration-200 ease-out ${hidden ? '-translate-y-full' : ''}`}
+      className={cn(
+        'stickyHeader h-14 md:h-16 transition-transform duration-200 ease-out',
+        hidden && '-translate-y-full',
+        isSidebarOpen && 'withSidebar',
+      )}
       style={{ background: 'rgba(255,255,255,.15)' }}
     >
       <button
