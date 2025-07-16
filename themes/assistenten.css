@@ -1,3 +1,22 @@
 /* Assistenten theme tweaks */
 .hero .tagline{margin-bottom:3rem;}
 @media(max-width:768px){.hero .tagline{margin-bottom:2.25rem;}}
+
+.stickyHeader{
+  position:sticky;
+  top:0;
+  left:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  padding:0 1rem;
+  z-index:999;
+  backdrop-filter:blur(14px) saturate(160%);
+  background:rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.25);
+}
+.stickyHeader.withSidebar{
+  margin-left:var(--sidebar-width);
+  width:calc(100% - var(--sidebar-width));
+  transition:margin-left .2s ease,width .2s ease;
+}
