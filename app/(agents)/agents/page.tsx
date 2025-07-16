@@ -2,12 +2,14 @@
 
 import { AgentCard, type AgentCardProps } from '@/components/agents/agent-card';
 import { useTranslation } from '@/lib/i18n';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { SearchInput } from '@/components/search-input';
+import { MenuIcon } from '@/components/icons';
+import { useSidebar } from '@/components/ui/sidebar';
 import { motion } from 'framer-motion';
 
 export default function AgentsPage() {
   const t = useTranslation();
+  const { toggleSidebar, openMobile } = useSidebar();
 
   const recentlyUsed: AgentCardProps[] = [
     { name: 'Luna', description: 'Creative writing assistant', avatar: 'https://avatar.vercel.sh/luna' },
@@ -26,10 +28,21 @@ export default function AgentsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1280px] space-y-12 p-[clamp(1rem,4vw,3rem)]">
-      <header className="space-y-2">
-        <h1 className="text-4xl font-bold">{t('aiAgentsTitle')}</h1>
-        <p className="text-muted-foreground">{t('aiAgentsSubtitle')}</p>
+    <div className="mx-auto max-w-[1280px] p-[clamp(1rem,4vw,3rem)]">
+      <header className="top-bar mb-4 flex items-center">
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label={t('toggleSidebar')}
+          className={`md:hidden rounded-md p-2 ${openMobile ? 'backdrop-blur-[6px] bg-background/70' : ''}`}
+        >
+          <MenuIcon />
+        </button>
+      </header>
+      <header className="hero">
+        <h1>{t('aiAgentsTitle')}</h1>
+        <p className="tagline">{t('aiAgentsSubtitle')}</p>
+        <SearchInput placeholder={t('askAboutAgentsPlaceholder')} />
       </header>
 
       <section className="space-y-4">
@@ -47,13 +60,6 @@ export default function AgentsPage() {
         </motion.div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{t('searchAgents')}</h2>
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 opacity-70" />
-          <Input className="h-14 rounded-[24px] pl-10 shadow-inner" placeholder={t('askAboutAgentsPlaceholder')} disabled />
-        </div>
-      </section>
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">{t('recommended')}</h2>
@@ -69,6 +75,34 @@ export default function AgentsPage() {
           ))}
         </motion.div>
       </section>
+      <style jsx>{`
+        .hero {
+          text-align: center;
+          margin-top: 3rem;
+          margin-bottom: 4rem;
+        }
+        .hero h1 {
+          font-size: clamp(2.5rem, 5vw, 4rem);
+          letter-spacing: -0.03em;
+        }
+        .hero .tagline {
+          font-size: clamp(1rem, 1.2vw, 1.25rem);
+          opacity: 0.8;
+          max-width: 52ch;
+          margin-inline: auto 2.5rem;
+        }
+        .hero .search {
+          margin-top: 2.25rem;
+        }
+        section {
+          margin-top: 4.5rem;
+        }
+        @media (max-width: 768px) {
+          section {
+            margin-top: 3rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }
