@@ -115,6 +115,8 @@ export const translations = {
     searchAgents: 'Search Assistants',
     askAboutAgentsPlaceholder: 'Search for the perfect assistant for you.',
     recommended: 'Recommended',
+    agentUpdateInfo: 'Info about Assistants',
+    upgradeModel: 'Upgrade model',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -230,6 +232,8 @@ export const translations = {
     searchAgents: 'Zoek assistenten',
     askAboutAgentsPlaceholder: 'Zoek de perfecte assistent voor jouw.',
     recommended: 'Aanbevolen',
+    agentUpdateInfo: 'Info over Assistenten',
+    upgradeModel: 'Upgrade model',
   },
 } as const;
 

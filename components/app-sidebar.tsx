@@ -68,7 +68,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
         </SidebarMenu>
         <SidebarMenu>
           <Link
-            href="/agents"
+            href="/assistenten"
             onClick={() => {
               setOpenMobile(false);
             }}
