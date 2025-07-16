@@ -5,6 +5,7 @@ import {
 } from 'ai';
 import { openai } from '@ai-sdk/openai'; // 👈 switched from xai
 import { createPartFromText } from '@google/genai';
+import type { GenerateContentParameters } from '@google/genai/dist/genai';
 import type {
   LanguageModelV1,
   LanguageModelV1CallOptions,
@@ -66,7 +67,7 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
           contents.push(message);
         }
       }
-      const params: Record<string, any> = {
+      const params: Omit<GenerateContentParameters, 'model'> = {
         contents,
         generationConfig: config,
         safetySettings: defaultSafety,
@@ -81,21 +82,22 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
           finishReason: 'stop',
           usage: { promptTokens: 0, completionTokens: 0 },
           rawCall: { rawPrompt: contents, rawSettings: config },
-        };
+        } as const;
       } catch (err) {
         console.error('Gemini request failed:', err);
         throw err;
       }
     },
     async doStream(options: LanguageModelV1CallOptions) {
-      const { text } = await this.doGenerate(options);
+      const result = await this.doGenerate(options);
+      const { text } = result;
       const stream = new ReadableStream<LanguageModelV1StreamPart>({
         start(controller) {
           if (text) controller.enqueue({ type: 'text-delta', textDelta: text });
           controller.close();
         },
       });
-      return { stream };
+      return { stream, ...result } as any;
     },
   };
 }

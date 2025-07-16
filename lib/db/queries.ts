@@ -38,6 +38,7 @@ import { generateUUID } from '../utils';
 import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
+import type { UserType } from '../user-types';
 
 if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not defined');
