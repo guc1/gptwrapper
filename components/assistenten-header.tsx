@@ -39,6 +39,7 @@ export default function AssistentenHeader() {
         'stickyHeader px-4 md:px-6 h-14 md:h-16 transition-transform duration-200 ease-out',
         { withSidebar: isSidebarOpen },
         hidden && '-translate-y-full',
+        agentDialogOpen && 'blur-sm'
       )}
       style={{ background: 'rgba(255,255,255,.15)', zIndex: agentDialogOpen ? 40 : undefined }}
     >
