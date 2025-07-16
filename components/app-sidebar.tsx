@@ -26,7 +26,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
   const t = useTranslation();
 
   return (
-    <Sidebar className="group-data-[side=left]:border-r-0">
+    <Sidebar variant="glass" className="group-data-[side=left]:border-r-0">
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-row justify-between items-center">
