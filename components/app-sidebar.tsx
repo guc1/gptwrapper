@@ -68,14 +68,14 @@ export function AppSidebar({ user }: { user: User | undefined }) {
         </SidebarMenu>
         <SidebarMenu>
           <Link
-            href="/agents"
+            href="/assistenten"
             onClick={() => {
               setOpenMobile(false);
             }}
             className="flex items-center gap-2 px-2 py-1 text-sm rounded-md hover:bg-accent"
           >
             <AgentsIcon />
-            {t('agents')}
+            {t('assistenten')}
           </Link>
         </SidebarMenu>
       </SidebarHeader>
