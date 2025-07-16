@@ -58,6 +58,7 @@
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
+        --header-height: 56px;
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
@@ -98,6 +99,7 @@
         --sidebar-accent-foreground: 240 4.8% 95.9%;
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
+        --header-height: 56px;
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
@@ -140,6 +142,7 @@
         --sidebar-accent-foreground: 24 37% 8%;
         --sidebar-border: 30 10% 90%;
         --sidebar-ring: 25 90% 55%;
+        --header-height: 56px;
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
