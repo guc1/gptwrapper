@@ -4,7 +4,7 @@ import {
   wrapLanguageModel,
 } from 'ai';
 import { openai } from '@ai-sdk/openai'; // 👈 switched from xai
-import { createPartFromText } from '@google/genai';
+import { createPartFromText, type GenerateContentParameters } from '@google/genai';
 import type {
   LanguageModelV1,
   LanguageModelV1CallOptions,
@@ -66,11 +66,11 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
           contents.push(message);
         }
       }
-      const params: Record<string, any> = {
+      const params: Omit<GenerateContentParameters, 'model'> = {
         contents,
         generationConfig: config,
         safetySettings: defaultSafety,
-      };
+      } as any;
       if (systemInstruction) {
         params.systemInstruction = systemInstruction;
       }
@@ -95,7 +95,7 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
           controller.close();
         },
       });
-      return { stream };
+      return { stream } as any;
     },
   };
 }
