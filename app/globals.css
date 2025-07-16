@@ -59,7 +59,8 @@
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
         --brand-accent: #FFB98B;
-        --brand-beige: #F5EFEA;
+        /* Slightly brighter beige to harmonise with the Agents gradient */
+        --brand-beige: #FCF9F7;
         --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
@@ -335,5 +336,85 @@
             transition: none !important;
             animation: none !important;
         }
+    }
+
+    /* --- Sidebar redesign styles --- */
+    [data-sidebar="sidebar"] {
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(18px) saturate(160%);
+        position: relative;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+            0 0 0 1px rgba(18, 18, 18, 0.06);
+    }
+
+    [data-sidebar="sidebar"]::before {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+    }
+
+    @keyframes spineShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    [data-sidebar="sidebar"]::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: linear-gradient(90deg, #FFDEB7, #FFD4DB, #FFF7C5);
+        background-size: 200% 200%;
+        animation: spineShift 30s linear infinite;
+    }
+
+    [data-sidebar="menu-button"] {
+        position: relative;
+        color: hsl(var(--sidebar-foreground) / 0.7);
+    }
+
+    [data-sidebar="menu-button"] svg {
+        opacity: 0.6;
+    }
+
+    [data-sidebar="menu-button"]::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.11);
+        backdrop-filter: blur(8px);
+        transform: scaleY(0);
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    [data-sidebar="menu-button"]:hover::before {
+        transform: scaleY(1);
+    }
+
+    [data-sidebar="menu-button"]:hover {
+        color: hsl(var(--sidebar-foreground) / 0.9);
+    }
+
+    [data-sidebar="menu-button"]:hover svg {
+        opacity: 1;
+    }
+
+    [data-sidebar="menu-button"][data-active="true"]::before {
+        background: linear-gradient(90deg, #FFDEB7, #FFD4DB);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+        transform: scaleY(1) translateY(2px);
     }
 }
