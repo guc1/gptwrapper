@@ -34,3 +34,48 @@
 .assistenten-toggle:hover{
   box-shadow:0 0 8px rgba(255,255,255,.5);
 }
+
+/* Glassy sidebar styling */
+.glassy-sidebar{
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(18px) saturate(160%);
+  position:relative;
+  padding-top:3.5rem;
+}
+@media(min-width:768px){
+  .glassy-sidebar{padding-top:4rem;}
+}
+.glassy-sidebar::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  background:linear-gradient(#FFB98B,#FFE3D2);
+}
+
+.sidebar-menu-button{
+  font-size:14px;
+  font-family:Inter, var(--font-geist), sans-serif;
+  font-weight:500;
+  line-height:1.25;
+  letter-spacing:-.01em;
+  border-radius:9999px;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.5rem .75rem;
+  color:var(--ink);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.dark .sidebar-menu-button{color:#fff;}
+.sidebar-menu-button svg{width:22px;height:22px;opacity:.7;}
+.sidebar-menu-button[data-active="true"]{
+  background:linear-gradient(to right,rgba(255,185,139,.4),rgba(255,227,210,.25));
+}
+.sidebar-menu-button[data-active="true"] svg{opacity:1;}
+.sidebar-menu-button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 2px 6px rgba(255,255,255,.25);
+}
