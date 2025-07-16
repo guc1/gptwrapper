@@ -58,6 +58,9 @@
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
+        --brand-accent: #FFB98B;
+        --brand-beige: #F5EFEA;
+        --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -95,6 +98,9 @@
         --sidebar-accent-foreground: 240 4.8% 95.9%;
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
+        --brand-accent: #FFB98B;
+        --brand-beige: #F5EFEA;
+        --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -134,6 +140,9 @@
         --sidebar-accent-foreground: 24 37% 8%;
         --sidebar-border: 30 10% 90%;
         --sidebar-ring: 25 90% 55%;
+        --brand-accent: #FFB98B;
+        --brand-beige: #F5EFEA;
+        --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -276,5 +285,55 @@
     /* send message input background */
     .orange [data-testid="multimodal-input"] {
         background-color: #fcedde; /* lighter orange */
+    }
+
+    /* Ripple effect for buttons */
+    @keyframes ripple {
+        from {
+            transform: scale(0);
+            opacity: 0.3;
+        }
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    .ripple:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: white;
+        opacity: 0;
+    }
+
+    .ripple:active:after {
+        animation: ripple 400ms ease-out;
+    }
+
+    .recommended {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+
+    @media (width <= 1024px) {
+        .recommended {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (width <= 768px) {
+        .recent,
+        .recommended {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition: none !important;
+            animation: none !important;
+        }
     }
 }
