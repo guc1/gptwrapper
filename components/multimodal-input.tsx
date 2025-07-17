@@ -42,6 +42,7 @@ function PureMultimodalInput({
   append,
   handleSubmit,
   className,
+  inputClassName,
   selectedVisibilityType,
 }: {
   chatId: string;
@@ -56,6 +57,7 @@ function PureMultimodalInput({
   append: UseChatHelpers['append'];
   handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
+  inputClassName?: string;
   selectedVisibilityType: VisibilityType;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -193,6 +195,15 @@ function PureMultimodalInput({
   );
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (input) {
+      setIsTyping(true);
+      const t = setTimeout(() => setIsTyping(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [input]);
 
   useEffect(() => {
     if (status === 'submitted') {
@@ -201,7 +212,13 @@ function PureMultimodalInput({
   }, [status, scrollToBottom]);
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div
+      className={cx(
+        'relative w-full flex flex-col gap-4 composerDock',
+        className,
+        { typing: isTyping },
+      )}
+    >
       <AnimatePresence>
         {!isAtBottom && (
           <motion.div
@@ -276,8 +293,8 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
-          className,
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-transparent pb-10 dark:border-zinc-700 composerTextarea',
+          inputClassName,
         )}
         rows={2}
         autoFocus
@@ -323,6 +340,8 @@ export const MultimodalInput = memo(
     if (prevProps.input !== nextProps.input) return false;
     if (prevProps.status !== nextProps.status) return false;
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
+    if (prevProps.className !== nextProps.className) return false;
+    if (prevProps.inputClassName !== nextProps.inputClassName) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
 
@@ -340,7 +359,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="glassIcon"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -391,7 +410,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="glassIcon"
       onClick={(event) => {
         event.preventDefault();
         submitForm();
