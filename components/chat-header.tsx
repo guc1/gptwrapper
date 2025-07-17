@@ -43,9 +43,8 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 border-b"> {/* Added border-b for separation */}
+    <header className="stickyHeader h-16 px-2 md:px-4 gap-2">
       <SidebarToggle />
-
       {(!open || windowWidth < 768) && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -59,13 +58,13 @@ function PureChatHeader({
               }}
             >
               <PlusIcon />
-              <span className="hidden md:inline ml-1">{t('newChat')}</span> {/* Changed sr-only to hidden md:inline */}
+              <span className="hidden md:inline ml-1">{t('newChat')}</span>{' '}
+              {/* Changed sr-only to hidden md:inline */}
             </Button>
           </TooltipTrigger>
           <TooltipContent>{t('newChat')}</TooltipContent>
         </Tooltip>
       )}
-
       {!isReadonly && (
         <ModelSelector
           session={session}
@@ -74,7 +73,6 @@ function PureChatHeader({
           className="order-1 md:order-2"
         />
       )}
-
       {!isReadonly && (
         <div className="order-1 md:order-3 flex items-center gap-2">
           <VisibilitySelector
@@ -88,9 +86,8 @@ function PureChatHeader({
           )}
         </div>
       )}
-
-      <div className="flex-grow md:flex-grow-0" /> {/* Pushes elements to the right more effectively */}
-
+      <div className="flex-grow md:flex-grow-0" />{' '}
+      {/* Pushes elements to the right more effectively */}
       {session?.user && session.user.models?.length !== plansLength && (
         <Button
           data-testid="upgrade-button"
@@ -101,7 +98,6 @@ function PureChatHeader({
           {t('upgrade')}
         </Button>
       )}
-
       <Button
         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-5 ml-2" // order-4 to order-last/5 and ml-auto to ml-2
         asChild
@@ -120,7 +116,8 @@ function PureChatHeader({
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
   if (prevProps.selectedModelId !== nextProps.selectedModelId) return false;
-  if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType) return false;
+  if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
+    return false;
   if (prevProps.isReadonly !== nextProps.isReadonly) return false;
   // Add more checks if needed, e.g., for session changes that affect UI
   return true;

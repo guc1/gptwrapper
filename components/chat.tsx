@@ -302,7 +302,7 @@ export function Chat({
 
   return (
     <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
+      <div className="flex flex-col min-w-0 h-dvh bg-[var(--surface-base)]">
         <ChatHeader
           chatId={id}
           selectedModelId={chatModelId}
@@ -311,42 +311,40 @@ export function Chat({
           isReadonly={isReadonly}
           session={session}
         />
+        <div className="flex flex-col flex-1 mx-auto w-full max-w-[55rem] px-4 md:px-6 mt-2 rounded-3xl backdrop-blur-md bg-[var(--surface-glass)]/60 shadow-inner">
+          <Messages
+            chatId={id}
+            status={status}
+            votes={votes}
+            messages={messages}
+            setMessages={setMessages}
+            reload={reload}
+            isReadonly={isReadonly}
+            isArtifactVisible={isArtifactVisible}
+          />
 
-        <Messages
-          chatId={id}
-          status={status}
-          votes={votes}
-          messages={messages}
-          setMessages={setMessages}
-          reload={reload}
-          isReadonly={isReadonly}
-          isArtifactVisible={isArtifactVisible}
-        />
-
-        <form
-          // The `handleSubmit` from `useChat` (now `internalUseChatHandleSubmit`)
-          // is designed to be used directly as a form's onSubmit handler.
-          // Our wrapped `handleSubmit` also supports this.
-          onSubmit={handleSubmit}
-          className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-[52rem]"
-        >
-          {!isReadonly && (
-            <MultimodalInput
-              chatId={id}
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleSubmit} // Pass the component's memoized handleSubmit
-              status={status}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={append}
-              selectedVisibilityType={visibilityType}
-            />
-          )}
-        </form>
+          <form
+            onSubmit={handleSubmit}
+            className="flex pb-4 md:pb-6 gap-2 w-full"
+          >
+            {!isReadonly && (
+              <MultimodalInput
+                chatId={id}
+                input={input}
+                setInput={setInput}
+                handleSubmit={handleSubmit}
+                status={status}
+                stop={stop}
+                attachments={attachments}
+                setAttachments={setAttachments}
+                messages={messages}
+                setMessages={setMessages}
+                append={append}
+                selectedVisibilityType={visibilityType}
+              />
+            )}
+          </form>
+        </div>
       </div>
 
       <Artifact

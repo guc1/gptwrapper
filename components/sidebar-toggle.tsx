@@ -9,6 +9,7 @@ import {
 
 import { SidebarLeftIcon } from './icons';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
 
 export function SidebarToggle({
@@ -23,8 +24,8 @@ export function SidebarToggle({
         <Button
           data-testid="sidebar-toggle-button"
           onClick={toggleSidebar}
-          variant="outline"
-          className="md:px-2 md:h-fit"
+          variant="ghost"
+          className={cn('assistenten-toggle md:h-fit md:px-2', className)}
         >
           <SidebarLeftIcon size={16} />
         </Button>
