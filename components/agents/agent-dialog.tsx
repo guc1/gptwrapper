@@ -1,6 +1,11 @@
 'use client';
 
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
@@ -14,6 +19,9 @@ export function AgentDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
       <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none">
+        <VisuallyHidden>
+          <DialogTitle>{t('agents')}</DialogTitle>
+        </VisuallyHidden>
         <div className="relative mx-auto w-full max-w-[52rem]">
           <div className="absolute inset-0 rounded-[28px] bg-[#f0f0f0] pointer-events-none" />
           <div className="relative p-6 sm:p-8 rounded-[28px] bg-white/90 dark:bg-gray-900/80 backdrop-blur-md shadow transition-transform duration-200 hover:scale-[1.02]">
