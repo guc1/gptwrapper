@@ -43,7 +43,7 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 border-b"> {/* Added border-b for separation */}
+    <header className="flex sticky top-0 h-16 bg-[var(--surface-glass)] backdrop-blur-md items-center px-4 gap-2 border-b border-white/20">
       <SidebarToggle />
 
       {(!open || windowWidth < 768) && (
@@ -94,8 +94,8 @@ function PureChatHeader({
       {session?.user && session.user.models?.length !== plansLength && (
         <Button
           data-testid="upgrade-button"
-          variant="outline"
-          className="hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-last md:order-4 ml-2"
+          variant="ghost"
+          className="hidden md:flex py-1.5 px-3 h-fit rounded-full bg-gradient-to-r from-[var(--accent-peach)] to-[var(--accent-peach-soft)] text-white order-last md:order-4 ml-2"
           onClick={() => openUpgradePopup()}
         >
           {t('upgrade')}

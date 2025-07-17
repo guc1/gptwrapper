@@ -201,7 +201,7 @@ function PureMultimodalInput({
   }, [status, scrollToBottom]);
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div className="relative w-full flex flex-col gap-4 bg-[var(--surface-glass)] backdrop-blur-md rounded-[28px] p-4">
       <AnimatePresence>
         {!isAtBottom && (
           <motion.div
@@ -276,7 +276,7 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-[28px] !text-base border border-white/30 bg-transparent pb-10 backdrop-blur-sm',
           className,
         )}
         rows={2}
@@ -340,7 +340,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="rounded-full p-2 h-fit bg-[var(--surface-glass)] backdrop-blur-sm hover:bg-white/30"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -365,7 +365,7 @@ function PureStopButton({
   return (
     <Button
       data-testid="stop-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="rounded-full p-2 h-fit bg-[var(--surface-glass)] backdrop-blur-sm"
       onClick={(event) => {
         event.preventDefault();
         stop();
@@ -391,7 +391,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="rounded-full p-2 h-fit bg-gradient-to-r from-[var(--accent-peach)] to-[var(--accent-peach-soft)] text-white"
       onClick={(event) => {
         event.preventDefault();
         submitForm();
