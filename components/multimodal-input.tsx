@@ -61,6 +61,8 @@ function PureMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const t = useTranslation();
+  const [focusGlow, setFocusGlow] = useState(false);
+  const [sentFlash, setSentFlash] = useState(false);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -70,15 +72,17 @@ function PureMultimodalInput({
 
   const adjustHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 2}px`;
+      const el = textareaRef.current;
+      el.style.height = 'auto';
+      const h = Math.min(Math.max(el.scrollHeight, 64), 160);
+      el.style.height = `${h}px`;
     }
   };
 
   const resetHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = '98px';
+      textareaRef.current.style.height = '64px';
     }
   };
 
@@ -126,6 +130,8 @@ function PureMultimodalInput({
     setAttachments([]);
     setLocalStorageInput('');
     resetHeight();
+    setSentFlash(true);
+    setTimeout(() => setSentFlash(false), 1000);
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -201,7 +207,14 @@ function PureMultimodalInput({
   }, [status, scrollToBottom]);
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div
+      className={cx(
+        'glassDock flex flex-col gap-4 relative',
+        focusGlow && 'focusGlow',
+        sentFlash && 'sentFlash',
+        className,
+      )}
+    >
       <AnimatePresence>
         {!isAtBottom && (
           <motion.div
@@ -275,12 +288,13 @@ function PureMultimodalInput({
         placeholder={t('sendMessagePlaceholder')}
         value={input}
         onChange={handleInput}
-        className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
-          className,
-        )}
+        className={cx('dockInput overflow-hidden', className)}
         rows={2}
         autoFocus
+        onFocus={() => {
+          setFocusGlow(true);
+          setTimeout(() => setFocusGlow(false), 600);
+        }}
         onKeyDown={(event) => {
           if (
             event.key === 'Enter' &&
@@ -298,11 +312,11 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute left-4">
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
-      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
+      <div className="absolute right-4">
         {status === 'submitted' ? (
           <StopButton stop={stop} setMessages={setMessages} />
         ) : (
@@ -338,18 +352,18 @@ function PureAttachmentsButton({
   status: UseChatHelpers['status'];
 }) {
   return (
-    <Button
+    <button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="glassChip"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
       }}
       disabled={status !== 'ready'}
-      variant="ghost"
+      type="button"
     >
       <PaperclipIcon size={14} />
-    </Button>
+    </button>
   );
 }
 
@@ -363,17 +377,18 @@ function PureStopButton({
   setMessages: UseChatHelpers['setMessages'];
 }) {
   return (
-    <Button
+    <button
       data-testid="stop-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="glassChip"
       onClick={(event) => {
         event.preventDefault();
         stop();
         setMessages((messages) => messages);
       }}
+      type="button"
     >
       <StopIcon size={14} />
-    </Button>
+    </button>
   );
 }
 
@@ -389,17 +404,18 @@ function PureSendButton({
   uploadQueue: Array<string>;
 }) {
   return (
-    <Button
+    <button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="glassChip"
       onClick={(event) => {
         event.preventDefault();
         submitForm();
       }}
       disabled={input.length === 0 || uploadQueue.length > 0}
+      type="button"
     >
       <ArrowUpIcon size={14} />
-    </Button>
+    </button>
   );
 }
 
