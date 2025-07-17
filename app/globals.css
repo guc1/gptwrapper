@@ -347,6 +347,47 @@
         transition: transform .18s ease, box-shadow .18s ease;
     }
 
+    .glassIcon {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 9999px;
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 1px 3px rgba(0,0,0,.05);
+        transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, background-color 30ms;
+        cursor: pointer;
+    }
+
+    .glassIcon > svg {
+        opacity: .7;
+    }
+
+    .glassIcon:hover,
+    .glassIcon:focus-visible {
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 4px 10px rgba(0,0,0,.10);
+    }
+
+    .glassIcon:hover > svg,
+    .glassIcon:focus-visible > svg {
+        opacity: 1;
+    }
+
+    .glassIcon:active {
+        background: rgba(255,255,255,.12);
+    }
+
+    .glassIcon::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: inherit;
+        pointer-events: none;
+    }
+
     .glassBubble:hover,
     .glassBubble:focus-visible {
         box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.08);
@@ -356,6 +397,15 @@
         .glassBubble:hover,
         .glassBubble:focus-visible {
             transform: scale(1.015);
+        }
+
+        .glassIcon:hover,
+        .glassIcon:focus-visible {
+            transform: scale(1.12);
+        }
+
+        .glassIcon:active {
+            transform: scale(.95);
         }
     }
 
