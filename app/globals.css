@@ -260,16 +260,12 @@
         color: hsl(var(--primary));
     }
 
-    .orange header button,
-    .orange [data-testid="message-upvote"],
-    .orange [data-testid="message-downvote"] {
+    .orange header button {
         border-color: hsl(var(--primary));
         color: hsl(var(--primary));
     }
 
-    .orange header button:hover,
-    .orange [data-testid="message-upvote"]:hover,
-    .orange [data-testid="message-downvote"]:hover {
+    .orange header button:hover {
         background-color: hsl(25 90% 55%);
         color: hsl(var(--primary-foreground));
     }
@@ -364,6 +360,59 @@
             opacity: .9;
             transition: opacity 40ms;
         }
+    }
+
+    .glassIcon {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgb(255 255 255 / 0.2);
+        box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease;
+    }
+
+    .glassIcon svg {
+        opacity: .7;
+        transition: opacity .18s ease;
+    }
+
+    .glassIcon:hover,
+    .glassIcon:focus-visible {
+        box-shadow: 0 4px 10px rgba(0,0,0,.10);
+    }
+
+    .glassIcon:hover svg,
+    .glassIcon:focus-visible svg {
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .glassIcon:hover,
+        .glassIcon:focus-visible {
+            transform: scale(1.12);
+        }
+    }
+
+    .glassIcon:active {
+        transform: scale(.95);
+        background: rgba(255,255,255,.12);
+        transition-duration: 30ms;
+    }
+
+    .glassIcon::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: inherit;
+        pointer-events: none;
     }
 
     @media (prefers-reduced-motion: reduce) {

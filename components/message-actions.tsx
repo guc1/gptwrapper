@@ -5,7 +5,6 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import type { Vote } from '@/lib/db/schema';
 
 import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from './icons';
-import { Button } from './ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -42,9 +41,10 @@ export function PureMessageActions({
       >
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              className="py-1 px-2 h-fit text-muted-foreground"
-              variant="outline"
+            <button
+              aria-label={t('copy')}
+              type="button"
+              className="glassIcon text-muted-foreground disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none"
               onClick={async () => {
                 const textFromParts = message.parts
                   ?.filter((part) => part.type === 'text')
@@ -62,18 +62,19 @@ export function PureMessageActions({
               }}
             >
               <CopyIcon />
-            </Button>
+            </button>
           </TooltipTrigger>
           <TooltipContent>{t('copy')}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
+            <button
               data-testid="message-upvote"
-              className="py-1 px-2 h-fit text-muted-foreground !pointer-events-auto"
+              type="button"
+              aria-label={t('upvoteResponse')}
+              className="glassIcon text-muted-foreground !pointer-events-auto disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none"
               disabled={vote?.isUpvoted}
-              variant="outline"
               onClick={async () => {
                 const upvote = fetch('/api/vote', {
                   method: 'PATCH',
@@ -115,17 +116,18 @@ export function PureMessageActions({
               }}
             >
               <ThumbUpIcon />
-            </Button>
+            </button>
           </TooltipTrigger>
           <TooltipContent>{t('upvoteResponse')}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
+            <button
               data-testid="message-downvote"
-              className="py-1 px-2 h-fit text-muted-foreground !pointer-events-auto"
-              variant="outline"
+              type="button"
+              aria-label={t('downvoteResponse')}
+              className="glassIcon text-muted-foreground !pointer-events-auto disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none"
               disabled={vote && !vote.isUpvoted}
               onClick={async () => {
                 const downvote = fetch('/api/vote', {
@@ -168,7 +170,7 @@ export function PureMessageActions({
               }}
             >
               <ThumbDownIcon />
-            </Button>
+            </button>
           </TooltipTrigger>
           <TooltipContent>{t('downvoteResponse')}</TooltipContent>
         </Tooltip>
