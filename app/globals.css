@@ -429,4 +429,58 @@
             animation: none !important;
         }
     }
+
+    .composerDock {
+        position: relative;
+        border-radius: 24px;
+        background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--brand-accent) 40%, transparent), transparent 70%);
+        backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        box-shadow: 0 2px 3px rgba(0,0,0,.06);
+    }
+
+    .composerDock::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .45);
+        pointer-events: none;
+    }
+
+    .composerDock:focus-within::before {
+        animation: composerPulse 800ms ease-out;
+    }
+
+    @keyframes composerPulse {
+        0%,100% { box-shadow: inset 0 0 0 1px rgb(255 255 255 / .45); }
+        50% { box-shadow: inset 0 0 0 2px rgb(255 255 255 / .6); }
+    }
+
+    .composerDock.typing::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: 4px;
+        height: 2px;
+        background: radial-gradient(circle, rgb(255 185 139 / .4), transparent);
+        animation: typingRipple 600ms ease-out;
+        pointer-events: none;
+    }
+
+    @keyframes typingRipple {
+        from { transform: translateX(-100%); opacity: .4; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+
+    .composerTextarea {
+        color: var(--ink);
+        caret-color: var(--brand-accent);
+    }
+
+    .composerTextarea::placeholder {
+        color: var(--ink);
+        opacity: .6;
+    }
 }

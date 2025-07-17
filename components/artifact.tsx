@@ -336,7 +336,7 @@ function PureArtifact({
                     setAttachments={setAttachments}
                     messages={messages}
                     append={append}
-                    className="bg-background dark:bg-muted"
+                    inputClassName="bg-background dark:bg-muted"
                     setMessages={setMessages}
                     selectedVisibilityType={selectedVisibilityType}
                   />
