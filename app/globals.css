@@ -62,6 +62,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: rgba(255, 255, 255, 0.2);
+        --glass-stroke: rgba(255, 255, 255, 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -103,6 +105,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: rgba(255, 255, 255, 0.2);
+        --glass-stroke: rgba(255, 255, 255, 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -146,6 +150,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: rgba(255, 255, 255, 0.2);
+        --glass-stroke: rgba(255, 255, 255, 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -242,12 +248,30 @@
         @apply block w-full object-cover rounded-t-lg;
     }
 
+    .glassBubble {
+        background: var(--glass-fill);
+        backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        border-radius: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .glassBubble:hover,
+        .glassBubble:focus-within {
+            transform: scale(1.015);
+        }
+    }
+
+    .glassBubble:hover,
+    .glassBubble:focus-within {
+        box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.08);
+    }
+
     /* Orange theme component tweaks */
-    .orange [data-role="assistant"] [data-testid="message-content"],
-    .orange .chat-response {
-        background-color: #ffd4ad;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.75rem;
+    .orange .glassBubble {
+        background: var(--glass-fill);
     }
 
     .orange [data-testid="attachments-button"] svg {
