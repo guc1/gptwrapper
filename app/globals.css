@@ -248,6 +248,13 @@
         @apply block w-full object-cover rounded-t-lg;
     }
 
+    /* Chat bubble text sizing */
+    .messageContent {
+        font-size: 1rem;
+        font-weight: 450;
+        line-height: 1.55;
+    }
+
     /* Orange theme component tweaks */
     .orange [data-role="assistant"] [data-testid="message-content"],
     .orange .chat-response {
