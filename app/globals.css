@@ -62,6 +62,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -103,6 +105,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -146,6 +150,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -243,12 +249,7 @@
     }
 
     /* Orange theme component tweaks */
-    .orange [data-role="assistant"] [data-testid="message-content"],
-    .orange .chat-response {
-        background-color: #ffd4ad;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.75rem;
-    }
+
 
     .orange [data-testid="attachments-button"] svg {
         color: hsl(var(--primary));
@@ -330,6 +331,43 @@
         .recent,
         .recommended {
             grid-template-columns: 1fr;
+        }
+    }
+
+    .glassBubble {
+        border-radius: 24px;
+        background: var(--glass-fill);
+        backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        transition: transform .18s ease, box-shadow .18s ease;
+        color: rgb(29 29 31 / 0.9);
+    }
+
+    .dark .glassBubble {
+        color: rgb(255 255 255 / 0.9);
+    }
+
+    .orange .glassBubble {
+        color: rgb(29 29 31 / 0.9);
+    }
+
+    .glassBubble:hover,
+    .glassBubble:focus-visible {
+        box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.08);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .glassBubble:hover,
+        .glassBubble:focus-visible {
+            transform: scale(1.015);
+        }
+    }
+
+    @media (hover: none) {
+        .glassBubble:active {
+            opacity: .9;
+            transition: opacity 40ms;
         }
     }
 
