@@ -62,6 +62,10 @@ function PureMultimodalInput({
   const { width } = useWindowSize();
   const t = useTranslation();
 
+  const [hasValue, setHasValue] = useState<boolean>(input.length > 0);
+  const [focusGlow, setFocusGlow] = useState<boolean>(false);
+  const [sentFlash, setSentFlash] = useState<boolean>(false);
+
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();
@@ -93,6 +97,7 @@ function PureMultimodalInput({
       // Prefer DOM value over localStorage to handle hydration
       const finalValue = domValue || localStorageInput || '';
       setInput(finalValue);
+      setHasValue(finalValue.length > 0);
       adjustHeight();
       if (finalValue) {
         textareaRef.current.focus();
@@ -110,6 +115,7 @@ function PureMultimodalInput({
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
+    setHasValue(event.target.value.length > 0);
     adjustHeight();
   };
 
@@ -126,6 +132,8 @@ function PureMultimodalInput({
     setAttachments([]);
     setLocalStorageInput('');
     resetHeight();
+    setSentFlash(true);
+    setTimeout(() => setSentFlash(false), 1000);
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -201,7 +209,14 @@ function PureMultimodalInput({
   }, [status, scrollToBottom]);
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div
+      className={cx(
+        'glassDock relative flex w-full flex-col gap-4',
+        focusGlow && 'focused',
+        sentFlash && 'flash',
+      )}
+      data-has-text={hasValue}
+    >
       <AnimatePresence>
         {!isAtBottom && (
           <motion.div
@@ -269,19 +284,24 @@ function PureMultimodalInput({
         </div>
       )}
 
-      <Textarea
-        data-testid="multimodal-input"
-        ref={textareaRef}
-        placeholder={t('sendMessagePlaceholder')}
-        value={input}
-        onChange={handleInput}
-        className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
-          className,
-        )}
-        rows={2}
-        autoFocus
-        onKeyDown={(event) => {
+      <div className="relative">
+        <Textarea
+          data-testid="multimodal-input"
+          ref={textareaRef}
+          placeholder=" "
+          value={input}
+          onChange={handleInput}
+          onFocus={() => {
+            setFocusGlow(true);
+            setTimeout(() => setFocusGlow(false), 600);
+          }}
+          className={cx(
+            'transition-all duration-150 ease-linear min-h-[64px] max-h-[160px] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+            className,
+          )}
+          rows={2}
+          autoFocus
+          onKeyDown={(event) => {
           if (
             event.key === 'Enter' &&
             !event.shiftKey &&
@@ -296,13 +316,17 @@ function PureMultimodalInput({
             }
           }
         }}
-      />
+        />
+        <span className="dock-placeholder pointer-events-none">
+          {t('sendMessagePlaceholder')}
+        </span>
+      </div>
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="dock-chip left-0" aria-hidden="true">
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
-      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
+      <div className="dock-chip right-0" aria-hidden="true">
         {status === 'submitted' ? (
           <StopButton stop={stop} setMessages={setMessages} />
         ) : (
@@ -340,7 +364,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="dock-btn"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -365,7 +389,7 @@ function PureStopButton({
   return (
     <Button
       data-testid="stop-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="dock-btn"
       onClick={(event) => {
         event.preventDefault();
         stop();
@@ -391,7 +415,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="dock-btn"
       onClick={(event) => {
         event.preventDefault();
         submitForm();
