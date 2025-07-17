@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import '../../themes/assistenten.css';
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -14,7 +15,6 @@ export default async function Layout({
 }) {
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get('sidebar:state')?.value === 'false';
-
 
   return (
     <>

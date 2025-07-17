@@ -62,6 +62,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -103,6 +107,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #0F0F10;
+        --surface-glass: rgba(255,255,255,.08);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -146,6 +154,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -240,6 +252,18 @@
 
     .model-card img {
         @apply block w-full object-cover rounded-t-lg;
+    }
+
+    .assistant-bubble {
+        @apply px-3 py-2 rounded-2xl border border-white/35 backdrop-blur-md bg-[var(--surface-glass)]/60;
+    }
+
+    .user-bubble {
+        @apply px-3 py-2 rounded-2xl border border-white/40 backdrop-blur-md bg-gradient-to-br from-[var(--accent-peach)]/30 to-[var(--accent-peach-soft)]/30;
+    }
+
+    .glass-pill {
+        @apply backdrop-blur-md bg-[var(--surface-glass)]/40 border border-white/30 rounded-full transition-transform hover:scale-105;
     }
 
     /* Orange theme component tweaks */
