@@ -423,10 +423,131 @@
         }
     }
 
-    @media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
         * {
             transition: none !important;
             animation: none !important;
         }
     }
+}
+
+.glassDock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    max-width: 55rem;
+    margin-inline: auto;
+    padding: 1rem 3rem;
+    border-radius: 28px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(160%);
+    display: flex;
+    flex-direction: column;
+}
+
+.glassDock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    background: linear-gradient(90deg,var(--accent-peach),var(--accent-peach-soft),var(--accent-peach));
+    background-size: 400% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: dock-pan 45s linear infinite;
+}
+
+@keyframes dock-pan {
+    from { background-position: 0 50%; }
+    to { background-position: 400% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glassDock::before { animation: none; }
+}
+
+.dock-chip {
+    position: absolute;
+    bottom: -6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(160%);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2);
+}
+
+.dock-chip.left-0 { left: 0; transform: translate(-50%, 0); }
+.dock-chip.right-0 { right: 0; transform: translate(50%, 0); }
+
+.dock-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    backdrop-filter: blur(14px) saturate(160%);
+    background: rgba(255,255,255,.18);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.dock-btn:hover,
+.dock-btn:focus-visible {
+    box-shadow: 0 0 8px rgba(255,255,255,.4), inset 0 0 0 1px rgb(255 255 255 / .2);
+    transform: scale(1.08);
+}
+
+.dock-btn:active {
+    transform: scale(.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dock-btn:hover,
+    .dock-btn:focus-visible,
+    .dock-btn:active {
+        transform: none;
+    }
+}
+
+.focused::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(255,255,255,.12), transparent);
+    animation: focus-fade 600ms forwards;
+    pointer-events: none;
+}
+
+@keyframes focus-fade { from { opacity:.12; } to { opacity:0; } }
+
+.flash::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255,255,255,.05);
+    animation: flash-fade 1s forwards;
+    pointer-events: none;
+}
+
+@keyframes flash-fade { from { opacity:1; } to { opacity:0; } }
+
+.dock-placeholder {
+    position: absolute;
+    left: 1rem;
+    top: 0.75rem;
+    color: hsl(var(--muted-foreground));
+    transition: transform .18s ease, opacity .18s ease;
+}
+
+.glassDock[data-has-text="true"] .dock-placeholder {
+    transform: translateY(-0.5rem);
+    opacity: 0;
 }
