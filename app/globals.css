@@ -299,8 +299,8 @@
     }
 
     /* send message input background */
-    .orange [data-testid="multimodal-input"] {
-        background-color: #fcedde; /* lighter orange */
+    .orange .composerDock {
+        background: radial-gradient(circle at center, color-mix(in srgb, var(--brand-accent) 70%, transparent), transparent 70%);
     }
 
     /* Ripple effect for buttons */
@@ -428,5 +428,54 @@
             transition: none !important;
             animation: none !important;
         }
+    }
+
+    .composerDock {
+        position: relative;
+        border-radius: 24px;
+        backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        background: radial-gradient(circle at center, color-mix(in srgb, var(--brand-accent) 60%, transparent), transparent 70%);
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        transition: background .2s ease, box-shadow .2s ease;
+    }
+
+    .composerDock:focus-within {
+        box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 0 8px rgba(255,185,139,.6);
+    }
+
+    @keyframes composerRipple {
+        from { transform: translateX(-50%); opacity: 0.3; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+
+    .composerDock.typing::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--brand-accent), transparent);
+        border-radius: inherit;
+        pointer-events: none;
+        animation: composerRipple 1s forwards;
+    }
+
+    .composerButton {
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 1px 3px rgba(0,0,0,.05);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .composerButton:hover,
+    .composerButton:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 4px 10px rgba(255,185,139,.6);
+    }
+
+    .caret-brand {
+        caret-color: var(--brand-accent);
     }
 }

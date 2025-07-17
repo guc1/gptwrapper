@@ -61,6 +61,8 @@ function PureMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const t = useTranslation();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -111,6 +113,9 @@ function PureMultimodalInput({
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
     adjustHeight();
+    setIsTyping(true);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 500);
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -201,7 +206,7 @@ function PureMultimodalInput({
   }, [status, scrollToBottom]);
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div className={cx('relative w-full flex flex-col gap-4 composerDock', isTyping && 'typing')}>
       <AnimatePresence>
         {!isAtBottom && (
           <motion.div
@@ -276,7 +281,7 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 bg-transparent border-none text-[color:var(--ink)] placeholder:text-[rgba(29,29,31,0.7)] caret-brand',
           className,
         )}
         rows={2}
@@ -340,7 +345,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="glassIcon composerButton"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -391,12 +396,13 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="glassIcon composerButton"
       onClick={(event) => {
         event.preventDefault();
         submitForm();
       }}
       disabled={input.length === 0 || uploadQueue.length > 0}
+      variant="ghost"
     >
       <ArrowUpIcon size={14} />
     </Button>
