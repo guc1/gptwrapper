@@ -62,6 +62,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -103,6 +107,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #0F0F10;
+        --surface-glass: rgba(255,255,255,.08);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -146,6 +154,10 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -288,6 +300,41 @@
     /* send message input background */
     .orange [data-testid="multimodal-input"] {
         background-color: #fcedde; /* lighter orange */
+    }
+
+    .conversation-rail {
+        background: var(--surface-glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 1.5rem;
+    }
+
+    .assistant-bubble {
+        background: color-mix(in srgb, var(--accent-peach-soft) 30%, transparent);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .user-bubble {
+        background: transparent;
+        border-radius: 1.5rem;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--accent-peach);
+    }
+
+    .glass-composer {
+        background: var(--surface-glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 1.75rem;
+    }
+
+    .chat-header-glass {
+        background: var(--surface-glass);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     }
 
     /* Ripple effect for buttons */
