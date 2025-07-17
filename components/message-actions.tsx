@@ -37,7 +37,9 @@ export function PureMessageActions({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-row gap-2">
+      <div
+        className="flex flex-row gap-2 opacity-0 group-hover/message:opacity-100 group-focus-visible/message:opacity-100 focus-within:opacity-100 transition-opacity"
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
