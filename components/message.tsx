@@ -127,11 +127,15 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                            message.role === 'user',
-                          'chat-response': message.role === 'assistant',
-                        })}
+                        className={cn(
+                          'flex flex-col gap-4 px-4 py-3 rounded-3xl border backdrop-blur-md',
+                          {
+                            'border-[var(--accent-peach)] bg-transparent text-foreground':
+                              message.role === 'user',
+                            'border-white/30 bg-[var(--surface-glass)]':
+                              message.role === 'assistant',
+                          },
+                        )}
                       >
                         <Markdown>{sanitizeText(part.text)}</Markdown>
                       </div>
@@ -266,12 +270,7 @@ export const ThinkingMessage = () => {
       data-role={role}
     >
       <div
-        className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem] group-data-[role=user]/message:py-2 rounded-xl',
-          {
-            'group-data-[role=user]/message:bg-muted': true,
-          },
-        )}
+        className="flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem] rounded-3xl border border-white/30 bg-[var(--surface-glass)] backdrop-blur-md px-4 py-3"
       >
         <div className="size-8 -ml-12 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
           <SparklesIcon size={14} />

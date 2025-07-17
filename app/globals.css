@@ -60,6 +60,10 @@
         --sidebar-ring: 217.2 91.2% 59.8%;
         --sidebar-background-light: 0 0% 98%;
         --brand-accent: #FFB98B;
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
@@ -101,6 +105,10 @@
         --sidebar-ring: 217.2 91.2% 59.8%;
         --sidebar-background-light: 240 5.9% 20%;
         --brand-accent: #FFB98B;
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
+        --surface-base: #0F0F10;
+        --surface-glass: rgba(255,255,255,.08);
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
@@ -144,6 +152,10 @@
         --sidebar-ring: 25 90% 55%;
         --sidebar-background-light: 32 71% 98%;
         --brand-accent: #FFB98B;
+        --accent-peach: #FFB98B;
+        --accent-peach-soft: #FFE3D2;
+        --surface-base: #FFFDFB;
+        --surface-glass: rgba(255,255,255,.20);
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --gap-user-to-assistant: 40px;
