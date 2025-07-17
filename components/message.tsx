@@ -127,11 +127,9 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                            message.role === 'user',
-                          'chat-response': message.role === 'assistant',
-                        })}
+                        className={cn(
+                          'flex flex-col gap-4 px-3 py-2 cursor-text glassBubble text-[#1D1D1F]/90 dark:text-white/90'
+                        )}
                       >
                         <Markdown>{sanitizeText(part.text)}</Markdown>
                       </div>
@@ -267,10 +265,7 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem] group-data-[role=user]/message:py-2 rounded-xl',
-          {
-            'group-data-[role=user]/message:bg-muted': true,
-          },
+          'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem]'
         )}
       >
         <div className="size-8 -ml-12 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
@@ -278,7 +273,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
+          <div className="flex flex-col gap-4 px-3 py-2 cursor-text glassBubble text-[#1D1D1F]/90 dark:text-white/90">
             Hmm...
           </div>
         </div>
