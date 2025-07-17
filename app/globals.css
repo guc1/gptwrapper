@@ -62,6 +62,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -103,6 +105,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -146,6 +150,8 @@
         --brand-accent: #FFB98B;
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
+        --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
     }
@@ -330,6 +336,33 @@
         .recent,
         .recommended {
             grid-template-columns: 1fr;
+        }
+    }
+
+    .glassBubble {
+        border-radius: 24px;
+        backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .glassBubble:hover,
+    .glassBubble:focus-visible {
+        box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.08);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .glassBubble:hover,
+        .glassBubble:focus-visible {
+            transform: scale(1.015);
+        }
+    }
+
+    @media (hover: none) {
+        .glassBubble:active {
+            opacity: .9;
+            transition: opacity 40ms;
         }
     }
 
