@@ -346,12 +346,37 @@
         }
     }
 
-    .glassBubble {
+.glassBubble {
         border-radius: 24px;
         backdrop-filter: blur(10px) saturate(160%);
         border: 1px solid var(--glass-stroke);
         box-shadow: 0 2px 6px rgba(0,0,0,.04);
         transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .frostedGlow {
+        border-radius: 24px;
+        backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid var(--glass-stroke);
+        background: radial-gradient(
+            ellipse 130% 100% at center,
+            color-mix(in srgb, var(--bubble-color) 60%, transparent) 0%,
+            transparent 90%
+        );
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .frostedGlow-orange { --bubble-color: var(--brand-accent); }
+    .frostedGlow-peach { --bubble-color: #ffe9d6; }
+    .frostedGlow-grey { --bubble-color: #e5e5e5; }
+
+    .frostedGlow:hover,
+    .frostedGlow:focus-visible {
+        box-shadow:
+            0 2px 6px rgba(0,0,0,.04),
+            0 6px 16px rgba(0,0,0,.08),
+            0 0 8px color-mix(in srgb, var(--bubble-color) 60%, transparent);
     }
 
     .glassIcon {
@@ -464,7 +489,7 @@
     .composerDock:focus-within {
         background: radial-gradient(ellipse 130% 100% at center, color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%, transparent 90%);
         transform: translateY(-2px) scaleY(1.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 0 8px rgba(255,185,139,.6);
+        box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 0 8px rgba(255,185,139,.6), inset 0 0 0 2px rgba(255,255,255,.8);
     }
 
     @keyframes composerRipple {
