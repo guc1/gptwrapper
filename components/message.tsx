@@ -128,11 +128,14 @@ const PurePreviewMessage = ({
                       <div
                         data-testid="message-content"
                         className={cn(
-                          'flex flex-col gap-4 glassBubble px-3 py-2 messageContent',
+                          'flex flex-col gap-4 messageContent px-3 py-2',
                           {
-                            'bg-primary text-primary-foreground':
+                            'frostedGlow-orange text-[color:var(--ink)]':
                               message.role === 'user',
-                            'chat-response': message.role === 'assistant',
+                            'frostedGlow-peach text-[color:var(--ink)]':
+                              message.role === 'assistant',
+                            'frostedGlow-grey text-[color:var(--ink)]':
+                              message.role === 'system' || message.role === 'meta',
                           },
                         )}
                       >
@@ -270,7 +273,7 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem] group-data-[role=user]/message:py-2 glassBubble',
+          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-[45rem] group-data-[role=user]/message:py-2 frostedGlow-peach',
           {
             'group-data-[role=user]/message:bg-muted': true,
           },
