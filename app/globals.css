@@ -300,7 +300,18 @@
 
     /* send message input background */
     .orange .composerDock {
-        background: radial-gradient(circle at center, color-mix(in srgb, var(--brand-accent) 70%, transparent), transparent 70%);
+        background: radial-gradient(ellipse 90% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 70%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 70%, transparent) 90%,
+                transparent 100%);
+    }
+
+    .orange .composerDock:hover,
+    .orange .composerDock:focus-within {
+        background: radial-gradient(ellipse 90% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 75%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 75%, transparent) 90%,
+                transparent 100%);
     }
 
     /* Ripple effect for buttons */
@@ -414,6 +425,11 @@
         .glassIcon:active {
             transform: scale(.95);
         }
+
+        .composerDock:hover,
+        .composerDock:focus-within {
+            transform: translateY(-2px) scaleY(1.05);
+        }
     }
 
     @media (hover: none) {
@@ -435,14 +451,30 @@
         border-radius: 24px;
         backdrop-filter: blur(10px) saturate(160%);
         border: 1px solid var(--glass-stroke);
-        background: radial-gradient(circle at center, color-mix(in srgb, var(--brand-accent) 60%, transparent), transparent 70%);
+        background: radial-gradient(ellipse 90% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 90%,
+                transparent 100%);
         box-shadow: 0 2px 6px rgba(0,0,0,.04);
-        transition: background .2s ease, box-shadow .2s ease;
+        transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+    .composerDock:hover {
+        background: radial-gradient(ellipse 90% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 90%,
+                transparent 100%);
+        box-shadow: 0 4px 10px rgba(0,0,0,.06);
     }
 
     .composerDock:focus-within {
-        box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 0 8px rgba(255,185,139,.6);
+        background: radial-gradient(ellipse 90% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 90%,
+                transparent 100%);
+        box-shadow: 0 4px 10px rgba(0,0,0,.06), 0 0 8px rgba(255,185,139,.6);
     }
+
 
     @keyframes composerRipple {
         from { transform: translateX(-50%); opacity: 0.3; }
@@ -473,6 +505,10 @@
     .composerButton:focus-visible {
         transform: translateY(-1px);
         box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 4px 10px rgba(255,185,139,.6);
+    }
+
+    .composerButton:active {
+        transform: translateY(1px);
     }
 
     .caret-brand {
