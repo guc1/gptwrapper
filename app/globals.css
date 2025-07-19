@@ -298,7 +298,9 @@
 
     /* send message input background */
     .orange .composerDock {
-        background: radial-gradient(ellipse 130% 100% at center, color-mix(in srgb, var(--brand-accent) 70%, transparent) 0%, transparent 90%);
+        background: radial-gradient(ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 0%,
+                transparent 85%);
     }
 
     /* Ripple effect for buttons */
@@ -387,8 +389,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         border-radius: 9999px;
         background: rgba(255,255,255,.18);
         backdrop-filter: blur(12px);
@@ -403,7 +405,8 @@
 
     .glassIcon:hover,
     .glassIcon:focus-visible {
-        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 4px 10px rgba(0,0,0,.10);
+        transform: translateY(-2px);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 4px 10px rgba(255,185,139,.6);
     }
 
     .glassIcon:hover > svg,
@@ -436,7 +439,7 @@
 
         .glassIcon:hover,
         .glassIcon:focus-visible {
-            transform: scale(1.12);
+            transform: translateY(-2px);
         }
 
         .glassIcon:active {
@@ -466,6 +469,14 @@
         .composerButton:active {
             transform: none !important;
         }
+        .composerDock:hover,
+        .composerDock:focus-within {
+            opacity: .95;
+        }
+        .composerButton:hover,
+        .composerButton:focus-visible {
+            opacity: .9;
+        }
     }
 
     .composerDock {
@@ -473,34 +484,58 @@
         border-radius: 24px;
         backdrop-filter: blur(10px) saturate(160%);
         border: 1px solid var(--glass-stroke);
-        background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 85%, transparent) 0%,
-                transparent 70%);
-        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / .12),
+            0 2px 4px rgba(0,0,0,.05);
+        background:
+            radial-gradient(ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 0%,
+                transparent 85%);
         transition: background .2s ease, box-shadow .2s ease, transform .18s ease;
     }
 
     .composerDock:hover {
         background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 90%, transparent) 0%,
-                transparent 70%);
-        transform: scaleY(1.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                transparent 85%);
+        transform: translateY(-2px);
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / .12),
+            0 4px 12px rgba(0,0,0,.08);
     }
 
     .orange .composerDock:hover,
     .orange .composerDock:focus-within {
         background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 95%, transparent) 0%,
-                transparent 70%);
+                color-mix(in srgb, var(--brand-accent) 70%, transparent) 0%,
+                transparent 85%);
     }
 
     .composerDock:focus-within {
         background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 90%, transparent) 0%,
-                transparent 70%);
-        transform: translateY(-2px) scaleY(1.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 0 8px rgba(255,185,139,.6);
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                transparent 85%);
+        transform: translateY(-2px);
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / .12),
+            0 4px 12px rgba(0,0,0,.08),
+            0 0 8px rgba(255,185,139,.6);
+        animation: composerPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes composerPulse {
+        0%, 100% {
+            box-shadow:
+                inset 0 0 0 1px rgb(255 255 255 / .12),
+                0 4px 12px rgba(0,0,0,.08),
+                0 0 8px rgba(255,185,139,.6);
+        }
+        50% {
+            box-shadow:
+                inset 0 0 0 1px rgb(255 255 255 / .12),
+                0 4px 12px rgba(0,0,0,.08),
+                0 0 12px rgba(255,185,139,.7);
+        }
     }
 
     @keyframes composerRipple {
