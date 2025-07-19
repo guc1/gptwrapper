@@ -130,7 +130,7 @@ const PurePreviewMessage = ({
                         className={cn(
                           'flex flex-col gap-4 frostedGlow px-3 py-2 messageContent',
                           {
-                            'frostedGlow-orange text-primary-foreground':
+                            'frostedInputBubble frostedGlow-orangeDeep text-primary-foreground':
                               message.role === 'user',
                             'frostedGlow-peach': message.role === 'assistant',
                           },
