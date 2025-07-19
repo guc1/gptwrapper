@@ -298,7 +298,12 @@
 
     /* send message input background */
     .orange .composerDock {
-        background: radial-gradient(ellipse 130% 100% at center, color-mix(in srgb, var(--brand-accent) 70%, transparent) 0%, transparent 90%);
+        background: radial-gradient(
+                ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 55%, transparent) 33%,
+                transparent 85%
+        );
     }
 
     /* Ripple effect for buttons */
@@ -472,40 +477,58 @@
         position: relative;
         border-radius: 24px;
         backdrop-filter: blur(10px) saturate(160%);
-        border: 1px solid var(--glass-stroke);
-        background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 85%, transparent) 0%,
-                transparent 70%);
-        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        border: 1px solid rgba(255,255,255,.12);
+        background: radial-gradient(
+                ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 55%, transparent) 33%,
+                transparent 85%
+        );
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 2px 4px rgba(0,0,0,.05);
         transition: background .2s ease, box-shadow .2s ease, transform .18s ease;
     }
 
     .composerDock:hover {
-        background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 90%, transparent) 0%,
-                transparent 70%);
-        transform: scaleY(1.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        background: radial-gradient(
+                ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 33%,
+                transparent 85%
+        );
+        transform: translateY(-2px);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.08);
     }
 
     .orange .composerDock:hover,
     .orange .composerDock:focus-within {
-        background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 95%, transparent) 0%,
-                transparent 70%);
+        background: radial-gradient(
+                ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 33%,
+                transparent 85%
+        );
     }
 
     .composerDock:focus-within {
-        background: radial-gradient(ellipse 130% 100% at center,
-                color-mix(in srgb, var(--brand-accent) 90%, transparent) 0%,
-                transparent 70%);
-        transform: translateY(-2px) scaleY(1.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 0 8px rgba(255,185,139,.6);
+        background: radial-gradient(
+                ellipse 130% 100% at center,
+                color-mix(in srgb, var(--brand-accent) 65%, transparent) 0%,
+                color-mix(in srgb, var(--brand-accent) 60%, transparent) 33%,
+                transparent 85%
+        );
+        transform: translateY(-2px);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.08), 0 0 12px rgba(255,185,139,.6);
+        animation: composerPulse 4s ease-in-out infinite;
     }
 
     @keyframes composerRipple {
         from { transform: translateX(-50%); opacity: 0.3; }
         to { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes composerPulse {
+        0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.08), 0 0 12px rgba(255,185,139,.6); }
+        50% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.08), 0 0 16px rgba(255,185,139,.7); }
     }
 
     .composerDock.typing::after {
@@ -522,6 +545,8 @@
     }
 
     .composerButton {
+        width: 40px;
+        height: 40px;
         background: rgba(255,255,255,.18);
         backdrop-filter: blur(12px);
         box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), 0 1px 3px rgba(0,0,0,.05);
@@ -536,7 +561,7 @@
     }
 
     .composerButton:active {
-        transform: translateY(0);
+        transform: scale(.95) translateY(0);
         background: rgba(255,255,255,.18);
     }
 
