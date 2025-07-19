@@ -128,11 +128,12 @@ const PurePreviewMessage = ({
                       <div
                         data-testid="message-content"
                         className={cn(
-                          'flex flex-col gap-4 frostedGlow px-3 py-2 messageContent',
+                          'flex flex-col gap-4 px-3 py-2 messageContent',
                           {
-                            'frostedGlow-orange text-primary-foreground':
+                            'frostedInputBubble text-[color:var(--ink)]':
                               message.role === 'user',
-                            'frostedGlow-peach': message.role === 'assistant',
+                            'frostedGlow frostedGlow-peach':
+                              message.role === 'assistant',
                           },
                         )}
                       >
