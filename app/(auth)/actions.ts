@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { createUser, getUser, transferChatOwnership } from '@/lib/db/queries';
 import { signIn } from './auth';
 import type { User } from '@/lib/db/schema';
-import { ChatSDKError } from '@/lib/errors';
 
 const authFormSchema = z.object({
   email: z.string().email(),
