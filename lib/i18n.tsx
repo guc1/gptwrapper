@@ -118,6 +118,8 @@ export const translations = {
     agentUpdateInfo: 'Info about Assistants',
     upgradeModel: 'Upgrade model',
     goToChat: 'Go to chat',
+    agentChatListHeading: 'Chats with this assistant',
+    agentDemoLabel: 'Example of the assistant',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -236,6 +238,8 @@ export const translations = {
     agentUpdateInfo: 'Info over Assistenten',
     upgradeModel: 'Upgrade model',
     goToChat: 'Ga naar chat',
+    agentChatListHeading: 'Chats met deze assistent',
+    agentDemoLabel: 'Voorbeeld van de assistent',
   },
 } as const;
 
