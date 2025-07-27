@@ -3,7 +3,11 @@ import { notFound, redirect } from 'next/navigation';
 
 import { auth } from '@/app/(auth)/auth';
 import { Chat } from '@/components/chat';
-import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
+import {
+  getChatById,
+  getMessagesByChatId,
+  getUserModelIds,
+} from '@/lib/db/queries';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { DBMessage } from '@/lib/db/schema';
@@ -77,7 +81,7 @@ export default async function Page({
     }));
   }
 
-  const userModels = session.user.models ?? [];
+  const userModels = await getUserModelIds({ userId: session.user.id });
   const baseModels =
     entitlementsByUserType[session.user.type].availableChatModelIds;
   const availableModels = Array.from(new Set([...baseModels, ...userModels]));

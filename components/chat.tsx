@@ -151,6 +151,10 @@ export function Chat({
           }
           return;
         }
+        if (error.type === 'forbidden_model' && error.surface === 'chat') {
+          openUpgradePopup();
+          return;
+        }
         toast({
           type: 'error',
           description: error.message,

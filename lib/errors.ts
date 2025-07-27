@@ -5,6 +5,7 @@ export type ErrorType =
   | 'not_found'
   | 'rate_limit'
   | 'limit_exceeded' // Added
+  | 'forbidden_model'
   | 'offline';
 
 export type Surface =
@@ -97,6 +98,8 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
       return 'The requested chat was not found. Please check the chat ID and try again.';
     case 'forbidden:chat':
       return 'This chat belongs to another user. Please check the chat ID and try again.';
+    case 'forbidden_model:chat':
+      return 'You do not have access to this model. Please upgrade your plan.';
     case 'unauthorized:chat':
       return 'You need to sign in to view this chat. Please sign in and try again.';
     case 'offline:chat':
@@ -139,6 +142,8 @@ function getStatusCodeByType(type: ErrorType) {
       return 429;
     case 'limit_exceeded': // Added
       return 402; // Payment Required, or 403 Forbidden could also work
+    case 'forbidden_model':
+      return 403;
     case 'offline':
       return 503;
     default:
