@@ -11,14 +11,44 @@ export default function AssistentenPage() {
   const t = useTranslation();
 
   const recentlyUsed: AgentCardProps[] = [
-    { name: 'Luna', description: 'Creative writing assistant', avatar: 'https://avatar.vercel.sh/luna' },
-    { name: 'Moga', description: 'Math tutor bot', avatar: 'https://avatar.vercel.sh/moga' },
+    {
+      name: 'Luna',
+      description: 'Creative writing assistant',
+      avatar: 'https://avatar.vercel.sh/luna',
+      modelId: 'gpt-4.1',
+      instructions: 'You help users write engaging stories.',
+    },
+    {
+      name: 'Moga',
+      description: 'Math tutor bot',
+      avatar: 'https://avatar.vercel.sh/moga',
+      modelId: 'gpt-4.1',
+      instructions: 'Assist with solving math problems.',
+    },
   ];
 
   const recommended: AgentCardProps[] = [
-    { name: 'Rela', description: 'Relationship advice', avatar: 'https://avatar.vercel.sh/rela' },
-    { name: 'Echo', description: 'Quick Q&A', avatar: 'https://avatar.vercel.sh/echo' },
-    { name: 'Beta', description: 'Beta features explorer', avatar: 'https://avatar.vercel.sh/beta' },
+    {
+      name: 'Rela',
+      description: 'Relationship advice',
+      avatar: 'https://avatar.vercel.sh/rela',
+      modelId: 'gpt-4.1',
+      instructions: 'Give thoughtful relationship tips.',
+    },
+    {
+      name: 'Echo',
+      description: 'Quick Q&A',
+      avatar: 'https://avatar.vercel.sh/echo',
+      modelId: 'gpt-4.1',
+      instructions: 'Answer short questions succinctly.',
+    },
+    {
+      name: 'Beta',
+      description: 'Beta features explorer',
+      avatar: 'https://avatar.vercel.sh/beta',
+      modelId: 'gpt-4.1',
+      instructions: 'Help test new features.',
+    },
   ];
 
   const container = {
