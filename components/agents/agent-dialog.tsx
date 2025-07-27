@@ -12,19 +12,31 @@ import { X } from 'lucide-react';
 import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/utils';
 
 export function AgentDialog() {
-  const { isOpen, closePopup } = useAgentPopup();
+  const { isOpen, agent, closePopup } = useAgentPopup();
   const t = useTranslation();
   const router = useRouter();
 
-  function goToChat() {
+  const { data } = useSWR(
+    isOpen && agent ? `/api/history?limit=20&modelId=${agent.modelId}` : null,
+    fetcher,
+  );
+  const chats = (data?.chats as Array<{ id: string; title: string }> | undefined) ?? [];
+
+  function goToChat(chatId?: string) {
     closePopup();
-    router.push('/');
+    if (chatId) {
+      router.push(`/chat/${chatId}`);
+    } else if (agent) {
+      router.push(`/?modelId=${agent.modelId}`);
+    }
     router.refresh();
   }
 
-  if (!isOpen) return null;
+  if (!isOpen || !agent) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
@@ -42,21 +54,23 @@ export function AgentDialog() {
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>
-          <h2>Luna</h2>
+          <h2>{agent.name}</h2>
           <div className="agentPreviewDemo" aria-label={t('agentDemoLabel')} />
-          <p className="agentPreviewDescription">
-            Creative writing assistant helping craft engaging stories.
-          </p>
+          <p className="agentPreviewDescription">{agent.description}</p>
           <div className="agentPreviewDivider" />
           <div className="agentChatListHeader">{t('agentChatListHeading')}</div>
           <div className="agentChatList">
-            <button type="button">How do I start a novel?</button>
-            <button type="button">Generate character ideas</button>
-            <button type="button">Outline a mystery plot</button>
-            <button type="button">Tips for dialogue</button>
-            <button type="button">Suggest a story prompt</button>
+            {chats.map((chat) => (
+              <button
+                type="button"
+                key={chat.id}
+                onClick={() => goToChat(chat.id)}
+              >
+                {chat.title}
+              </button>
+            ))}
           </div>
-          <button type="button" className="goToChatButton" onClick={goToChat}>
+          <button type="button" className="goToChatButton" onClick={() => goToChat()}>
             {t('goToChat')}
           </button>
         </motion.div>

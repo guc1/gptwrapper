@@ -1,13 +1,16 @@
 import { create } from 'zustand';
+import type { Agent } from '@/lib/agents';
 
 interface AgentPopupState {
   isOpen: boolean;
-  openPopup: () => void;
+  agent: Agent | null;
+  openPopup: (agent: Agent) => void;
   closePopup: () => void;
 }
 
 export const useAgentPopup = create<AgentPopupState>((set) => ({
   isOpen: false,
-  openPopup: () => set({ isOpen: true }),
-  closePopup: () => set({ isOpen: false }),
+  agent: null,
+  openPopup: (agent) => set({ isOpen: true, agent }),
+  closePopup: () => set({ isOpen: false, agent: null }),
 }));
