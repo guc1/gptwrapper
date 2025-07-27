@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 
 import { Chat } from '@/components/chat';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import { entitlementsByUserType } from '@/lib/ai/entitlements';
+import { getUserModelIds } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { auth } from '../(auth)/auth';
@@ -58,7 +60,13 @@ export default async function Page({
 
   const id = generateUUID();
   const modelIdFromCookie = cookieStore.get('chat-model');
-  const initialModelId = selectedModelIdParam ?? modelIdFromCookie?.value ?? DEFAULT_CHAT_MODEL;
+  const userModels = await getUserModelIds({ userId: session.user.id });
+  const baseModels = entitlementsByUserType[session.user.type].availableChatModelIds;
+  const availableModels = Array.from(new Set([...baseModels, ...userModels]));
+  let initialModelId = selectedModelIdParam ?? modelIdFromCookie?.value ?? DEFAULT_CHAT_MODEL;
+  if (!availableModels.includes(initialModelId)) {
+    initialModelId = DEFAULT_CHAT_MODEL;
+  }
 
   return (
     <>

@@ -17,6 +17,7 @@ import {
   saveChat,
   saveUserMessageWithLimit,
   saveMessages,
+  getUserModelIds,
 } from '@/lib/db/queries';
 import {
   generateUUID,
@@ -76,6 +77,13 @@ export async function POST(request: Request) {
       return new ChatSDKError('unauthorized:chat').toResponse();
     }
     const userType: UserType = session.user.type;
+
+    const userModels = await getUserModelIds({ userId: session.user.id });
+    const baseModels = entitlementsByUserType[userType].availableChatModelIds;
+    const availableModels = new Set([...baseModels, ...userModels]);
+    if (!availableModels.has(selectedChatModel)) {
+      return new ChatSDKError('forbidden_model:chat').toResponse();
+    }
 
     const chat = await getChatById({ id });
     if (!chat) {
