@@ -96,8 +96,9 @@ export default async function Page({
 
   return (
     <>
-      <Chat {...chatComponentProps} />
-      <DataStreamHandler id={chatId} /> {/* Ensure consistent use of chatId */}
+      <Chat key={chat.id} {...chatComponentProps} />
+      {/* Use a unique key to avoid duplicate keys */}
+      <DataStreamHandler key={`stream-${chat.id}`} id={chatId} />
     </>
   );
 }
