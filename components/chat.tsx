@@ -66,6 +66,10 @@ export function Chat({
 
   const [chatModelId, setChatModelId] = useState(initialChatModel);
 
+  useEffect(() => {
+    setChatModelId(initialChatModel);
+  }, [id, initialChatModel]);
+
   const handleModelChange = useCallback(
     (modelId: string) => {
       if (modelId === chatModelId) return;
