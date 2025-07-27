@@ -117,11 +117,16 @@ export const myProvider = isTestEnvironment
     customProvider({
       languageModels: {
         /* flagship model for normal chat                                */
-        'free-model': openai('gpt-4.1'), // GPT‑4.1 :contentReference[oaicite:4]{index=4}
+        'free-model': openai('gpt-4.1'), // GPT‑4.1
 
         'basis-model': openai('gpt-4.1'),
         'plus-model': geminiLanguageModel(false),
         'top-model': geminiLanguageModel(true),
+        'agent-luna': openai('gpt-4.1'),
+        'agent-moga': openai('gpt-4.1'),
+        'agent-rela': openai('gpt-4.1'),
+        'agent-echo': openai('gpt-4.1'),
+        'agent-beta': openai('gpt-4.1'),
 
         /* reasoning stream with <think> traces, using 4o‑mini           */
         'chat-model-reasoning': wrapLanguageModel({

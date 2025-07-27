@@ -83,10 +83,12 @@ const providers = [
     credentials: { guestUserId: { label: 'guestUserId', type: 'text' } },
     async authorize(credentials) {
       if (isValidUUID(credentials?.guestUserId)) {
-        const existing = await getUserById(credentials!.guestUserId);
+        const existing = await getUserById(credentials?.guestUserId);
         if (existing) {
           return { ...existing, type: 'guest', models: [] } as any;
         }
+        const [guestUser] = await createGuestUser(credentials?.guestUserId);
+        return { ...guestUser, type: 'guest', models: [] } as any;
       }
 
       const [guestUser] = await createGuestUser();
@@ -152,6 +154,11 @@ export const {
       }
 
       if (token.id) {
+        const existing = await getUserById(token.id as string);
+        if (!existing) {
+          await createGuestUser(token.id as string);
+        }
+
         token.type = await getUserTypeById({ userId: token.id as string });
         token.models = await getUserModelIds({ userId: token.id as string });
       }

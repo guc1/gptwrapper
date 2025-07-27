@@ -1,25 +1,18 @@
 'use client';
 
-import { AgentCard, type AgentCardProps } from '@/components/agents/agent-card';
+import { AgentCard } from '@/components/agents/agent-card';
 import { useTranslation } from '@/lib/i18n';
 import { SearchInput } from '@/components/search-input';
 import AssistentenHeader from '@/components/assistenten-header';
 import '../../../themes/assistenten.css';
 import { motion } from 'framer-motion';
+import { agents } from '@/lib/agents';
 
 export default function AssistentenPage() {
   const t = useTranslation();
 
-  const recentlyUsed: AgentCardProps[] = [
-    { name: 'Luna', description: 'Creative writing assistant', avatar: 'https://avatar.vercel.sh/luna' },
-    { name: 'Moga', description: 'Math tutor bot', avatar: 'https://avatar.vercel.sh/moga' },
-  ];
-
-  const recommended: AgentCardProps[] = [
-    { name: 'Rela', description: 'Relationship advice', avatar: 'https://avatar.vercel.sh/rela' },
-    { name: 'Echo', description: 'Quick Q&A', avatar: 'https://avatar.vercel.sh/echo' },
-    { name: 'Beta', description: 'Beta features explorer', avatar: 'https://avatar.vercel.sh/beta' },
-  ];
+  const recentlyUsed = agents.slice(0, 2);
+  const recommended = agents.slice(2);
 
   const container = {
     hidden: {},
@@ -46,7 +39,7 @@ export default function AssistentenPage() {
           className="grid gap-4 recent md:grid-cols-2"
         >
           {recentlyUsed.map((agent) => (
-            <AgentCard key={agent.name} {...agent} />
+            <AgentCard key={agent.id} agent={agent} />
           ))}
         </motion.div>
       </section>
@@ -62,7 +55,7 @@ export default function AssistentenPage() {
           className="grid gap-4 recommended"
         >
           {recommended.map((agent) => (
-            <AgentCard key={agent.name} {...agent} />
+            <AgentCard key={agent.id} agent={agent} />
           ))}
         </motion.div>
       </section>
