@@ -1,12 +1,8 @@
 'use client';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
 
@@ -18,21 +14,31 @@ export function AgentDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
-      <DialogContent className="bg-transparent shadow-none border-none p-0 max-w-none rounded-none">
+      <DialogContent className="agentPreviewDialog bg-transparent shadow-none border-none p-0 max-w-none rounded-none">
         <VisuallyHidden>
           <DialogTitle>{t('agents')}</DialogTitle>
         </VisuallyHidden>
-        <div className="relative mx-auto w-full max-w-[52rem]">
-          <div className="absolute inset-0 rounded-[28px] bg-[#f0f0f0] pointer-events-none" />
-          <div className="relative p-6 sm:p-8 rounded-[28px] bg-white/90 dark:bg-gray-900/80 backdrop-blur-md shadow transition-transform duration-200 hover:scale-[1.02]">
-          <div className="h-60" />
-          <div className="mt-6 flex justify-center">
-            <Button className="bg-gradient-to-r from-[var(--brand-accent)] to-[#FFE3D2] text-white px-4 h-9 flex items-center shadow transition-shadow hover:shadow-[0_0_8px_rgba(255,255,255,0.5)]">
-              {t('goToChat')}
-            </Button>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.16 }}
+          className="agentPreviewCard mx-auto"
+        >
+          <h2>Luna</h2>
+          <div className="agentPreviewDemo" aria-label={t('agentDemoLabel')} />
+          <p className="agentPreviewDescription">
+            Creative writing assistant helping craft engaging stories.
+          </p>
+          <div className="agentPreviewDivider" />
+          <div className="agentChatListHeader">{t('agentChatListHeading')}</div>
+          <div className="agentChatList">
+            <button type="button">How do I start a novel?</button>
+            <button type="button">Generate character ideas</button>
+            <button type="button">Outline a mystery plot</button>
+            <button type="button">Tips for dialogue</button>
+            <button type="button">Suggest a story prompt</button>
           </div>
-          </div>
-        </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );
