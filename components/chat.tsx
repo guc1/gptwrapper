@@ -66,6 +66,10 @@ export function Chat({
 
   const [chatModelId, setChatModelId] = useState(initialChatModel);
 
+  useEffect(() => {
+    document.cookie = `chat-model=${chatModelId}; path=/`;
+  }, [chatModelId]);
+
   const handleModelChange = useCallback(
     (modelId: string) => {
       if (modelId === chatModelId) return;
