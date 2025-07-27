@@ -25,6 +25,10 @@ export default async function Page({
     typeof resolvedSearchParams?.modelId === 'string'
       ? resolvedSearchParams.modelId
       : null;
+  const agentIdParam =
+    typeof resolvedSearchParams?.agentId === 'string'
+      ? resolvedSearchParams.agentId
+      : null;
 
   if (success && planId && session?.user?.id) {
     const { PostCheckoutUpdater } = await import('@/components/post-checkout-updater');
@@ -71,6 +75,7 @@ export default async function Page({
         isReadonly={false}
         session={session}
         autoResume={false}
+        agentId={agentIdParam ?? undefined}
       />
       <DataStreamHandler id={id} />
     </>

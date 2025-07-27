@@ -180,21 +180,25 @@ export async function saveChat({
   title,
   visibility,
   modelId,
+  agentId,
 }: {
   id: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
   modelId: string;
+  agentId?: string | null;
 }) {
   try {
     return await db.insert(chat).values({
       id,
       createdAt: new Date(),
+      updatedAt: new Date(),
       userId,
       title,
       visibility,
       modelId,
+      agentId,
     });
   } catch (error) {
     console.error('Error saving chat:', error);
@@ -298,6 +302,52 @@ export async function getChatsByUserId({
   }
 }
 
+export async function getChatsByAgentId({
+  agentId,
+  limit,
+  cursor,
+}: {
+  agentId: string;
+  limit: number;
+  cursor?: string | null;
+}) {
+  try {
+    const extendedLimit = limit + 1;
+
+    let whereClause: SQL<any> = eq(chat.agentId, agentId);
+
+    if (cursor) {
+      const [cursorChat] = await db
+        .select({ updatedAt: chat.updatedAt })
+        .from(chat)
+        .where(eq(chat.id, cursor))
+        .limit(1);
+
+      if (!cursorChat) {
+        throw new ChatSDKError('not_found:database', `Chat with id ${cursor} not found`);
+      }
+
+      whereClause = and(eq(chat.agentId, agentId), lt(chat.updatedAt, cursorChat.updatedAt));
+    }
+
+    const chatsResult = await db
+      .select()
+      .from(chat)
+      .where(whereClause)
+      .orderBy(desc(chat.updatedAt))
+      .limit(extendedLimit);
+
+    const hasMore = chatsResult.length > limit;
+
+    return {
+      chats: hasMore ? chatsResult.slice(0, limit) : chatsResult,
+      nextCursor: hasMore ? chatsResult[limit].id : null,
+    };
+  } catch (error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to get chats by agent id');
+  }
+}
+
 export async function getChatById({ id }: { id: string }) {
   try {
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
@@ -313,7 +363,14 @@ export async function saveMessages({
   messages: Array<DBMessage>;
 }) {
   try {
-    return await db.insert(message).values(messages);
+    const result = await db.insert(message).values(messages).returning();
+    if (messages.length > 0) {
+      await db
+        .update(chat)
+        .set({ updatedAt: new Date() })
+        .where(eq(chat.id, messages[0].chatId));
+    }
+    return result;
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to save messages');
   }
@@ -683,6 +740,11 @@ export async function saveUserMessageWithLimit({
         createdAt: new Date(),
       })
       .returning();
+
+    await tx
+      .update(chat)
+      .set({ updatedAt: new Date() })
+      .where(eq(chat.id, chatId));
 
     return inserted;
   });

@@ -47,6 +47,7 @@ export function Chat({
   session, // This session prop comes from the Server Component page
   autoResume,
   initialInput: propInitialInput,
+  agentId,
 }: {
   id: string;
   initialMessages: Array<UIMessage>;
@@ -56,6 +57,7 @@ export function Chat({
   session: Session; // Session is now guaranteed by the page
   autoResume: boolean;
   initialInput?: string;
+  agentId?: string;
 }) {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { openPopup: openLoginSignupPopup } = useLoginSignupPopup();
@@ -127,6 +129,7 @@ export function Chat({
     fetch: fetchWithErrorHandlers,
     experimental_prepareRequestBody: (body) => ({
       id,
+      agentId,
       message: body.messages.at(-1),
       selectedChatModel: chatModelId,
       selectedVisibilityType: visibilityType,
