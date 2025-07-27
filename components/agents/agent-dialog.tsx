@@ -12,19 +12,33 @@ import { X } from 'lucide-react';
 import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/utils';
 
 export function AgentDialog() {
-  const { isOpen, closePopup } = useAgentPopup();
+  const { isOpen, closePopup, agent } = useAgentPopup();
   const t = useTranslation();
   const router = useRouter();
 
+  const { data } = useSWR(
+    isOpen && agent ? `/api/history?limit=50&modelId=${agent.modelId}` : null,
+    fetcher,
+  );
+
   function goToChat() {
+    if (!agent) return;
     closePopup();
-    router.push('/');
+    router.push(`/?modelId=${agent.modelId}`);
     router.refresh();
   }
 
-  if (!isOpen) return null;
+  function openChat(chatId: string) {
+    closePopup();
+    router.push(`/chat/${chatId}`);
+    router.refresh();
+  }
+
+  if (!isOpen || !agent) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={closePopup}>
@@ -42,19 +56,21 @@ export function AgentDialog() {
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>
-          <h2>Luna</h2>
+          <h2>{agent.name}</h2>
           <div className="agentPreviewDemo" aria-label={t('agentDemoLabel')} />
-          <p className="agentPreviewDescription">
-            Creative writing assistant helping craft engaging stories.
-          </p>
+          <p className="agentPreviewDescription">{agent.description}</p>
           <div className="agentPreviewDivider" />
           <div className="agentChatListHeader">{t('agentChatListHeading')}</div>
           <div className="agentChatList">
-            <button type="button">How do I start a novel?</button>
-            <button type="button">Generate character ideas</button>
-            <button type="button">Outline a mystery plot</button>
-            <button type="button">Tips for dialogue</button>
-            <button type="button">Suggest a story prompt</button>
+            {data?.chats.map((chat: { id: string; title: string }) => (
+              <button
+                key={chat.id}
+                type="button"
+                onClick={() => openChat(chat.id)}
+              >
+                {chat.title}
+              </button>
+            ))}
           </div>
           <button type="button" className="goToChatButton" onClick={goToChat}>
             {t('goToChat')}

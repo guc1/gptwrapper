@@ -6,6 +6,8 @@ export interface AgentCardProps {
   name: string;
   description: string;
   avatar: string;
+  modelId: string;
+  instructions: string;
 }
 
 const cardVariants = {
@@ -13,7 +15,13 @@ const cardVariants = {
   animate: { opacity: 1, y: 0 },
 };
 
-export function AgentCard({ name, description, avatar }: AgentCardProps) {
+export function AgentCard({
+  name,
+  description,
+  avatar,
+  modelId,
+  instructions,
+}: AgentCardProps) {
   const { openPopup } = useAgentPopup();
   return (
     <motion.button
@@ -21,7 +29,15 @@ export function AgentCard({ name, description, avatar }: AgentCardProps) {
       whileHover={{ translateY: -4, scale: 1.015 }}
       whileTap={{ scale: 0.98 }}
       className="ripple relative flex items-start gap-5 rounded-[24px] border border-white/30 bg-white/10 px-[2rem] py-[1.75rem] backdrop-blur-[18px] backdrop-saturate-[180%] transition-transform shadow-sm hover:shadow-md focus:outline-none overflow-hidden"
-      onClick={openPopup}
+      onClick={() =>
+        openPopup({
+          name,
+          description,
+          avatar,
+          modelId,
+          instructions,
+        })
+      }
     >
       <span
         className="flex h-[72px] w-[72px] flex-shrink-0 items-center justify-center rounded-full"
