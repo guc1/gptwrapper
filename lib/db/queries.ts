@@ -227,24 +227,23 @@ export async function getChatsByUserId({
   limit,
   startingAfter,
   endingBefore,
+  modelId,
 }: {
   id: string;
   limit: number;
   startingAfter: string | null;
   endingBefore: string | null;
+  modelId?: string | null;
 }) {
   try {
     const extendedLimit = limit + 1;
 
+    const baseCondition = modelId ? and(eq(chat.modelId, modelId), eq(chat.userId, id)) : eq(chat.userId, id);
     const query = (whereCondition?: SQL<any>) =>
       db
         .select()
         .from(chat)
-        .where(
-          whereCondition
-            ? and(whereCondition, eq(chat.userId, id))
-            : eq(chat.userId, id),
-        )
+        .where(whereCondition ? and(whereCondition, baseCondition) : baseCondition)
         .orderBy(desc(chat.createdAt))
         .limit(extendedLimit);
 
