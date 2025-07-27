@@ -118,6 +118,9 @@ export const translations = {
     agentUpdateInfo: 'Info about Assistants',
     upgradeModel: 'Upgrade model',
     goToChat: 'Go to chat',
+    chatsWithAssistant: 'Chats with this assistant',
+    loadMore: 'Load more…',
+    agentDemoAria: 'Assistant demo example',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -236,6 +239,9 @@ export const translations = {
     agentUpdateInfo: 'Info over Assistenten',
     upgradeModel: 'Upgrade model',
     goToChat: 'Ga naar chat',
+    chatsWithAssistant: 'Chats met deze assistent',
+    loadMore: 'Meer laden…',
+    agentDemoAria: 'Voorbeeld van de assistent',
   },
 } as const;
 

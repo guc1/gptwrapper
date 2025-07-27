@@ -92,6 +92,7 @@ export default async function Page({
     session: session, // session is guaranteed here
     autoResume: true,
     initialInput: initialPromptFromQuery,
+    agentId: chat.agentId ?? undefined,
   };
 
   return (

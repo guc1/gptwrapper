@@ -68,8 +68,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { id, message, selectedChatModel, selectedVisibilityType } =
-      requestBody;
+    const {
+      id,
+      message,
+      selectedChatModel,
+      selectedVisibilityType,
+      agentId,
+    } = requestBody;
 
     const session = await auth();
     if (!session?.user) {
@@ -86,6 +91,7 @@ export async function POST(request: Request) {
         title,
         visibility: selectedVisibilityType,
         modelId: selectedChatModel,
+        agentId,
       });
     } else if (chat.userId !== session.user.id) {
       return new ChatSDKError('forbidden:chat').toResponse();
