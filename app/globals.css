@@ -63,6 +63,8 @@
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-fill-light: rgba(255,255,255,.85);
+        --glass-fill-dark: rgba(30,30,30,.70);
         --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
@@ -106,6 +108,8 @@
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-fill-light: rgba(255,255,255,.85);
+        --glass-fill-dark: rgba(30,30,30,.70);
         --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
@@ -151,6 +155,8 @@
         --brand-beige: #F5EFEA;
         --ink: #1D1D1F;
         --glass-fill: color-mix(in srgb, var(--brand-accent) 12%, rgb(255 255 255 / 0.2));
+        --glass-fill-light: rgba(255,255,255,.85);
+        --glass-fill-dark: rgba(30,30,30,.70);
         --glass-stroke: rgb(255 255 255 / 0.3);
         --gap-user-to-assistant: 40px;
         --gap-assistant-to-user: 0px;
