@@ -77,6 +77,14 @@ export async function POST(request: Request) {
     }
     const userType: UserType = session.user.type;
 
+    const userModels = session.user.models ?? [];
+    const baseModels =
+      entitlementsByUserType[userType].availableChatModelIds;
+    const availableModels = Array.from(new Set([...baseModels, ...userModels]));
+    if (!availableModels.includes(selectedChatModel)) {
+      return new ChatSDKError('forbidden_model:chat').toResponse();
+    }
+
     const chat = await getChatById({ id });
     if (!chat) {
       const title = await generateTitleFromUserMessage({ message });
