@@ -24,10 +24,18 @@ async function proxy(request: NextRequest, slug: string[]) {
   });
 }
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string[] } }) {
-  return proxy(request, params.slug);
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string[] }> },
+) {
+  const { slug } = await params;
+  return proxy(request, slug);
 }
 
-export async function POST(request: NextRequest, { params }: { params: { slug: string[] } }) {
-  return proxy(request, params.slug);
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string[] }> },
+) {
+  const { slug } = await params;
+  return proxy(request, slug);
 }
