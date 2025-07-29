@@ -41,11 +41,11 @@ export const agents: Array<Agent> = [
     systemInstruction: 'You are Echo answering quick questions.',
   },
   {
-    id: 'beta',
-    name: 'Beta',
-    description: 'Beta features explorer',
-    avatar: 'https://avatar.vercel.sh/beta',
-    modelId: 'agent-beta',
-    systemInstruction: 'You are Beta exploring new features.',
+    id: 'domainAgent',
+    name: 'DomainAgent',
+    description: 'Domain name brainstorming assistant',
+    avatar: 'https://avatar.vercel.sh/domainAgent',
+    modelId: 'agent-domain',
+    systemInstruction: 'You are DomainAgent helping with domain ideas.',
   },
 ];

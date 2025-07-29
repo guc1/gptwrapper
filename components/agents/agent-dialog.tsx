@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useAgentPopup } from '@/hooks/use-agent-popup';
 import { useTranslation } from '@/lib/i18n';
+import { DomainAgentSettings } from '@/components/domain-agent-settings';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/utils';
@@ -31,7 +32,11 @@ export function AgentDialog() {
     if (chatId) {
       router.push(`/chat/${chatId}`);
     } else if (agent) {
-      router.push(`/?modelId=${agent.modelId}`);
+      if (agent.id === 'domainAgent') {
+        router.push('/domain');
+      } else {
+        router.push(`/?modelId=${agent.modelId}`);
+      }
     }
     router.refresh();
   }
@@ -70,6 +75,15 @@ export function AgentDialog() {
               </button>
             ))}
           </div>
+          {agent.id === 'domainAgent' && (
+            <DomainAgentSettings
+              trigger={
+                <button type="button" className="goToChatButton">
+                  {t('settings')}
+                </button>
+              }
+            />
+          )}
           <button type="button" className="goToChatButton" onClick={() => goToChat()}>
             {t('goToChat')}
           </button>
