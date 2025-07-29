@@ -31,7 +31,11 @@ export function AgentDialog() {
     if (chatId) {
       router.push(`/chat/${chatId}`);
     } else if (agent) {
-      router.push(`/?modelId=${agent.modelId}`);
+      if (agent.modelId === 'domain-agent') {
+        router.push('/domain-agent');
+      } else {
+        router.push(`/?modelId=${agent.modelId}`);
+      }
     }
     router.refresh();
   }
