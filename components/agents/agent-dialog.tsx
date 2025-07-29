@@ -14,11 +14,14 @@ import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/utils';
+import { useState } from 'react';
+import { DomainSettingsDialog } from '@/components/domain-settings-dialog';
 
 export function AgentDialog() {
   const { isOpen, agent, closePopup } = useAgentPopup();
   const t = useTranslation();
   const router = useRouter();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { data } = useSWR(
     isOpen && agent ? `/api/history?limit=20&modelId=${agent.modelId}` : null,
@@ -31,7 +34,11 @@ export function AgentDialog() {
     if (chatId) {
       router.push(`/chat/${chatId}`);
     } else if (agent) {
-      router.push(`/?modelId=${agent.modelId}`);
+      if (agent.id === 'domain') {
+        router.push('/domain');
+      } else {
+        router.push(`/?modelId=${agent.modelId}`);
+      }
     }
     router.refresh();
   }
@@ -73,6 +80,18 @@ export function AgentDialog() {
           <button type="button" className="goToChatButton" onClick={() => goToChat()}>
             {t('goToChat')}
           </button>
+          {agent.id === 'domain' && (
+            <button
+              type="button"
+              className="goToChatButton mt-2"
+              onClick={() => setSettingsOpen(true)}
+            >
+              {t('settings')}
+            </button>
+          )}
+          {agent.id === 'domain' && (
+            <DomainSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+          )}
         </motion.div>
       </DialogContent>
     </Dialog>
