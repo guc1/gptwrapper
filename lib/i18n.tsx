@@ -120,6 +120,8 @@ export const translations = {
     goToChat: 'Go to chat',
     agentChatListHeading: 'Chats with this assistant',
     agentDemoLabel: 'Example of the assistant',
+    domainAgentDescription: 'Generate domain name ideas',
+    domainDescribePrompt: 'Describe the business or project:',
   },
   nl: {
     newChat: 'Nieuw gesprek',
@@ -240,6 +242,8 @@ export const translations = {
     goToChat: 'Ga naar chat',
     agentChatListHeading: 'Chats met deze assistent',
     agentDemoLabel: 'Voorbeeld van de assistent',
+    domainAgentDescription: 'Genereer domeinnaamideeën',
+    domainDescribePrompt: 'Beschrijf het bedrijf of project:',
   },
 } as const;
 

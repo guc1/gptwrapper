@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
       process.env.GOOGLE_CLIENT_SECRET
       ? 'true'
       : 'false',
+    NEXT_PUBLIC_DOMAIN_API_URL: process.env.DOMAIN_API_URL,
+    NEXT_PUBLIC_DOMAIN_API_KEY: process.env.DOMAIN_API_KEY,
   },
   images: {
     remotePatterns: [
