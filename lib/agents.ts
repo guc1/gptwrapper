@@ -48,4 +48,12 @@ export const agents: Array<Agent> = [
     modelId: 'agent-beta',
     systemInstruction: 'You are Beta exploring new features.',
   },
+  {
+    id: 'domain-agent',
+    name: 'DomainAgent',
+    description: 'Domain name helper',
+    avatar: 'https://avatar.vercel.sh/domain',
+    modelId: 'domain-agent',
+    systemInstruction: 'You help users find domain names.',
+  },
 ];
