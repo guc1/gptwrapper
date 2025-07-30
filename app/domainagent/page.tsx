@@ -13,6 +13,8 @@ import { toast } from '@/components/toast';
 import { useTranslation } from '@/lib/i18n';
 import type { DomainSettings } from '@/lib/domainClient';
 import * as api from '@/lib/domainClient';
+import { useSession } from 'next-auth/react';
+import { useSWRConfig } from 'swr';
 import DomainAgentHeader from '@/components/domainagent-header';
 import '../../themes/assistenten.css';
 import { motion } from 'framer-motion';
@@ -24,6 +26,7 @@ interface Question { id: string; text: string; }
 export default function DomainAgentPage() {
   const t = useTranslation();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
   const [brief, setBrief] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string,string>>({});
@@ -40,6 +43,8 @@ export default function DomainAgentPage() {
   const [openLogs, setOpenLogs] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
   const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -50,16 +55,20 @@ export default function DomainAgentPage() {
   async function start() {
     setLoading(true);
     try {
-      const res = await api.createSession(brief);
+      const res = await api.startSession(brief);
       setLogs((l) => [
         ...l,
         { id: crypto.randomUUID(), type: 'createSession', request: { initial_brief: brief }, response: res },
       ]);
       setSessionId(res.session_id);
+      setChatId(res.chat_id);
       setQuestions(res.questions);
       await api.saveSettings(res.session_id, settings);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'saveSettings', request: settings }]);
       setPhase('questions');
+      if (session?.user?.id) {
+        mutate(`/api/message-status?userId=${session.user.id}`);
+      }
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
     }
@@ -97,6 +106,12 @@ export default function DomainAgentPage() {
       });
       if (continueLoop) {
         const fb = await api.sendFeedback(sessionId, { liked, disliked });
+        if (chatId) {
+          await api.logContinue(chatId);
+          if (session?.user?.id) {
+            mutate(`/api/message-status?userId=${session.user.id}`);
+          }
+        }
         setLogs((l) => [
           ...l,
           { id: crypto.randomUUID(), type: 'sendFeedback', request: { liked, disliked }, response: fb },
