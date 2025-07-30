@@ -24,6 +24,7 @@ interface Question { id: string; text: string; }
 export default function DomainAgentPage() {
   const t = useTranslation();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
   const [brief, setBrief] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string,string>>({});
@@ -50,6 +51,18 @@ export default function DomainAgentPage() {
   async function start() {
     setLoading(true);
     try {
+      const chatRes = await fetch('/domainagent/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', brief }),
+      });
+      if (!chatRes.ok) {
+        const data = await chatRes.json();
+        throw new Error(data.error || 'Failed to start chat');
+      }
+      const { chatId: newChatId } = await chatRes.json();
+      setChatId(newChatId);
+
       const res = await api.createSession(brief);
       setLogs((l) => [
         ...l,
@@ -96,6 +109,17 @@ export default function DomainAgentPage() {
         else disliked[d] = f.comment;
       });
       if (continueLoop) {
+        if (chatId) {
+          const usageRes = await fetch('/domainagent/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'continue', chatId }),
+          });
+          if (!usageRes.ok) {
+            const data = await usageRes.json();
+            throw new Error(data.error || 'Message limit reached');
+          }
+        }
         const fb = await api.sendFeedback(sessionId, { liked, disliked });
         setLogs((l) => [
           ...l,
