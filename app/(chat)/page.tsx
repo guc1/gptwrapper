@@ -27,6 +27,10 @@ export default async function Page({
       ? resolvedSearchParams.modelId
       : null;
 
+  if (selectedModelIdParam === 'domain-agent') {
+    redirect('/domain-agent');
+  }
+
   if (success && planId && session?.user?.id) {
     const { PostCheckoutUpdater } = await import('@/components/post-checkout-updater');
     return <PostCheckoutUpdater userId={session.user.id} planId={planId} />;
