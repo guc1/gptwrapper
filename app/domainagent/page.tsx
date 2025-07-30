@@ -3,11 +3,21 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { toast } from '@/components/toast';
 import { useTranslation } from '@/lib/i18n';
 import type { DomainSettings } from '@/lib/domainClient';
 import * as api from '@/lib/domainClient';
+import DomainAgentHeader from '@/components/domainagent-header';
+import '../../themes/assistenten.css';
+import { motion } from 'framer-motion';
+import { LoaderIcon } from '@/components/icons';
+import clsx from 'clsx';
 
 interface Question { id: string; text: string; }
 
@@ -29,6 +39,7 @@ export default function DomainAgentPage() {
   const [openSettings, setOpenSettings] = useState(false);
   const [openLogs, setOpenLogs] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -37,6 +48,7 @@ export default function DomainAgentPage() {
   }, [sessionId, openSettings]);
 
   async function start() {
+    setLoading(true);
     try {
       const res = await api.createSession(brief);
       setLogs((l) => [
@@ -51,10 +63,12 @@ export default function DomainAgentPage() {
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
     }
+    setLoading(false);
   }
 
   async function submitAnswers() {
     if (!sessionId) return;
+    setLoading(true);
     try {
       const ansRes = await api.sendAnswers(sessionId, { answers });
       setLogs((l) => [
@@ -68,10 +82,12 @@ export default function DomainAgentPage() {
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
     }
+    setLoading(false);
   }
 
   async function sendFeedback(continueLoop: boolean) {
     if (!sessionId) return;
+    setLoading(true);
     try {
       const liked: Record<string,string> = {};
       const disliked: Record<string,string> = {};
@@ -100,6 +116,7 @@ export default function DomainAgentPage() {
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
     }
+    setLoading(false);
   }
 
   function updateAnswer(id: string, value: string) {
@@ -115,11 +132,15 @@ export default function DomainAgentPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-4 space-y-6">
+    <>
+      <DomainAgentHeader
+        onOpenSettings={() => setOpenSettings(true)}
+        onOpenLogs={() => setOpenLogs(true)}
+        showLogs={settings.show_logs}
+        overlayOpen={openSettings || openLogs}
+      />
+      <div className="mx-auto max-w-2xl p-4 space-y-6">
       <Sheet open={openSettings} onOpenChange={setOpenSettings}>
-        <SheetTrigger asChild>
-          <Button variant="outline">{t('settings')}</Button>
-        </SheetTrigger>
         <SheetContent>
           <SheetHeader>
             <SheetTitle>{t('settings')}</SheetTitle>
@@ -160,9 +181,6 @@ export default function DomainAgentPage() {
 
       {settings.show_logs && (
         <Sheet open={openLogs} onOpenChange={setOpenLogs}>
-          <SheetTrigger asChild>
-            <Button variant="outline">{t('logs')}</Button>
-          </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader>
               <SheetTitle>{t('logs')}</SheetTitle>
@@ -190,41 +208,114 @@ export default function DomainAgentPage() {
       )}
 
       {phase === 'start' && (
-        <div className="space-y-4">
-          <div>{t('domainAgentPrompt')}</div>
-          <Textarea value={brief} onChange={(e)=>setBrief(e.target.value)} />
-          <Button onClick={start} className="mt-2">{t('send')}</Button>
+        <div className="space-y-4 text-center mt-10">
+          <div className="text-lg font-semibold">{t('domainAgentPrompt')}</div>
+          <Textarea
+            className="rounded-xl bg-white/10 backdrop-blur-md border border-white/30 shadow-lg"
+            value={brief}
+            onChange={(e) => setBrief(e.target.value)}
+          />
+          <Button onClick={start} className="mt-2 h-11 px-6" disabled={loading}>
+            {loading && (
+              <span className="animate-spin inline-block mr-2">
+                <LoaderIcon />
+              </span>
+            )}
+            {t('send')}
+          </Button>
         </div>
       )}
 
       {phase === 'questions' && (
-        <div className="space-y-4">
-          {questions.map((q)=>{
+        <motion.div className="space-y-4" initial="hidden" animate="show" variants={{hidden:{},show:{transition:{staggerChildren:0.1}}}}>
+          {questions.map((q) => {
             const inputId = `q-${q.id}`;
             return (
-              <label key={q.id} htmlFor={inputId} className="flex flex-col gap-1">
+              <motion.label
+                key={q.id}
+                htmlFor={inputId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02 }}
+                className="flex flex-col gap-1 p-4 rounded-xl border border-white/30 bg-white/10 backdrop-blur-md shadow"
+              >
                 {q.text}
-                <Input id={inputId} value={answers[q.id]||''} onChange={(e)=>updateAnswer(q.id,e.target.value)} />
-              </label>
+                <Input
+                  id={inputId}
+                  value={answers[q.id] || ''}
+                  onChange={(e) => updateAnswer(q.id, e.target.value)}
+                />
+              </motion.label>
             );
           })}
-          <Button onClick={submitAnswers}>{t('send')}</Button>
-        </div>
+          <Button onClick={submitAnswers} disabled={loading} className="h-11 px-6">
+            {loading && (
+              <span className="animate-spin inline-block mr-2">
+                <LoaderIcon />
+              </span>
+            )}
+            {t('send')}
+          </Button>
+        </motion.div>
       )}
 
       {phase === 'suggestions' && (
         <div className="space-y-4">
-          {domains.map((d)=>(
-            <div key={d} className="flex items-center gap-2 border rounded p-2">
-              <button type="button" onClick={()=>updateFeedback(d,true)} className={feedback[d]?.liked?'text-green-600':''}>👍</button>
-              <button type="button" onClick={()=>updateFeedback(d,false)} className={!feedback[d] || feedback[d]?.liked ? '':'text-red-600'}>👎</button>
+          {domains.map((d) => (
+            <motion.div
+              key={d}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 border rounded p-2 bg-white/10 backdrop-blur-md shadow"
+            >
+              <button
+                type="button"
+                onClick={() => updateFeedback(d, true)}
+                className={
+                  clsx(
+                    'p-1 rounded-full',
+                    feedback[d]?.liked
+                      ? 'text-green-600 ring-2 ring-green-500'
+                      : 'text-muted-foreground hover:bg-white/20'
+                  )
+                }
+              >
+                👍
+              </button>
+              <button
+                type="button"
+                onClick={() => updateFeedback(d, false)}
+                className={
+                  clsx(
+                    'p-1 rounded-full',
+                    feedback[d] && !feedback[d].liked
+                      ? 'text-red-600 ring-2 ring-red-500'
+                      : 'text-muted-foreground hover:bg-white/20'
+                  )
+                }
+              >
+                👎
+              </button>
               <span className="flex-1 text-center">{d}</span>
-              <Input placeholder="" value={feedback[d]?.comment||''} onChange={(e)=>updateComment(d,e.target.value)} />
-            </div>
+              <Input
+                placeholder=""
+                value={feedback[d]?.comment || ''}
+                onChange={(e) => updateComment(d, e.target.value)}
+              />
+            </motion.div>
           ))}
           <div className="flex gap-2">
-            <Button onClick={()=>sendFeedback(true)}>{t('continue')}</Button>
-            <Button variant="outline" onClick={()=>sendFeedback(false)}>{t('stop')}</Button>
+            <Button onClick={() => sendFeedback(true)} disabled={loading} className="h-10 px-6">
+              {loading && (
+                <span className="animate-spin inline-block mr-2">
+                  <LoaderIcon />
+                </span>
+              )}
+              {t('continue')}
+            </Button>
+            <Button variant="outline" onClick={() => sendFeedback(false)} disabled={loading} className="h-10 px-6">
+              {t('stop')}
+            </Button>
           </div>
         </div>
       )}
@@ -233,5 +324,6 @@ export default function DomainAgentPage() {
         <div>{t('done')}</div>
       )}
     </div>
+    </>
   );
 }
