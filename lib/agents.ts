@@ -48,4 +48,12 @@ export const agents: Array<Agent> = [
     modelId: 'agent-beta',
     systemInstruction: 'You are Beta exploring new features.',
   },
+  {
+    id: 'session',
+    name: 'Session',
+    description: 'Python remote session agent',
+    avatar: 'https://avatar.vercel.sh/session',
+    modelId: 'session-model',
+    systemInstruction: 'You are a remote session agent.',
+  },
 ];

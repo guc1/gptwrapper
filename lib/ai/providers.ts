@@ -100,6 +100,47 @@ function geminiLanguageModel(useThinking: boolean): LanguageModelV1 {
   };
 }
 
+function remoteSessionModel(): LanguageModelV1 {
+  const baseUrl = process.env.REMOTE_SESSION_API_URL ?? '';
+  const apiKey = process.env.REMOTE_SESSION_API_KEY ?? '';
+  return {
+    specificationVersion: 'v1',
+    provider: 'remote-session',
+    modelId: 'session-model',
+    async doGenerate({ prompt }: LanguageModelV1CallOptions) {
+      const res = await fetch(`${baseUrl}/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey,
+        },
+        body: JSON.stringify({ messages: prompt }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Remote session API error ${res.status}: ${text}`);
+      }
+      const data = (await res.json()) as { text?: string };
+      return {
+        text: data.text ?? '',
+        finishReason: 'stop',
+        usage: { promptTokens: 0, completionTokens: 0 },
+        rawCall: { rawPrompt: prompt, rawSettings: {} },
+      };
+    },
+    async doStream(options: LanguageModelV1CallOptions) {
+      const { text } = await this.doGenerate(options);
+      const stream = new ReadableStream<LanguageModelV1StreamPart>({
+        start(controller) {
+          if (text) controller.enqueue({ type: 'text-delta', textDelta: text });
+          controller.close();
+        },
+      });
+      return { stream } as any;
+    },
+  };
+}
+
 export const myProvider = isTestEnvironment
   ? /* ——————————————————————  MOCKS FOR AUTOMATED TESTS  ——————————————————— */
     customProvider({
@@ -111,6 +152,7 @@ export const myProvider = isTestEnvironment
         'top-model': chatModel,
         'title-model': titleModel,
         'artifact-model': artifactModel,
+        'session-model': chatModel,
       },
     })
   : /* ——————————————————————  PRODUCTION (OpenAI)  ———————————————————————— */
@@ -127,6 +169,7 @@ export const myProvider = isTestEnvironment
         'agent-rela': openai('gpt-4.1'),
         'agent-echo': openai('gpt-4.1'),
         'agent-beta': openai('gpt-4.1'),
+        'session-model': remoteSessionModel(),
 
         /* reasoning stream with <think> traces, using 4o‑mini           */
         'chat-model-reasoning': wrapLanguageModel({
