@@ -3,8 +3,12 @@ import type { NextRequest } from 'next/server';
 const API_URL = process.env.DOMAIN_API_URL || 'http://161.35.152.9:8000';
 const API_KEY = process.env.DOMAIN_API_KEY || 'alksdfjoij09U908FHSFJoidhf9s8dfh9g87buvweuih87329UFI';
 
-async function proxy(req: NextRequest, { params }: { params: { path?: string[] } }) {
-  const subPath = params.path ? `/${params.path.join('/')}` : '';
+async function proxy(
+  req: NextRequest,
+  { params }: { params: Promise<{ path?: string[] }> },
+) {
+  const resolvedParams = await params;
+  const subPath = resolvedParams?.path ? `/${resolvedParams.path.join('/')}` : '';
   const url = `${API_URL}${subPath}${req.nextUrl.search}`;
   const init: RequestInit = {
     method: req.method,
@@ -24,18 +28,18 @@ async function proxy(req: NextRequest, { params }: { params: { path?: string[] }
   });
 }
 
-export async function GET(request: NextRequest, ctx: { params: { path?: string[] } }) {
+export async function GET(request: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
   return proxy(request, ctx);
 }
-export async function POST(request: NextRequest, ctx: { params: { path?: string[] } }) {
+export async function POST(request: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
   return proxy(request, ctx);
 }
-export async function PUT(request: NextRequest, ctx: { params: { path?: string[] } }) {
+export async function PUT(request: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
   return proxy(request, ctx);
 }
-export async function PATCH(request: NextRequest, ctx: { params: { path?: string[] } }) {
+export async function PATCH(request: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
   return proxy(request, ctx);
 }
-export async function DELETE(request: NextRequest, ctx: { params: { path?: string[] } }) {
+export async function DELETE(request: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
   return proxy(request, ctx);
 }

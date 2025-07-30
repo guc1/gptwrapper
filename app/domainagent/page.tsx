@@ -27,6 +27,8 @@ export default function DomainAgentPage() {
     show_logs: false,
   });
   const [openSettings, setOpenSettings] = useState(false);
+  const [openLogs, setOpenLogs] = useState(false);
+  const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -37,9 +39,14 @@ export default function DomainAgentPage() {
   async function start() {
     try {
       const res = await api.createSession(brief);
+      setLogs((l) => [
+        ...l,
+        { id: crypto.randomUUID(), type: 'createSession', request: { initial_brief: brief }, response: res },
+      ]);
       setSessionId(res.session_id);
       setQuestions(res.questions);
       await api.saveSettings(res.session_id, settings);
+      setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'saveSettings', request: settings }]);
       setPhase('questions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
@@ -49,8 +56,13 @@ export default function DomainAgentPage() {
   async function submitAnswers() {
     if (!sessionId) return;
     try {
-      await api.sendAnswers(sessionId, { answers });
+      const ansRes = await api.sendAnswers(sessionId, { answers });
+      setLogs((l) => [
+        ...l,
+        { id: crypto.randomUUID(), type: 'sendAnswers', request: { answers }, response: ansRes },
+      ]);
       const gen = await api.generate(sessionId);
+      setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'generate', request: {}, response: gen }]);
       setDomains(gen.available);
       setPhase('suggestions');
     } catch (err:any) {
@@ -69,12 +81,20 @@ export default function DomainAgentPage() {
       });
       if (continueLoop) {
         const fb = await api.sendFeedback(sessionId, { liked, disliked });
+        setLogs((l) => [
+          ...l,
+          { id: crypto.randomUUID(), type: 'sendFeedback', request: { liked, disliked }, response: fb },
+        ]);
         setQuestions(fb.questions);
         setFeedback({});
         setDomains([]);
         setPhase('questions');
       } else {
-        await api.sendFeedback(sessionId, { liked, disliked });
+        const fb = await api.sendFeedback(sessionId, { liked, disliked });
+        setLogs((l) => [
+          ...l,
+          { id: crypto.randomUUID(), type: 'sendFeedback', request: { liked, disliked }, response: fb },
+        ]);
         setPhase('done');
       }
     } catch (err:any) {
@@ -137,6 +157,37 @@ export default function DomainAgentPage() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {settings.show_logs && (
+        <Sheet open={openLogs} onOpenChange={setOpenLogs}>
+          <SheetTrigger asChild>
+            <Button variant="outline">{t('logs')}</Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>{t('logs')}</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4 space-y-4 overflow-y-auto pr-2 h-full">
+              {logs.map((log) => (
+                <div key={log.id} className="border rounded p-2 text-xs space-y-1">
+                  <div className="font-semibold">{log.type}</div>
+                  <pre className="whitespace-pre-wrap break-all">
+                    {JSON.stringify(log.request, null, 2)}
+                  </pre>
+                  {log.response && (
+                    <pre className="whitespace-pre-wrap break-all">
+                      {JSON.stringify(log.response, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              ))}
+              {logs.length === 0 && (
+                <div className="text-sm text-muted-foreground">{t('noLogs')}</div>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
 
       {phase === 'start' && (
         <div className="space-y-4">
