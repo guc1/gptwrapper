@@ -10,8 +10,10 @@ interface Question {
   text: string;
 }
 
-// Calls are proxied through an internal Next.js API route to avoid CORS issues
+// Calls to the python service are proxied through an internal Next.js API route
 const API_URL = '/domainagent/api';
+// Internal routes for tracking chats/messages
+const CHAT_API_URL = '/domainagent/chat';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -31,12 +33,32 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export async function createSession(initialBrief: string): Promise<{ session_id: string; questions: Question[] }>
+export async function startSession(
+  initialBrief: string,
+): Promise<{ session_id: string; questions: Question[]; chat_id: string }>
 {
-  return request('/sessions', {
+  const res = await fetch(`${CHAT_API_URL}/start`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ initial_brief: initialBrief }),
   });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || 'Request failed');
+  }
+  return res.json();
+}
+
+export async function logContinue(chatId: string): Promise<void> {
+  const res = await fetch(`${CHAT_API_URL}/message`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId }),
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || 'Request failed');
+  }
 }
 
 export async function getSettings(sessionId: string): Promise<DomainSettings> {
