@@ -8,6 +8,9 @@ import { toast } from '@/components/toast';
 import { useTranslation } from '@/lib/i18n';
 import type { DomainSettings } from '@/lib/domainClient';
 import * as api from '@/lib/domainClient';
+import { DomainAgentHeader } from '@/components/domainagent-header';
+import { LoaderIcon, ThumbUpIcon, ThumbDownIcon } from '@/components/icons';
+import { motion } from 'framer-motion';
 
 interface Question { id: string; text: string; }
 
@@ -29,6 +32,7 @@ export default function DomainAgentPage() {
   const [openSettings, setOpenSettings] = useState(false);
   const [openLogs, setOpenLogs] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -38,6 +42,7 @@ export default function DomainAgentPage() {
 
   async function start() {
     try {
+      setLoading(true);
       const res = await api.createSession(brief);
       setLogs((l) => [
         ...l,
@@ -50,12 +55,15 @@ export default function DomainAgentPage() {
       setPhase('questions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
+    } finally {
+      setLoading(false);
     }
   }
 
   async function submitAnswers() {
     if (!sessionId) return;
     try {
+      setLoading(true);
       const ansRes = await api.sendAnswers(sessionId, { answers });
       setLogs((l) => [
         ...l,
@@ -67,12 +75,15 @@ export default function DomainAgentPage() {
       setPhase('suggestions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
+    } finally {
+      setLoading(false);
     }
   }
 
   async function sendFeedback(continueLoop: boolean) {
     if (!sessionId) return;
     try {
+      setLoading(true);
       const liked: Record<string,string> = {};
       const disliked: Record<string,string> = {};
       Object.entries(feedback).forEach(([d, f]) => {
@@ -99,6 +110,8 @@ export default function DomainAgentPage() {
       }
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -115,12 +128,17 @@ export default function DomainAgentPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-4 space-y-6">
+    <>
+      <DomainAgentHeader
+        onOpenSettings={() => setOpenSettings(true)}
+        onOpenLogs={() => setOpenLogs(true)}
+      />
+      <div className="mx-auto max-w-2xl p-4 space-y-6">
       <Sheet open={openSettings} onOpenChange={setOpenSettings}>
         <SheetTrigger asChild>
           <Button variant="outline">{t('settings')}</Button>
         </SheetTrigger>
-        <SheetContent>
+        <SheetContent className="p-6">
           <SheetHeader>
             <SheetTitle>{t('settings')}</SheetTitle>
           </SheetHeader>
@@ -163,7 +181,7 @@ export default function DomainAgentPage() {
           <SheetTrigger asChild>
             <Button variant="outline">{t('logs')}</Button>
           </SheetTrigger>
-          <SheetContent side="right">
+          <SheetContent side="right" className="p-6">
             <SheetHeader>
               <SheetTitle>{t('logs')}</SheetTitle>
             </SheetHeader>
@@ -190,41 +208,97 @@ export default function DomainAgentPage() {
       )}
 
       {phase === 'start' && (
-        <div className="space-y-4">
-          <div>{t('domainAgentPrompt')}</div>
-          <Textarea value={brief} onChange={(e)=>setBrief(e.target.value)} />
-          <Button onClick={start} className="mt-2">{t('send')}</Button>
+        <div className="space-y-4 text-center">
+          <div className="text-lg font-medium">{t('domainAgentPrompt')}</div>
+          <Textarea
+            value={brief}
+            onChange={(e) => setBrief(e.target.value)}
+            className="glassBubble w-full h-32 text-lg p-4"
+          />
+          <Button onClick={start} className="mt-2 frostedGlow-orangeDeep relative px-6">
+            {loading ? (
+              <span className="absolute inset-y-0 right-4 flex items-center animate-spin"><LoaderIcon /></span>
+            ) : null}
+            {t('send')}
+          </Button>
         </div>
       )}
 
       {phase === 'questions' && (
         <div className="space-y-4">
-          {questions.map((q)=>{
+          {questions.map((q, index) => {
             const inputId = `q-${q.id}`;
             return (
-              <label key={q.id} htmlFor={inputId} className="flex flex-col gap-1">
+              <motion.label
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * index }}
+                key={q.id}
+                htmlFor={inputId}
+                className="flex flex-col gap-2 glassBubble p-4"
+              >
                 {q.text}
-                <Input id={inputId} value={answers[q.id]||''} onChange={(e)=>updateAnswer(q.id,e.target.value)} />
-              </label>
+                <Input
+                  id={inputId}
+                  value={answers[q.id] || ''}
+                  onChange={(e) => updateAnswer(q.id, e.target.value)}
+                />
+              </motion.label>
             );
           })}
-          <Button onClick={submitAnswers}>{t('send')}</Button>
+          <Button onClick={submitAnswers} className="relative">
+            {loading ? (
+              <span className="absolute inset-y-0 right-4 flex items-center animate-spin"><LoaderIcon /></span>
+            ) : null}
+            {t('send')}
+          </Button>
         </div>
       )}
 
       {phase === 'suggestions' && (
         <div className="space-y-4">
           {domains.map((d)=>(
-            <div key={d} className="flex items-center gap-2 border rounded p-2">
-              <button type="button" onClick={()=>updateFeedback(d,true)} className={feedback[d]?.liked?'text-green-600':''}>👍</button>
-              <button type="button" onClick={()=>updateFeedback(d,false)} className={!feedback[d] || feedback[d]?.liked ? '':'text-red-600'}>👎</button>
+            <motion.div
+              key={d}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3 glassBubble p-3"
+            >
+              <button
+                type="button"
+                onClick={() => updateFeedback(d, true)}
+                className={`glassIcon ${feedback[d]?.liked ? 'bg-green-600 text-white' : ''}`}
+              >
+                <ThumbUpIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => updateFeedback(d, false)}
+                className={`glassIcon ${feedback[d] && !feedback[d]?.liked ? 'bg-red-600 text-white' : ''}`}
+              >
+                <ThumbDownIcon />
+              </button>
               <span className="flex-1 text-center">{d}</span>
-              <Input placeholder="" value={feedback[d]?.comment||''} onChange={(e)=>updateComment(d,e.target.value)} />
-            </div>
+              <Input
+                placeholder=""
+                value={feedback[d]?.comment || ''}
+                onChange={(e) => updateComment(d, e.target.value)}
+              />
+            </motion.div>
           ))}
           <div className="flex gap-2">
-            <Button onClick={()=>sendFeedback(true)}>{t('continue')}</Button>
-            <Button variant="outline" onClick={()=>sendFeedback(false)}>{t('stop')}</Button>
+            <Button onClick={() => sendFeedback(true)} className="relative">
+              {loading ? (
+                <span className="absolute inset-y-0 right-4 flex items-center animate-spin"><LoaderIcon /></span>
+              ) : null}
+              {t('continue')}
+            </Button>
+            <Button variant="outline" onClick={() => sendFeedback(false)} className="relative">
+              {loading ? (
+                <span className="absolute inset-y-0 right-4 flex items-center animate-spin"><LoaderIcon /></span>
+              ) : null}
+              {t('stop')}
+            </Button>
           </div>
         </div>
       )}
@@ -232,6 +306,7 @@ export default function DomainAgentPage() {
       {phase === 'done' && (
         <div>{t('done')}</div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
