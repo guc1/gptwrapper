@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,10 +42,64 @@ export default function DomainAgentPage() {
   });
   const [openSettings, setOpenSettings] = useState(false);
   const [openLogs, setOpenLogs] = useState(false);
+  const [openHistory, setOpenHistory] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
+  const [takenDomains, setTakenDomains] = useState<string[]>([]);
+  const [historyAvailable, setHistoryAvailable] = useState<string[]>([]);
+  const [historyTaken, setHistoryTaken] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const { mutate } = useSWRConfig();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const idFromParams = searchParams.get('chatId');
+    if (!idFromParams) return;
+    const stored = typeof window !== 'undefined'
+      ? localStorage.getItem(`domainagent-chat-${idFromParams}`)
+      : null;
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        setSessionId(data.sessionId || null);
+        setChatId(idFromParams);
+        setBrief(data.brief || '');
+        setQuestions(data.questions || []);
+        setAnswers(data.answers || {});
+        setDomains(data.domains || []);
+        setTakenDomains(data.takenDomains || []);
+        setFeedback(data.feedback || {});
+        setPhase(data.phase || 'start');
+        setSettings(data.settings || settings);
+        setLogs(data.logs || []);
+        setHistoryAvailable(data.historyAvailable || []);
+        setHistoryTaken(data.historyTaken || []);
+      } catch {}
+    } else {
+      setChatId(idFromParams);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!chatId) return;
+    const data = {
+      sessionId,
+      brief,
+      questions,
+      answers,
+      domains,
+      takenDomains,
+      feedback,
+      phase,
+      settings,
+      logs,
+      historyAvailable,
+      historyTaken,
+    };
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`domainagent-chat-${chatId}`, JSON.stringify(data));
+    }
+  }, [sessionId, chatId, brief, questions, answers, domains, takenDomains, feedback, phase, settings, logs, historyAvailable, historyTaken]);
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -63,6 +118,10 @@ export default function DomainAgentPage() {
       setSessionId(res.session_id);
       setChatId(res.chat_id);
       setQuestions(res.questions);
+      setDomains([]);
+      setTakenDomains([]);
+      setHistoryAvailable([]);
+      setHistoryTaken([]);
       await api.saveSettings(res.session_id, settings);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'saveSettings', request: settings }]);
       setPhase('questions');
@@ -87,6 +146,9 @@ export default function DomainAgentPage() {
       const gen = await api.generate(sessionId);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'generate', request: {}, response: gen }]);
       setDomains(gen.available);
+      setTakenDomains(gen.taken);
+      setHistoryAvailable((h) => Array.from(new Set([...h, ...gen.available])));
+      setHistoryTaken((h) => Array.from(new Set([...h, ...gen.taken])));
       setPhase('suggestions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
@@ -151,8 +213,9 @@ export default function DomainAgentPage() {
       <DomainAgentHeader
         onOpenSettings={() => setOpenSettings(true)}
         onOpenLogs={() => setOpenLogs(true)}
+        onOpenHistory={() => setOpenHistory(true)}
         showLogs={settings.show_logs}
-        overlayOpen={openSettings || openLogs}
+        overlayOpen={openSettings || openLogs || openHistory}
       />
       <div className="mx-auto max-w-2xl p-4 space-y-6">
       <Sheet open={openSettings} onOpenChange={setOpenSettings}>
@@ -221,6 +284,38 @@ export default function DomainAgentPage() {
           </SheetContent>
         </Sheet>
       )}
+
+      <Sheet open={openHistory} onOpenChange={setOpenHistory}>
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>{t('history')}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 space-y-4 overflow-y-auto pr-2 h-full">
+            <div>
+              <div className="font-semibold text-green-600 mb-1">
+                {t('available')}
+              </div>
+              {historyAvailable.map((d) => (
+                <div key={d}>{d}</div>
+              ))}
+              {historyAvailable.length === 0 && (
+                <div className="text-sm text-muted-foreground">{t('noHistory')}</div>
+              )}
+            </div>
+            <div>
+              <div className="font-semibold text-red-600 mb-1">
+                {t('taken')}
+              </div>
+              {historyTaken.map((d) => (
+                <div key={d}>{d}</div>
+              ))}
+              {historyTaken.length === 0 && (
+                <div className="text-sm text-muted-foreground">{t('noHistory')}</div>
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {phase === 'start' && (
         <div className="space-y-4 text-center mt-10">
@@ -336,7 +431,31 @@ export default function DomainAgentPage() {
       )}
 
       {phase === 'done' && (
-        <div>{t('done')}</div>
+        <div className="space-y-4">
+          <div>{t('done')}</div>
+          <div>
+            <div className="font-semibold text-green-600 mb-1">
+              {t('available')}
+            </div>
+            {historyAvailable.map((d) => (
+              <div key={d}>{d}</div>
+            ))}
+            {historyAvailable.length === 0 && (
+              <div className="text-sm text-muted-foreground">{t('noHistory')}</div>
+            )}
+          </div>
+          <div>
+            <div className="font-semibold text-red-600 mb-1">
+              {t('taken')}
+            </div>
+            {historyTaken.map((d) => (
+              <div key={d}>{d}</div>
+            ))}
+            {historyTaken.length === 0 && (
+              <div className="text-sm text-muted-foreground">{t('noHistory')}</div>
+            )}
+          </div>
+        </div>
       )}
     </div>
     </>
