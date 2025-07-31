@@ -13,11 +13,13 @@ import clsx from 'clsx';
 export default function DomainAgentHeader({
   onOpenSettings,
   onOpenLogs,
+  onOpenHistory,
   showLogs,
   overlayOpen,
 }: {
   onOpenSettings: () => void;
   onOpenLogs: () => void;
+  onOpenHistory: () => void;
   showLogs: boolean;
   overlayOpen: boolean;
 }) {
@@ -68,6 +70,9 @@ export default function DomainAgentHeader({
           {t('logs')}
         </Button>
       )}
+      <Button variant="outline" onClick={onOpenHistory} className="h-9 px-3">
+        {t('history')}
+      </Button>
     </motion.header>
   );
 }

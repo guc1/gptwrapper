@@ -29,7 +29,11 @@ export function AgentDialog() {
   function goToChat(chatId?: string) {
     closePopup();
     if (chatId) {
-      router.push(`/chat/${chatId}`);
+      if (agent && agent.id === 'domain-agent') {
+        router.push(`/domainagent?chatId=${chatId}`);
+      } else {
+        router.push(`/chat/${chatId}`);
+      }
     } else if (agent) {
       if (agent.id === 'domain-agent') {
         router.push('/domainagent');

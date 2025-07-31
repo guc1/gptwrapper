@@ -73,3 +73,8 @@ To set up the project locally, start services with `docker-compose`, install dep
 ### Pull Request Instructions
 -   **Title Format:** `[type]: A brief but descriptive title`
 -   **Types:** `feat`, `fix`, `refactor`, `test`, `docs`.
+
+### Domain Agent Chats
+-   Chats started with the `domain-agent` model must **not** be loaded using the regular chat page.
+-   Link them to `/domainagent?chatId=CHAT_ID` and store their state separately (e.g. `domainagent-chat-CHAT_ID`).
+-   Treat these chats differently in the backend to avoid white screen issues when resuming.
