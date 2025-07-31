@@ -23,6 +23,13 @@ import clsx from 'clsx';
 
 interface Question { id: string; text: string; }
 
+const defaultSettings: DomainSettings = {
+  local_dev: false,
+  creators: ['A'],
+  generation_count: 1,
+  show_logs: false,
+};
+
 export default function DomainAgentPage() {
   const t = useTranslation();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -31,14 +38,13 @@ export default function DomainAgentPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string,string>>({});
   const [domains, setDomains] = useState<string[]>([]);
+  const [history, setHistory] = useState<{ available: string[]; taken: string[] }>({
+    available: [],
+    taken: [],
+  });
   const [feedback, setFeedback] = useState<Record<string,{liked:boolean; comment:string}>>({});
   const [phase, setPhase] = useState<'start'|'questions'|'suggestions'|'done'>('start');
-  const [settings, setSettings] = useState<DomainSettings>({
-    local_dev: false,
-    creators: ['A'],
-    generation_count: 1,
-    show_logs: false,
-  });
+  const [settings, setSettings] = useState<DomainSettings>(defaultSettings);
   const [openSettings, setOpenSettings] = useState(false);
   const [openLogs, setOpenLogs] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
@@ -47,10 +53,53 @@ export default function DomainAgentPage() {
   const { mutate } = useSWRConfig();
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('domainAgentState');
+      if (stored) {
+        const s = JSON.parse(stored);
+        setSessionId(s.sessionId ?? null);
+        setChatId(s.chatId ?? null);
+        setBrief(s.brief ?? '');
+        setQuestions(s.questions ?? []);
+        setAnswers(s.answers ?? {});
+        setDomains(s.domains ?? []);
+        setFeedback(s.feedback ?? {});
+        setPhase(s.phase ?? 'start');
+        setSettings(s.settings ?? defaultSettings);
+        setHistory(s.history ?? { available: [], taken: [] });
+        setLogs(s.logs ?? []);
+      }
+    } catch {
+      // ignore parsing errors
+    }
+  }, []);
+
+  useEffect(() => {
     if (sessionId && openSettings) {
       api.getSettings(sessionId).then(setSettings).catch(() => {});
     }
   }, [sessionId, openSettings]);
+
+  useEffect(() => {
+    const state = {
+      sessionId,
+      chatId,
+      brief,
+      questions,
+      answers,
+      domains,
+      feedback,
+      phase,
+      settings,
+      history,
+      logs,
+    };
+    try {
+      localStorage.setItem('domainAgentState', JSON.stringify(state));
+    } catch {
+      // ignore
+    }
+  }, [sessionId, chatId, brief, questions, answers, domains, feedback, phase, settings, history, logs]);
 
   async function start() {
     setLoading(true);
@@ -63,6 +112,10 @@ export default function DomainAgentPage() {
       setSessionId(res.session_id);
       setChatId(res.chat_id);
       setQuestions(res.questions);
+      setAnswers({});
+      setDomains([]);
+      setFeedback({});
+      setHistory({ available: [], taken: [] });
       await api.saveSettings(res.session_id, settings);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'saveSettings', request: settings }]);
       setPhase('questions');
@@ -87,6 +140,10 @@ export default function DomainAgentPage() {
       const gen = await api.generate(sessionId);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'generate', request: {}, response: gen }]);
       setDomains(gen.available);
+      setHistory((h) => ({
+        available: [...h.available, ...gen.available],
+        taken: [...h.taken, ...gen.taken],
+      }));
       setPhase('suggestions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
@@ -153,6 +210,7 @@ export default function DomainAgentPage() {
         onOpenLogs={() => setOpenLogs(true)}
         showLogs={settings.show_logs}
         overlayOpen={openSettings || openLogs}
+        history={history}
       />
       <div className="mx-auto max-w-2xl p-4 space-y-6">
       <Sheet open={openSettings} onOpenChange={setOpenSettings}>
@@ -336,7 +394,23 @@ export default function DomainAgentPage() {
       )}
 
       {phase === 'done' && (
-        <div>{t('done')}</div>
+        <div className="space-y-2">
+          <div>{t('done')}</div>
+          <div>
+            <strong>{t('history')}:</strong>{' '}
+            {history.available.length > 0 && (
+              <span>
+                {t('domainHistoryAvailable')}: {history.available.join(', ')}{' '}
+              </span>
+            )}
+            {history.taken.length > 0 && (
+              <span>
+                {history.available.length > 0 ? '| ' : ''}
+                {t('domainHistoryTaken')}: {history.taken.join(', ')}
+              </span>
+            )}
+          </div>
+        </div>
       )}
     </div>
     </>
