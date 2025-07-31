@@ -15,11 +15,13 @@ export default function DomainAgentHeader({
   onOpenLogs,
   showLogs,
   overlayOpen,
+  history,
 }: {
   onOpenSettings: () => void;
   onOpenLogs: () => void;
   showLogs: boolean;
   overlayOpen: boolean;
+  history: { available: string[]; taken: string[] };
 }) {
   const { toggleSidebar, open: isSidebarOpen } = useSidebar();
   const { data: session } = useSession();
@@ -53,6 +55,23 @@ export default function DomainAgentHeader({
         session?.user && (
           <MessageLimitIndicator userId={session.user.id} className="hidden sm:block" />
         )
+      )}
+      {(history.available.length > 0 || history.taken.length > 0) && (
+        <div className="hidden sm:flex gap-2 text-xs overflow-x-auto whitespace-nowrap px-2">
+          <span className="font-semibold mr-1">{t('domainAgentHistory')}:</span>
+          <span className="flex gap-1">
+            {history.available.map((d) => (
+              <span key={`a-${d}`} className="text-green-600">
+                {d}
+              </span>
+            ))}
+            {history.taken.map((d) => (
+              <span key={`t-${d}`} className="line-through opacity-70">
+                {d}
+              </span>
+            ))}
+          </span>
+        </div>
       )}
       <div className="flex-1" />
       {session?.user && session.user.models?.length !== 3 && (

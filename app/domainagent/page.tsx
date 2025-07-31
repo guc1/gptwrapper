@@ -42,9 +42,50 @@ export default function DomainAgentPage() {
   const [openSettings, setOpenSettings] = useState(false);
   const [openLogs, setOpenLogs] = useState(false);
   const [logs, setLogs] = useState<Array<{ id: string; type: string; request: any; response?: any }>>([]);
+  const [history, setHistory] = useState<{ available: string[]; taken: string[] }>({ available: [], taken: [] });
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const { mutate } = useSWRConfig();
+
+  const STORAGE_KEY = 'domainAgentState';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      if (data.sessionId) setSessionId(data.sessionId);
+      if (data.chatId) setChatId(data.chatId);
+      if (data.brief) setBrief(data.brief);
+      if (data.questions) setQuestions(data.questions);
+      if (data.answers) setAnswers(data.answers);
+      if (data.domains) setDomains(data.domains);
+      if (data.feedback) setFeedback(data.feedback);
+      if (data.phase) setPhase(data.phase);
+      if (data.settings) setSettings(data.settings);
+      if (data.logs) setLogs(data.logs);
+      if (data.history) setHistory(data.history);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const data = {
+      sessionId,
+      chatId,
+      brief,
+      questions,
+      answers,
+      domains,
+      feedback,
+      phase,
+      settings,
+      logs,
+      history,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }, [sessionId, chatId, brief, questions, answers, domains, feedback, phase, settings, logs, history]);
 
   useEffect(() => {
     if (sessionId && openSettings) {
@@ -63,6 +104,7 @@ export default function DomainAgentPage() {
       setSessionId(res.session_id);
       setChatId(res.chat_id);
       setQuestions(res.questions);
+      setHistory({ available: [], taken: [] });
       await api.saveSettings(res.session_id, settings);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'saveSettings', request: settings }]);
       setPhase('questions');
@@ -87,6 +129,10 @@ export default function DomainAgentPage() {
       const gen = await api.generate(sessionId);
       setLogs((l) => [...l, { id: crypto.randomUUID(), type: 'generate', request: {}, response: gen }]);
       setDomains(gen.available);
+      setHistory((h) => ({
+        available: [...h.available, ...(gen.available || [])],
+        taken: [...h.taken, ...(gen.taken || [])],
+      }));
       setPhase('suggestions');
     } catch (err:any) {
       toast({ type: 'error', description: err.message });
@@ -153,6 +199,7 @@ export default function DomainAgentPage() {
         onOpenLogs={() => setOpenLogs(true)}
         showLogs={settings.show_logs}
         overlayOpen={openSettings || openLogs}
+        history={history}
       />
       <div className="mx-auto max-w-2xl p-4 space-y-6">
       <Sheet open={openSettings} onOpenChange={setOpenSettings}>
@@ -336,7 +383,26 @@ export default function DomainAgentPage() {
       )}
 
       {phase === 'done' && (
-        <div>{t('done')}</div>
+        <div className="space-y-2">
+          <div>{t('done')}</div>
+          {(history.available.length > 0 || history.taken.length > 0) && (
+            <div className="mt-2">
+              <div className="font-semibold mb-1">{t('domainAgentHistory')}:</div>
+              <div className="flex flex-wrap gap-2">
+                {history.available.map((d) => (
+                  <span key={`done-a-${d}`} className="text-green-600">
+                    {d}
+                  </span>
+                ))}
+                {history.taken.map((d) => (
+                  <span key={`done-t-${d}`} className="line-through opacity-70">
+                    {d}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
     </>
