@@ -291,7 +291,7 @@ export async function GET(request: NextRequest) {
     // The fallback function MUST return a Promise<ReadableStream | Response> or ReadableStream | Response
     const resumedStream = await streamContext.resumableStream(
       streamId || chatId,
-      async () => {
+      () => {
         const data = new StreamData();
         data.close(); // Close the StreamData instance, making its stream end.
         return data.stream; // This is a ReadableStream
