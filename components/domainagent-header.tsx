@@ -15,11 +15,13 @@ export default function DomainAgentHeader({
   onOpenLogs,
   showLogs,
   overlayOpen,
+  history,
 }: {
   onOpenSettings: () => void;
   onOpenLogs: () => void;
   showLogs: boolean;
   overlayOpen: boolean;
+  history: { available: string[]; taken: string[] };
 }) {
   const { toggleSidebar, open: isSidebarOpen } = useSidebar();
   const { data: session } = useSession();
@@ -54,7 +56,20 @@ export default function DomainAgentHeader({
           <MessageLimitIndicator userId={session.user.id} className="hidden sm:block" />
         )
       )}
-      <div className="flex-1" />
+      <div className="flex-1 overflow-x-auto whitespace-nowrap text-xs text-center">
+        <strong>{t('history')}:</strong>{' '}
+        {history.available.length > 0 && (
+          <span>
+            {t('domainHistoryAvailable')}: {history.available.join(', ')}{' '}
+          </span>
+        )}
+        {history.taken.length > 0 && (
+          <span>
+            {history.available.length > 0 ? '| ' : ''}
+            {t('domainHistoryTaken')}: {history.taken.join(', ')}
+          </span>
+        )}
+      </div>
       {session?.user && session.user.models?.length !== 3 && (
         <Button variant="outline" className="hidden md:flex h-9 px-3" onClick={() => openUpgradePopup()}>
           {t('upgrade')}
